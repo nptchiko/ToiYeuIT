@@ -1,0 +1,17 @@
+name: Cai nay giup auto test va deploy ne 
+
+on:
+  push:
+    branches:
+      - main 
+      - mikudeptrai
+
+jobs:
+  test:
+     runs-on: self-hosted
+     steps:
+        - name: checkout 
+          uses: actions/checkout@v2  
+        
+        - name: check if working 
+          run: ls
