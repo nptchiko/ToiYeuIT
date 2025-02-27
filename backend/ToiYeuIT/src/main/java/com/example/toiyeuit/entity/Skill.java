@@ -3,23 +3,14 @@ package com.example.toiyeuit.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="role")
-public class Role {
+@Table(name="skill")
+public class Skill {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "role_id")
     private Integer id;
 
     private String name;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public Integer getId() {
         return id;
@@ -27,5 +18,13 @@ public class Role {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
