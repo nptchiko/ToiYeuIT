@@ -1,4 +1,7 @@
 package com.example.toiyeuit.enums;
 
-public class Level {
+public enum Level {
+    BASIC,
+    INTERMEDIATE,
+    ADVANCE
 }
