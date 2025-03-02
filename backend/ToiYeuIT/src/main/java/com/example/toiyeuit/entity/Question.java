@@ -3,33 +3,37 @@ package com.example.toiyeuit.entity;
 import com.example.toiyeuit.enums.QuestionScope;
 import com.example.toiyeuit.enums.QuestionType;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.PackagePrivate;
 
 
 @Entity
+@Table(name = "Question")
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    String id;
+    @Column(name = "ques_id")
+    Long id;
 
     String description;
 
     @Column(name = "correct_ans", nullable = false)
     String correctAnswer;
 
-    @Column(name = "ques_scope")
     @Enumerated(EnumType.STRING)
-    QuestionScope questionScope;
+    @Column(columnDefinition = "varchar(32) default 'TEST'")
+    QuestionScope questionScope = QuestionScope.TEST;
 
-    @Column(name = "ques_type")
     @Enumerated(EnumType.STRING)
-    QuestionType questionType;
+    @Column(columnDefinition = "varchar(32) default 'MULTICHOICE'")
+    QuestionType questionType = QuestionType.MULTICHOICE;
+
 
 }

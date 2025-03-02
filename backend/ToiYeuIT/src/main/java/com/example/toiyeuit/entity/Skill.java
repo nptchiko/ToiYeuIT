@@ -1,8 +1,13 @@
 package com.example.toiyeuit.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Entity
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name="skill")
 public class Skill {
 
@@ -12,19 +17,4 @@ public class Skill {
 
     private String name;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

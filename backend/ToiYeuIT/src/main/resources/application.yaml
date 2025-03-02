@@ -10,11 +10,14 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
 
     database: mysql
     show-sql: true
     open-in-view: true
+    properties:
+      hibernate:
+        format_sql: true
 server:
   port: 8081
 

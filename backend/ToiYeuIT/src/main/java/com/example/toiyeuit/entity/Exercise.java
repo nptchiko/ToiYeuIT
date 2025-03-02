@@ -1,8 +1,21 @@
 package com.example.toiyeuit.entity;
 
+import com.example.toiyeuit.enums.QuestionType;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Set;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Entity
+@Getter // auto get
+@Setter // auto set
+@Builder    // builder pattern
+@NoArgsConstructor //constructor ko tham so
+@AllArgsConstructor // constructor all tham so
+@FieldDefaults(level = AccessLevel.PRIVATE) //Entity
 @Table(name="exercise")
 public class Exercise {
 
@@ -11,7 +24,9 @@ public class Exercise {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name="lesson_id")
+    @JoinColumn(name="lesson_id",
+        referencedColumnName = "lesson_id"
+    )
     private Lesson lesson;
 
     private String instruction;
@@ -20,53 +35,14 @@ public class Exercise {
 
     private String mediaUrl;
 
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private QuestionType type;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Lesson getLesson() {
-        return lesson;
-    }
-
-    public void setLesson(Lesson lesson) {
-        this.lesson = lesson;
-    }
-
-    public String getInstruction() {
-        return instruction;
-    }
-
-    public void setInstruction(String instruction) {
-        this.instruction = instruction;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getMediaUrl() {
-        return mediaUrl;
-    }
-
-    public void setMediaUrl(String mediaUrl) {
-        this.mediaUrl = mediaUrl;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinTable(
+            name = "exercise_detail",
+            joinColumns = @JoinColumn(name = "ex_id"),
+            inverseJoinColumns = @JoinColumn(name = "question_id")
+    )
+    Set<Question> questions;
 }

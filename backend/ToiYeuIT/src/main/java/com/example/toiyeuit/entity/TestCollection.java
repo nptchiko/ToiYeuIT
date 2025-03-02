@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Table(name = "test_collection")
 public class TestCollection {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,10 +18,13 @@ public class TestCollection {
 
     String name;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "test_collection_id",
-            joinColumns = @JoinColumn(name = "id", referencedColumnName = "id")
-    )
+    @ManyToOne
+    @JoinColumn(name = "skill_id")
     Skill skill;
+
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    Course course;
+
+
 }

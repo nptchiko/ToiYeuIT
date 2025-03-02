@@ -2,11 +2,23 @@ package com.example.toiyeuit.entity;
 
 import com.example.toiyeuit.enums.Gender;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Set;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Entity
+@Getter // auto get
+@Setter // auto set
+@Builder    // builder pattern
+@NoArgsConstructor //constructor ko tham so
+@AllArgsConstructor // constructor all tham so
+@FieldDefaults(level = AccessLevel.PRIVATE) //EntGetter
 @Table(name="user")
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="user_id")
@@ -27,59 +39,11 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
-    public String getUsername() {
-        return username;
-    }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    Set<Enrollment> enrollments;
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL)
+    Set<FlashcardDeck> flashcardDeck;
 }
