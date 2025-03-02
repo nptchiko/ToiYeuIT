@@ -1,63 +1,39 @@
 package com.example.toiyeuit.entity;
 
 import com.example.toiyeuit.enums.QuestionScope;
+import com.example.toiyeuit.enums.QuestionType;
 import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.PackagePrivate;
+
 
 @Entity
-@Table(name="question")
+@Table(name = "Question")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Question {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="ques_id")
-    private Integer id;
+    @Column(name = "ques_id")
+    Long id;
 
-    private String description;
+    String description;
 
-    private String questionType;
+    @Column(name = "correct_ans", nullable = false)
+    String correctAnswer;
 
-    private QuestionScope questionScope;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "varchar(32) default 'TEST'")
+    QuestionScope questionScope = QuestionScope.TEST;
 
-    @Column(name="correct_ans")
-    private String answer;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "varchar(32) default 'MULTICHOICE'")
+    QuestionType questionType = QuestionType.MULTICHOICE;
 
-    public Integer getId() {
-        return id;
-    }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getQuestionType() {
-        return questionType;
-    }
-
-    public void setQuestionType(String questionType) {
-        this.questionType = questionType;
-    }
-
-    public QuestionScope getQuestionScope() {
-        return questionScope;
-    }
-
-    public void setQuestionScope(QuestionScope questionScope) {
-        this.questionScope = questionScope;
-    }
-
-    public String getAnswer() {
-        return answer;
-    }
-
-    public void setAnswer(String answer) {
-        this.answer = answer;
-    }
 }

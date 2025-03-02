@@ -2,9 +2,22 @@ spring:
   application:
       name: ToiYeuIT
 
+
   datasource:
     username: root
     password: 17071134
     url: jdbc:mysql://localhost:3306/ToiYeuIT?createDatabaseIfNotExist=true
     driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    database: mysql
+    show-sql: true
+    open-in-view: true
+    properties:
+      hibernate:
+        format_sql: true
+server:
+  port: 8081
 
