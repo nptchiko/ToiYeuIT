@@ -36,7 +36,7 @@ jobs:
             distribution: 'temurin' 
         
         - name: Set up maven
-          run:  cd ${{ APP_PATH }} && mvn clean install
+          run:  cd ${{ env.APP_PATH }} && mvn clean install
 
         - name: Build Docker image 
           run: docker build -t ${{ env.IMAGE_NAME  }} ${{   env.APP_PATH   }}
