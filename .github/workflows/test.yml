@@ -1,7 +1,7 @@
 name: Cai nay giup auto test va deploy ne 
 
 on:
-  pull-request:
+  pull_request:
     branches:
       - main  
   push:
