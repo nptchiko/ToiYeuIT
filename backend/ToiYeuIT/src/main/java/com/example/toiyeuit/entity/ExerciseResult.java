@@ -21,7 +21,7 @@ public class ExerciseResult {
     @MapsId(value = "submit_id")
     @ManyToOne
     @JoinColumn(name = "id")
-    ExerciseSubmision exerciseSubmision;
+    ExerciseSubmission exerciseSubmission;
 
     @MapsId(value = "ques_id")
     @ManyToOne
