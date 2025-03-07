@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor // constructor all tham so
 @FieldDefaults(level = AccessLevel.PRIVATE) //E
 @Table(name = "test_submission")
-public class TestSubmision {
+public class TestSubmission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "submission_id")

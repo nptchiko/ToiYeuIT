@@ -21,7 +21,7 @@ public class TestResult {
     @MapsId(value = "test_id")
     @ManyToOne
     @JoinColumn(name = "id")
-    TestSubmision testSubmision;
+    TestSubmission testSubmission;
 
     @MapsId(value = "ques_id")
     @ManyToOne
