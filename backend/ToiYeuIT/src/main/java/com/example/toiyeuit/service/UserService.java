@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -31,18 +32,22 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserDTO> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
-    public User getUserById(long id) throws ResourceNotFoundException {
-        return userRepository.findById(id)
+    public UserDTO getUserById(long id) throws ResourceNotFoundException {
+        User u = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return convertToDto(u);
     }
 
-    public User getUserByEmail(String email) throws ResourceNotFoundException {
-        return userRepository.findByEmail(email)
+    public UserDTO getUserByEmail(String email) throws ResourceNotFoundException {
+         User u = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return convertToDto(u);
     }
 
     public Boolean existsByEmail(String email) throws ResourceNotFoundException {
@@ -54,7 +59,7 @@ public class UserService {
     }
 
     @Transactional
-    public User createUser(UserDTO userDTO) throws UserAlreadyExistsException {
+    public UserDTO createUser(UserDTO userDTO) throws UserAlreadyExistsException {
         if (userRepository.existsByEmail(userDTO.getEmail().toLowerCase())) {
             throw new UserAlreadyExistsException("User already exists");
         }
@@ -78,13 +83,14 @@ public class UserService {
 
         user.setEmail(user.getEmail().toLowerCase());
         try {
-            return userRepository.save(user);
+            return convertToDto(userRepository.save(user));
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw new RuntimeException("Something went wrong when creating user");
         }
     }
 
+    @Transactional
     public void deleteUser(long id) throws ResourceNotFoundException {
         if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("User not found");
@@ -92,10 +98,22 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    @Transactional
     public void changePassword(long id, String newPassword) throws ResourceNotFoundException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    private UserDTO convertToDto(User user) {
+        return UserDTO.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .gender(user.getGender())
+                .phone(user.getPhone())
+                .roleName(user.getRole() != null ? user.getRole().getName() : null)
+                .build();
     }
 }
