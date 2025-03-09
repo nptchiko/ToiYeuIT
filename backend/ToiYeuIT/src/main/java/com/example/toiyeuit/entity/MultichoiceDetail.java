@@ -28,13 +28,3 @@ public class MultichoiceDetail {
     String description;
 
 }
-@Getter
-@Setter
-@Embeddable
-@FieldDefaults(level = AccessLevel.PRIVATE)
-class Key implements Serializable {
-    @Enumerated(EnumType.STRING)
-    AnswerKey key;
-
-    Long question_id;
-}

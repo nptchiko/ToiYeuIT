@@ -4,7 +4,10 @@ import com.example.toiyeuit.entity.Course;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface CourseRepository extends JpaRepository<Course, Long> {
+import java.util.Optional;
 
+@Repository
+public interface CourseRepository extends JpaRepository<Course, Integer> {
+    @Override
+    Optional<Course> findById(Integer integer);
 }

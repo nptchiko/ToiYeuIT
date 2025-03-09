@@ -35,11 +35,3 @@ public class ExerciseResult {
     String correct_ans;
 }
 
-@Getter
-@Setter
-@Embeddable
-@FieldDefaults(level = AccessLevel.PRIVATE)
-class ResultKey implements Serializable {
-    Long submit_id;
-    Long ques_id;
-}

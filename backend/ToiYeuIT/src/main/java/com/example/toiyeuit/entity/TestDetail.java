@@ -38,11 +38,3 @@ public class TestDetail {
     int part;
 }
 
-@Getter
-@Setter
-@Embeddable
-@FieldDefaults(level = AccessLevel.PRIVATE)
-class TestKey implements Serializable {
-    Integer test_id;
-    Long ques_id;
-}

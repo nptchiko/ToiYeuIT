@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS ToiYeuIT;
+USE ToiYeuIT;
 CREATE TABLE `role` (
   `role_id` int PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(255)

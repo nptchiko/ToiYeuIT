@@ -35,11 +35,3 @@ public class TestResult {
     String correct_ans;
 }
 
-@Getter
-@Setter
-@Embeddable
-@FieldDefaults(level = AccessLevel.PRIVATE)
-class TResultKey implements Serializable {
-    Long test_id;
-    Long ques_id;
-}

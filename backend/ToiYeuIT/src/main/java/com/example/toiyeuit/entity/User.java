@@ -30,6 +30,7 @@ public class User {
 
     private String email;
 
+    @Column(columnDefinition = "varchar(32) default 'MALE'")
     @Enumerated(EnumType.STRING)
     private Gender gender;
 

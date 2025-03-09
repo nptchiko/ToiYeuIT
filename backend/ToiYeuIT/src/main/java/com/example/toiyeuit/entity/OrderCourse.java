@@ -42,12 +42,3 @@ public class OrderCourse {
 
 }
 
-@Getter
-@Setter
-@Embeddable
-@FieldDefaults(level = AccessLevel.PRIVATE)
-class OrderKey implements Serializable {
-    Integer course_id;
-    Long user_id;
-}
-
