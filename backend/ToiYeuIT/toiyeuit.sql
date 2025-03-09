@@ -6,7 +6,7 @@ CREATE TABLE `role` (
 );
 
 CREATE TABLE `user` (
-  `user_id` bigint PRIMARY KEY,
+  `user_id` bigint PRIMARY KEY AUTO_INCREMENT,
   `username` varchar(255) UNIQUE NOT NULL,
   `password` varchar(255) NOT NULL,
   `email` varchar(255) UNIQUE NOT NULL,

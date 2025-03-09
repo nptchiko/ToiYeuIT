@@ -7,8 +7,11 @@ import com.example.toiyeuit.exception.UserAlreadyExistsException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
 import com.example.toiyeuit.repository.RoleRepository;
 import com.example.toiyeuit.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,6 +21,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
@@ -41,7 +45,7 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
-    public Boolean exitsByEmail(String email) throws ResourceNotFoundException {
+    public Boolean existsByEmail(String email) throws ResourceNotFoundException {
         return userRepository.existsByEmail(email);
     }
 
@@ -49,6 +53,7 @@ public class UserService {
         return userRepository.existsByUsername(username);
     }
 
+    @Transactional
     public User createUser(UserDTO userDTO) throws UserAlreadyExistsException {
         if (userRepository.existsByEmail(userDTO.getEmail().toLowerCase())) {
             throw new UserAlreadyExistsException("User already exists");
@@ -59,22 +64,25 @@ public class UserService {
         }
 
         // get role from roleName, default to USER if not found
-        Role role = roleRepository.findByName(userDTO.getRoleName())
+        Role userRole = roleRepository.findByName(userDTO.getRoleName())
                 .orElseGet(() -> roleRepository.findByName("USER")
-                        .orElseThrow(() -> new ResourceNotFoundException("Default role not found"))));
-
+                        .orElseThrow(() -> new ResourceNotFoundException("Default role not found")));
         User user = User.builder()
                         .username(userDTO.getUsername())
                         .email(userDTO.getEmail())
                         .password(passwordEncoder.encode(userDTO.getPassword()))
                         .phone(userDTO.getPhone())
                         .gender(userDTO.getGender())
-                        .role(role)
+                        .role(userRole)
                 .build();
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setEmail(user.getEmail().toLowerCase());
-        return userRepository.save(user);
+        try {
+            return userRepository.save(user);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new RuntimeException("Something went wrong when creating user");
+        }
     }
 
     public void deleteUser(long id) throws ResourceNotFoundException {
