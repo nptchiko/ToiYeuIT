@@ -2,6 +2,6 @@ package com.example.toiyeuit.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String message) {
-        super(message);
+        super(essage);
     }
 }

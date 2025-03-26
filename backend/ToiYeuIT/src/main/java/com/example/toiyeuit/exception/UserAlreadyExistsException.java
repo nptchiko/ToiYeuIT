@@ -1,7 +1,7 @@
 package com.example.toiyeuit.exception;
 
-public class UserAlreadyExistsException extends RuntimeException {
-    public UserAlreadyExistsException(String message) {
-        super(message);
+public class UserAlreadyExistsException extends AppException {
+    public UserAlreadyExistsException(){
+        super(ErrorCode.USER_EXISTED);
     }
 }

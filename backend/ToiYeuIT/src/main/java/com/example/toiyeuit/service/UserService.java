@@ -61,11 +61,11 @@ public class UserService {
     @Transactional
     public UserDTO createUser(UserDTO userDTO) throws UserAlreadyExistsException {
         if (userRepository.existsByEmail(userDTO.getEmail().toLowerCase())) {
-            throw new UserAlreadyExistsException("User already exists");
+            throw new UserAlreadyExistsException();
         }
 
         if (userRepository.existsByUsername(userDTO.getUsername().toLowerCase())) {
-            throw new UserAlreadyExistsException("User already exists");
+            throw new UserAlreadyExistsException();
         }
 
         // get role from roleName, default to USER if not found
