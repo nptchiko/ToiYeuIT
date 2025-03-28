@@ -1,6 +1,5 @@
 package com.example.toiyeuit.dto;
 
-import com.example.toiyeuit.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,5 +16,5 @@ public class UserDTO {
     private String password;
     private String gender;
     private String phone;
-    private String roleName;
+    private String role;
 }

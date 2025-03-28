@@ -2,8 +2,9 @@ package com.example.toiyeuit.controller;
 
 import com.example.toiyeuit.dto.UserDTO;
 import com.example.toiyeuit.dto.UserResponseDTO;
-import com.example.toiyeuit.entity.User;
-import com.example.toiyeuit.repository.UserRepository;
+import com.example.toiyeuit.exception.AlreadyExistsException;
+import com.example.toiyeuit.exception.ResourceNotFoundException;
+import com.example.toiyeuit.exception.UserServiceLogicException;
 import com.example.toiyeuit.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,16 +31,13 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(userService.getUserById(id));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long id) throws ResourceNotFoundException {
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> createUser(@RequestBody UserDTO userDTO) throws UserServiceLogicException,
+            ResourceNotFoundException, AlreadyExistsException {
         UserResponseDTO createdUser = userService.createUser(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
