@@ -6,7 +6,6 @@ import com.example.toiyeuit.entity.Role;
 import com.example.toiyeuit.entity.User;
 import com.example.toiyeuit.enums.Gender;
 import com.example.toiyeuit.exception.AlreadyExistsException;
-import com.example.toiyeuit.exception.UserAlreadyExistsException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
 import com.example.toiyeuit.exception.UserServiceLogicException;
 import com.example.toiyeuit.repository.RoleRepository;
@@ -43,13 +42,19 @@ public class UserService {
     }
 
     public UserResponseDTO getUserById(long id) throws ResourceNotFoundException {
-        User u = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return convertToDto(u);
+
+        try {
+            User u = userRepository.findById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+            return convertToDto(u);
+        } catch(Exception e) {
+            throw new ResourceNotFoundException("User not found");
+        }
     }
 
     public UserResponseDTO getUserByEmail(String email) throws ResourceNotFoundException {
-         User u = userRepository.findByEmail(email)
+        User u = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return convertToDto(u);
     }
@@ -66,24 +71,26 @@ public class UserService {
     public UserResponseDTO createUser(UserDTO userDTO) throws AlreadyExistsException,
             UserServiceLogicException {
         if (userRepository.existsByEmail(userDTO.getEmail().toLowerCase())) {
-            throw new AlreadyExistsException("User already exists");
+            throw new AlreadyExistsException("User with email " + userDTO.getEmail() + " already exists");
         }
 
         if (userRepository.existsByUsername(userDTO.getUsername().toLowerCase())) {
-            throw new AlreadyExistsException("User already exists");
+            throw new AlreadyExistsException("User with username: " + userDTO.getUsername() + " already exists");
         }
 
         // get role from roleName, default to USER if not found
-        Role userRole = roleRepository.findByName(userDTO.getRoleName())
+
+        Role userRole = roleRepository.findByName(userDTO.getRole())
                 .orElseGet(() -> roleRepository.findByName("USER")
                         .orElseThrow(() -> new ResourceNotFoundException("Default role not found")));
+
         User user = User.builder()
-                        .username(userDTO.getUsername())
-                        .email(userDTO.getEmail())
-                        .password(passwordEncoder.encode(userDTO.getPassword()))
-                        .phone(userDTO.getPhone())
-                        .gender(Gender.fromString(userDTO.getGender()))
-                        .role(userRole)
+                .username(userDTO.getUsername())
+                .email(userDTO.getEmail())
+                .password(passwordEncoder.encode(userDTO.getPassword()))
+                .phone(userDTO.getPhone())
+                .gender(Gender.fromString(userDTO.getGender()))
+                .role(userRole)
                 .build();
 
         user.setEmail(user.getEmail().toLowerCase());

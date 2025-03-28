@@ -1,10 +1,10 @@
 package com.example.toiyeuit.controller;
-
 import com.example.toiyeuit.dto.CourseRequestDTO;
 import com.example.toiyeuit.entity.Course;
 import com.example.toiyeuit.enums.Level;
 import com.example.toiyeuit.exception.AlreadyExistsException;
 import com.example.toiyeuit.exception.CourseServiceLogicException;
+import com.example.toiyeuit.exception.ResourceNotFoundException;
 import com.example.toiyeuit.repository.CourseRepository;
 import com.example.toiyeuit.service.CourseService;
 import org.springframework.http.HttpStatus;
@@ -33,7 +33,7 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Course> findById(@PathVariable Integer id) {
+    public ResponseEntity<Course> findById(@PathVariable Integer id) throws ResourceNotFoundException {
         Course course = courseService.findById(id);
 
         return new ResponseEntity<>(course, HttpStatus.OK);
@@ -54,5 +54,18 @@ public class CourseController {
 
         Course createdCourse = courseRepository.save(courseEntity);
         return new ResponseEntity<>(createdCourse, HttpStatus.CREATED);
+    }
+
+    @PutMapping
+    public ResponseEntity<Course> update(@RequestBody Course course) throws CourseServiceLogicException,
+            ResourceNotFoundException {
+
+        return new ResponseEntity<>(courseService.update(course), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteById(@PathVariable Integer id) throws ResourceNotFoundException {
+        courseRepository.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
