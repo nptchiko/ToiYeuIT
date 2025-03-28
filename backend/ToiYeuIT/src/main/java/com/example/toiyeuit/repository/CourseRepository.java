@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface CourseRepository extends JpaRepository<Course, Integer> {
     @Override
     Optional<Course> findById(Integer integer);
+    Optional<Course> findByTitle(String title);
 }

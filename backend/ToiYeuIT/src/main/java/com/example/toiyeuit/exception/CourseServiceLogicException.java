@@ -1,7 +1,7 @@
 package com.example.toiyeuit.exception;
 
-public class CategoryServiceLogicException extends RuntimeException {
-    public CategoryServiceLogicException(String message) {
+public class CourseServiceLogicException extends RuntimeException {
+    public CourseServiceLogicException(String message) {
         super(message);
     }
 }
