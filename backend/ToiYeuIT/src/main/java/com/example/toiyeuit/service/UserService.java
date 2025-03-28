@@ -1,10 +1,14 @@
 package com.example.toiyeuit.service;
 
 import com.example.toiyeuit.dto.UserDTO;
+import com.example.toiyeuit.dto.UserResponseDTO;
 import com.example.toiyeuit.entity.Role;
 import com.example.toiyeuit.entity.User;
+import com.example.toiyeuit.enums.Gender;
+import com.example.toiyeuit.exception.AlreadyExistsException;
 import com.example.toiyeuit.exception.UserAlreadyExistsException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
+import com.example.toiyeuit.exception.UserServiceLogicException;
 import com.example.toiyeuit.repository.RoleRepository;
 import com.example.toiyeuit.repository.UserRepository;
 import org.slf4j.Logger;
@@ -32,19 +36,19 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<UserDTO> getAllUsers() {
+    public List<UserResponseDTO> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    public UserDTO getUserById(long id) throws ResourceNotFoundException {
+    public UserResponseDTO getUserById(long id) throws ResourceNotFoundException {
         User u = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return convertToDto(u);
     }
 
-    public UserDTO getUserByEmail(String email) throws ResourceNotFoundException {
+    public UserResponseDTO getUserByEmail(String email) throws ResourceNotFoundException {
          User u = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return convertToDto(u);
@@ -59,13 +63,14 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO createUser(UserDTO userDTO) throws UserAlreadyExistsException {
+    public UserResponseDTO createUser(UserDTO userDTO) throws AlreadyExistsException,
+            UserServiceLogicException {
         if (userRepository.existsByEmail(userDTO.getEmail().toLowerCase())) {
-            throw new UserAlreadyExistsException("User already exists");
+            throw new AlreadyExistsException("User already exists");
         }
 
         if (userRepository.existsByUsername(userDTO.getUsername().toLowerCase())) {
-            throw new UserAlreadyExistsException("User already exists");
+            throw new AlreadyExistsException("User already exists");
         }
 
         // get role from roleName, default to USER if not found
@@ -77,7 +82,7 @@ public class UserService {
                         .email(userDTO.getEmail())
                         .password(passwordEncoder.encode(userDTO.getPassword()))
                         .phone(userDTO.getPhone())
-                        .gender(userDTO.getGender())
+                        .gender(Gender.fromString(userDTO.getGender()))
                         .role(userRole)
                 .build();
 
@@ -86,7 +91,7 @@ public class UserService {
             return convertToDto(userRepository.save(user));
         } catch (Exception e) {
             logger.error(e.getMessage());
-            throw new RuntimeException("Something went wrong when creating user");
+            throw new UserServiceLogicException("User creation failed");
         }
     }
 
@@ -106,12 +111,12 @@ public class UserService {
         userRepository.save(user);
     }
 
-    private UserDTO convertToDto(User user) {
-        return UserDTO.builder()
+    private UserResponseDTO convertToDto(User user) {
+        return UserResponseDTO.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .gender(user.getGender())
+                .gender(user.getGender().toString())
                 .phone(user.getPhone())
                 .roleName(user.getRole() != null ? user.getRole().getName() : null)
                 .build();
