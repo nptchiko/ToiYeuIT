@@ -3,7 +3,7 @@ name: Cai nay giup auto test va deploy ne
 on:
   pull_request:
     branches:
-      - main  
+  
   push:
     branches:
       - main
