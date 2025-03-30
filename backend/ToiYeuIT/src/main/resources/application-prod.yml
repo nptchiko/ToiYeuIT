@@ -2,8 +2,6 @@ spring:
   application:
       name: ToiYeuIT
 
-  config:
-    import: classpath:/env.properties
   datasource:
     username: ${DB_USER}
     password: ${DB_PASSWORD}

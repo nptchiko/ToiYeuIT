@@ -1,5 +1,6 @@
-package com.example.toiyeuit.dto;
+package com.example.toiyeuit.dto.request;
 
+import com.example.toiyeuit.enums.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,12 +10,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
-    private Long id;
+public class UserCreationRequest {
     private String username;
     private String email;
     private String password;
-    private String gender;
+    private Gender gender;
     private String phone;
-    private String role;
 }
