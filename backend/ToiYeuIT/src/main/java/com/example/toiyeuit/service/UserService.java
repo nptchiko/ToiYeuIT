@@ -1,6 +1,6 @@
 package com.example.toiyeuit.service;
 
-import com.example.toiyeuit.dto.UserDTO;
+import com.example.toiyeuit.dto.request.UserCreationRequest;
 import com.example.toiyeuit.entity.Role;
 import com.example.toiyeuit.entity.User;
 import com.example.toiyeuit.exception.UserAlreadyExistsException;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,19 +33,19 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<UserDTO> getAllUsers() {
+    public List<UserCreationRequest> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    public UserDTO getUserById(long id) throws ResourceNotFoundException {
+    public UserCreationRequest getUserById(long id) throws ResourceNotFoundException {
         User u = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return convertToDto(u);
     }
 
-    public UserDTO getUserByEmail(String email) throws ResourceNotFoundException {
+    public UserCreationRequest getUserByEmail(String email) throws ResourceNotFoundException {
          User u = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return convertToDto(u);
@@ -59,26 +60,27 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO createUser(UserDTO userDTO) throws UserAlreadyExistsException {
-        if (userRepository.existsByEmail(userDTO.getEmail().toLowerCase())) {
+    public UserCreationRequest createUser(UserCreationRequest userCreationRequest) throws UserAlreadyExistsException {
+        if (userRepository.existsByEmail(userCreationRequest.getEmail().toLowerCase())) {
             throw new UserAlreadyExistsException();
         }
 
-        if (userRepository.existsByUsername(userDTO.getUsername().toLowerCase())) {
+        if (userRepository.existsByUsername(userCreationRequest.getUsername().toLowerCase())) {
             throw new UserAlreadyExistsException();
         }
 
         // get role from roleName, default to USER if not found
-        Role userRole = roleRepository.findByName(userDTO.getRoleName())
-                .orElseGet(() -> roleRepository.findByName("USER")
-                        .orElseThrow(() -> new ResourceNotFoundException("Default role not found")));
+      //  Role userRole = roleRepository.findByName(userCreationRequest.getRoleName())
+        //        .orElseGet(() -> roleRepository.findByName("USER")
+        //                .orElseThrow(() -> new ResourceNotFoundException("Default role not found")));
+        Optional<Role> userRole = roleRepository.findByName("USER");
         User user = User.builder()
-                        .username(userDTO.getUsername())
-                        .email(userDTO.getEmail())
-                        .password(passwordEncoder.encode(userDTO.getPassword()))
-                        .phone(userDTO.getPhone())
-                        .gender(userDTO.getGender())
-                        .role(userRole)
+                        .username(userCreationRequest.getUsername())
+                        .email(userCreationRequest.getEmail())
+                        .password(passwordEncoder.encode(userCreationRequest.getPassword()))
+                        .phone(userCreationRequest.getPhone())
+                        .gender(userCreationRequest.getGender())
+                        .role(userRole.get())
                 .build();
 
         user.setEmail(user.getEmail().toLowerCase());
@@ -106,14 +108,13 @@ public class UserService {
         userRepository.save(user);
     }
 
-    private UserDTO convertToDto(User user) {
-        return UserDTO.builder()
-                .id(user.getId())
+    private UserCreationRequest convertToDto(User user) {
+        return UserCreationRequest.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .gender(user.getGender())
                 .phone(user.getPhone())
-                .roleName(user.getRole() != null ? user.getRole().getName() : null)
+
                 .build();
     }
 }

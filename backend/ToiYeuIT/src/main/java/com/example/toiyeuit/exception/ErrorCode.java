@@ -15,6 +15,7 @@ public enum ErrorCode {
     EXPIRED_TOKEN(4011, "Expired token. Please refresh the new one", HttpStatus.UNAUTHORIZED),
     RESOURCE_NOT_FOUND(4040, "Resource not found", HttpStatus.NOT_FOUND),
     USER_NOT_FOUND(4041, "User not found", HttpStatus.NOT_FOUND),
+    INVALID_TOKEN(4002, "Invalid token. The token has been tampered or excluded", HttpStatus.BAD_REQUEST)
     ;
     private final int code;
     private final String message;
