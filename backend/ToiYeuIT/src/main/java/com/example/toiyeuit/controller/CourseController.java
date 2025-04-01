@@ -1,5 +1,5 @@
 package com.example.toiyeuit.controller;
-import com.example.toiyeuit.dto.CourseRequestDTO;
+import com.example.toiyeuit.dto.request.CourseRequestDTO;
 import com.example.toiyeuit.entity.Course;
 import com.example.toiyeuit.enums.Level;
 import com.example.toiyeuit.exception.AlreadyExistsException;
@@ -26,21 +26,21 @@ public class CourseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Course>> findAll() {
+    public ResponseEntity<List<Course>> getAllCourses() {
         List<Course> courses = courseService.findAll();
 
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Course> findById(@PathVariable Integer id) throws ResourceNotFoundException {
+    public ResponseEntity<Course> getCourseById(@PathVariable Integer id) throws ResourceNotFoundException {
         Course course = courseService.findById(id);
 
         return new ResponseEntity<>(course, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Course> create(@RequestBody CourseRequestDTO course) throws CourseServiceLogicException,
+    public ResponseEntity<Course> createCourse(@RequestBody CourseRequestDTO course) throws CourseServiceLogicException,
             AlreadyExistsException {
 
         Course courseEntity = Course.builder()
@@ -57,7 +57,7 @@ public class CourseController {
     }
 
     @PutMapping
-    public ResponseEntity<Course> update(@RequestBody Course course) throws CourseServiceLogicException,
+    public ResponseEntity<Course> updateCourse(@RequestBody Course course) throws CourseServiceLogicException,
             ResourceNotFoundException {
 
         return new ResponseEntity<>(courseService.update(course), HttpStatus.OK);

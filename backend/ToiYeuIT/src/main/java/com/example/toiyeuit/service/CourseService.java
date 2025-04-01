@@ -60,12 +60,13 @@ public class CourseService {
         if (!courseOptional.isPresent()) {
             throw new ResourceNotFoundException("Course not found with id " + course.getId());
         }
-        Course updatedCourse = courseRepository.save(course);
-        return updatedCourse;
+        return courseRepository.save(course);
     }
 
-    @Transactional
     public void delete(Integer id) {
+        Course course = courseRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("Course not found with id " + id));
+
         courseRepository.deleteById(id);
     }
 }

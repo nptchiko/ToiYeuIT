@@ -1,4 +1,4 @@
-package com.example.toiyeuit.dto;
+package com.example.toiyeuit.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

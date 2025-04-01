@@ -5,7 +5,7 @@ import com.example.toiyeuit.exception.InvalidEnumException;
 public enum Level {
     BASIC,
     INTERMEDIATE,
-    ADVANCE;
+    ADVANCED;
 
     public static Level fromString(String value) {
         if (value != null) {

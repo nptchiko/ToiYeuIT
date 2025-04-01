@@ -1,6 +1,5 @@
-package com.example.toiyeuit.dto;
+package com.example.toiyeuit.dto.response;
 
-import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
