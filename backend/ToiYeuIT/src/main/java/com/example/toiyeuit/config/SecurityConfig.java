@@ -44,10 +44,11 @@ public class SecurityConfig {
             "/api/auth/signup",
             "/api/auth/refresh",
             "/api/auth/logout",
-            "/api/course/**",
-            "/api/course/{id}",
+            "/api/courses/**",
+            "/api/courses/{id}",
             "/api/users/**",
-            "/api/payment/**"
+            "/api/payment/**",
+            "/api/lessons/**"
     };
 
     @Bean

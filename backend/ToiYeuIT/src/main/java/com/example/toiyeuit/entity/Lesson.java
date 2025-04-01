@@ -25,8 +25,10 @@ public class Lesson {
 
     private String title;
 
+    @Column(name="video_url")
     private String videoUrl;
 
+    @Column(name="image_url")
     private String imageUrl;
 
     private String description;
