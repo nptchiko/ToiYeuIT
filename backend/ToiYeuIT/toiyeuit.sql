@@ -20,7 +20,7 @@ CREATE TABLE `course` (
   `course_id` int PRIMARY KEY AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `description` text,
-  `level` enum('BASIC', 'INTERMEDIATE', 'ADVANCE'),
+  `level` enum('BASIC', 'INTERMEDIATE', 'ADVANCED'),
   `price` int NOT NULL,
   `enabled` boolean,
   `duration` int
