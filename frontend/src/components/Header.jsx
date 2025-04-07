@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-
+import Icon from "/ToiYeuIT/frontend/public/icon.png";
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("TOEIC");
@@ -14,8 +14,8 @@ const Header = () => {
   return (
     <nav className="flex justify-between items-center p-5 font-semibold bg-slate-50 relative">
       <div className="flex items-center gap-4">
-        <div className="flex justify-center items-center bg-white py-5 rounded-[140px] px-3">
-          icon
+        <div className="flex justify-center items-center h-20 w-40 rounded-[140px]">
+          <img src={Icon} className="h-full w-full object-cover" />
         </div>
         <div className="relative">
           <button
