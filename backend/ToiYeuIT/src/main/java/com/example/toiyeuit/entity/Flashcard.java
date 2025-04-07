@@ -19,21 +19,39 @@ public class Flashcard {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "card_id")
-    Integer id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "deck_id")
-    FlashcardDeck deck;
+    private FlashcardDeck deck;
 
     @Column(name = "front_content", nullable = false)
-    String frontContent;
+    private String frontContent;
 
     @Column(name = "back_content")
-    String backContent;
+    private String backContent;
+
+    @Column(name = "audio_url")
+    private String audioUrl;
+
+    @Column(name = "is_favorite")
+    private Boolean isFavorite = false;
 
     @CreationTimestamp
     @Column(name = "created_at")
-    LocalDateTime creationTime;
+    private LocalDateTime createdAt;
 
-    Boolean isViewed;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = this.createdAt;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

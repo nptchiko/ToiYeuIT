@@ -158,12 +158,14 @@ CREATE TABLE `flashcard_decks` (
 );
 
 CREATE TABLE `flashcards` (
-  `card_id` int PRIMARY KEY AUTO_INCREMENT,
-  `deck_id` int,
-  `front_content` text NOT NULL,
-  `back_content` text NOT NULL,
-  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  `is_viewed` boolean,
+  `card_id` INT PRIMARY KEY AUTO_INCREMENT,
+  `deck_id` INT,
+  `front_content` TEXT NOT NULL,
+  `back_content` TEXT NOT NULL,
+  `audio_url` VARCHAR(255), -- Optional audio file link
+  `is_favorite` BOOLEAN DEFAULT FALSE, -- Because someone out there is emotionally attached to one flashcard
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (`deck_id`) REFERENCES `flashcard_decks` (`deck_id`)
 );
 
