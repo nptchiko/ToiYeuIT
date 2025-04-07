@@ -14,11 +14,12 @@ import java.nio.file.AccessDeniedException;
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionalHandler {
-    @ExceptionHandler(value = Exception.class)
-    ResponseEntity<?> handlingGeneralException(Exception ex){
-        log.error(ex.getMessage());
-        return ResponseEntity.badRequest().body(ex.getMessage());
-    }
+    // too broad exception -- this class should be in handler directory too1
+//    @ExceptionHandler(value = Exception.class)
+//    ResponseEntity<?> handlingGeneralException(Exception ex){
+//        log.error(ex.getMessage());
+//        return ResponseEntity.badRequest().body(ex.getMessage());
+//    }
 
     @ExceptionHandler(value = AppException.class)
     ApiResponse<?> handlingAppException(AppException e){
