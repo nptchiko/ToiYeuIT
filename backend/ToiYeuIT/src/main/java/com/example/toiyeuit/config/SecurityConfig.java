@@ -49,7 +49,7 @@ public class SecurityConfig {
             "/api/users/**",
             "/api/payment/**",
             "/api/lessons/**",
-            "/api/flashcards/**",
+            "/api/decks/**",
     };
 
     @Bean
