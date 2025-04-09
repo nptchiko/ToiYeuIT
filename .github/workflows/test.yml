@@ -3,10 +3,11 @@ name: Cai nay giup auto test va deploy ne
 on:
   pull_request:
     branches:
-      - main  
+  
   push:
     branches:
       - main
+      - mikudeptrai
 jobs:
   build-deploy:
      runs-on: self-hosted
@@ -41,7 +42,7 @@ jobs:
             cache: maven
         
         - name: Set up maven
-          run:  cd ${{ env.APP_PATH }} && mvn clean install
+          run:  cd ${{ env.APP_PATH }} && mvn clean install -Pprod
 
         - name: Build Docker image 
           run: docker build -t ${{ env.IMAGE_NAME  }} ${{   env.APP_PATH   }}
