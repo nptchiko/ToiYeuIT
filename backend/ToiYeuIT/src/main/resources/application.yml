@@ -3,9 +3,6 @@ spring:
       name: ToiYeuIT
   #profiles:
    # //active: @spring.profiles.active@
-
-  config:
-    import: env.properties
   datasource:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
@@ -30,7 +27,9 @@ env:
 jwt:
   valid-duration: 1 #hours
   refresh-duration: 72 # hours
-
+credential:
+  admin-email: ${ADMIN_EMAIL}
+  admin-password: ${ADMIN_PASSWORD}
 rsa:
   private-key: classpath:certs/private.pem
   public-key: classpath:certs/public.pem

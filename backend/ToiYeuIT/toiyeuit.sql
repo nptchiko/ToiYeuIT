@@ -57,8 +57,6 @@ CREATE TABLE `exercise` (
 CREATE TABLE `question` (
   `ques_id` bigint PRIMARY KEY,
   `description` varchar(255),
-  `questionType` varchar(255) COMMENT 'MULTIPLECHOICE, FILLING_BLANK',
-  `questionScope` enum('TEST', 'EXERCISE'),
   `correct_ans` varchar(255)
 );
 

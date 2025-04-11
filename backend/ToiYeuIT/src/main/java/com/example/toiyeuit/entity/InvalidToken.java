@@ -3,8 +3,7 @@ package com.example.toiyeuit.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.sql.Date;
-import java.util.UUID;
+import java.util.Date;
 
 @Entity
 @Setter
@@ -14,15 +13,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class InvalidToken {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private String id;
 
     @Column(name = "expiry_time", nullable = false)
     Date expiryTime;
-
-
-
-
-
-
 }

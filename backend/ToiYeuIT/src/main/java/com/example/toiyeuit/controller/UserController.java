@@ -1,10 +1,13 @@
 package com.example.toiyeuit.controller;
 
 import com.example.toiyeuit.dto.request.UserCreationRequest;
+import com.example.toiyeuit.dto.response.ApiResponse;
+import com.example.toiyeuit.dto.response.UserResponseDTO;
 import com.example.toiyeuit.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,29 +24,30 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<UserCreationRequest>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
-    }
+//    @GetMapping
+//    public ResponseEntity<List<UserCreationRequest>> getAllUsers() {
+//        return ResponseEntity.ok(userService.getAllUsers());
+//    }
+//
+//    @GetMapping("/{id}")
+//    public ResponseEntity<UserCreationRequest> getUserById(@PathVariable Long id) {
+//        try {
+//            return ResponseEntity.ok(userService.getUserById(id));
+//        } catch (Exception e) {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
+//
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserCreationRequest> getUserById(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(userService.getUserById(id));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
+    @PostMapping("/create-user")
+    public ApiResponse<UserResponseDTO> createUser(@RequestBody UserCreationRequest userCreationRequest) {
+        var userResponse = userService.createUser(userCreationRequest);
 
-    @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody UserCreationRequest userCreationRequest) {
-        try {
-            UserCreationRequest createdUser = userService.createUser(userCreationRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
+        return ApiResponse.<UserResponseDTO>builder()
+                .code(HttpStatus.CREATED.value())
+                .message("Created successfully")
+                .body(userResponse)
+                .build();
     }
 
     @DeleteMapping("/{id}")

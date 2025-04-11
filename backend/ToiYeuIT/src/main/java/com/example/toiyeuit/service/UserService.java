@@ -1,20 +1,24 @@
 package com.example.toiyeuit.service;
 
 import com.example.toiyeuit.dto.request.UserCreationRequest;
+import com.example.toiyeuit.dto.response.UserResponseDTO;
 import com.example.toiyeuit.entity.Role;
 import com.example.toiyeuit.entity.User;
+import com.example.toiyeuit.exception.AppException;
+import com.example.toiyeuit.exception.ErrorCode;
 import com.example.toiyeuit.exception.UserAlreadyExistsException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
+import com.example.toiyeuit.mapper.UserMapper;
 import com.example.toiyeuit.repository.RoleRepository;
 import com.example.toiyeuit.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,32 +27,37 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserMapper userMapper;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder){
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+
     }
 
-    public List<UserCreationRequest> getAllUsers() {
+    public List<UserResponseDTO> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(this::convertToDto)
+                .map(userMapper::toUserResponse)
                 .collect(Collectors.toList());
     }
 
-    public UserCreationRequest getUserById(long id) throws ResourceNotFoundException {
+    public UserResponseDTO getUserById(long id) throws ResourceNotFoundException {
         User u = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return convertToDto(u);
+        return userMapper.toUserResponse(u);
     }
 
-    public UserCreationRequest getUserByEmail(String email) throws ResourceNotFoundException {
+    public UserResponseDTO getUserByEmail(String email) throws ResourceNotFoundException {
          User u = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return convertToDto(u);
+        return userMapper.toUserResponse(u);
     }
 
     public Boolean existsByEmail(String email) throws ResourceNotFoundException {
@@ -60,36 +69,27 @@ public class UserService {
     }
 
     @Transactional
-    public UserCreationRequest createUser(UserCreationRequest userCreationRequest) throws UserAlreadyExistsException {
-        if (userRepository.existsByEmail(userCreationRequest.getEmail().toLowerCase())) {
-            throw new UserAlreadyExistsException();
-        }
+    public UserResponseDTO createUser(UserCreationRequest userCreationRequest) throws UserAlreadyExistsException {
 
-        if (userRepository.existsByUsername(userCreationRequest.getUsername().toLowerCase())) {
-            throw new UserAlreadyExistsException();
-        }
+        if (userRepository.existsByEmail(userCreationRequest.getEmail().toLowerCase()))
+            throw new AppException(ErrorCode.USER_EMAIL_EXISTED);
+        if (userRepository.existsUserByPhone(userCreationRequest.getPhone()))
+            throw new AppException(ErrorCode.USER_PHONE_EXISTED);
 
         // get role from roleName, default to USER if not found
       //  Role userRole = roleRepository.findByName(userCreationRequest.getRoleName())
         //        .orElseGet(() -> roleRepository.findByName("USER")
         //                .orElseThrow(() -> new ResourceNotFoundException("Default role not found")));
-        Optional<Role> userRole = roleRepository.findByName("USER");
-        User user = User.builder()
-                        .username(userCreationRequest.getUsername())
-                        .email(userCreationRequest.getEmail())
-                        .password(passwordEncoder.encode(userCreationRequest.getPassword()))
-                        .phone(userCreationRequest.getPhone())
-                        .gender(userCreationRequest.getGender())
-                        .role(userRole.get())
-                .build();
+        Role userRole = roleRepository.findByName("USER")
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
 
-        user.setEmail(user.getEmail().toLowerCase());
-        try {
-            return convertToDto(userRepository.save(user));
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            throw new RuntimeException("Something went wrong when creating user");
-        }
+        User user = userMapper.toUser(userCreationRequest);
+        user.setRole(userRole);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        //user.setEmail(user.getEmail().toLowerCase());
+        logger.info("[service.UserService]: email: " + user.getEmail());
+
+        return userMapper.toUserResponse(userRepository.save(user));
     }
 
     @Transactional
@@ -106,15 +106,5 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
-    }
-
-    private UserCreationRequest convertToDto(User user) {
-        return UserCreationRequest.builder()
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .gender(user.getGender())
-                .phone(user.getPhone())
-
-                .build();
     }
 }

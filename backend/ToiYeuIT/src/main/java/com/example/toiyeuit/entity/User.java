@@ -2,6 +2,7 @@ package com.example.toiyeuit.entity;
 
 import com.example.toiyeuit.enums.Gender;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,6 +25,7 @@ public class User {
     @Column(name="user_id")
     private Long id;
 
+
     private String username;
 
     private String password;
@@ -33,6 +35,7 @@ public class User {
     @Column(columnDefinition = "varchar(32) default 'MALE'")
     @Enumerated(EnumType.STRING)
     private Gender gender;
+
 
     private String phone;
 
