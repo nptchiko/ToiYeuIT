@@ -54,7 +54,7 @@ public class SecurityConfig {
             "/api/users/create-user",
             "/api/payment/**",
             "/api/lessons/**",
-            "/api/flashcards/**",
+            "/api/decks/**",
     };
 
     @Bean

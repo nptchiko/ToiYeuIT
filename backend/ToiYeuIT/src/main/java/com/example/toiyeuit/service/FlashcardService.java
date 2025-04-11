@@ -1,6 +1,6 @@
 package com.example.toiyeuit.service;
 
-import com.example.toiyeuit.dto.request.FlashcardDeckRequestDTO;
+import com.example.toiyeuit.dto.request.FlashcardRequestDTO;
 import com.example.toiyeuit.entity.Flashcard;
 import com.example.toiyeuit.entity.FlashcardDeck;
 import com.example.toiyeuit.entity.User;
@@ -12,8 +12,6 @@ import com.example.toiyeuit.repository.UserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +30,11 @@ public class FlashcardService {
         this.userRepository = userRepository;
     }
 
+    // TODO: implement UserFlashcardService to find flashcards by userId (move this code along)
     public List<List<Flashcard>> findAllByUserId(Long userId) throws UsernameNotFoundException,
             ResourceNotFoundException,
             FlashcardServiceLogicException {
+
         if (userId == null || !userRepository.existsById(userId)) {
             throw new UsernameNotFoundException("User not found");
         }
@@ -57,9 +57,15 @@ public class FlashcardService {
         }
     }
 
-    public Flashcard findById(Long id) throws ResourceNotFoundException {
-        return flashcardRepository.findById(id).orElseThrow(()
-                -> new ResourceNotFoundException("This id doesn't exist"));
+    public Flashcard findById(Integer deckId, Long id) throws ResourceNotFoundException, FlashcardServiceLogicException {
+        Flashcard flashcard = flashcardRepository.findById(id).orElseThrow(()
+                -> new ResourceNotFoundException("Flashcard with id " + id + " doesn't exist"));
+
+        if (flashcard.getDeck().getId().equals(deckId)) {
+            return flashcard;
+        } else {
+            throw new FlashcardServiceLogicException("Flashcard with id " + id + " is not in the deck");
+        }
     }
 
     public List<Flashcard> findAllByDeckId(Integer deckId) {
@@ -69,26 +75,77 @@ public class FlashcardService {
         return flashcardRepository.findAllByDeck(deck);
     }
 
-    @Transactional
-    public FlashcardDeck createNewDeck(FlashcardDeckRequestDTO flashcardDeck) {
 
-        if (flashcardDeck.getName() == null || flashcardDeck.getName().isEmpty()) {
-            throw new FlashcardServiceLogicException("Flashcard deck name cannot be empty");
+    @Transactional
+    public Flashcard addNewFlashcard(Integer deckId, FlashcardRequestDTO flashcardRequestDTO) {
+        FlashcardDeck deck = flashcardDeckRepository.findById(deckId)
+                .orElseThrow(() -> new ResourceNotFoundException("Deck with id " +
+                        deckId + " doesn't exist"));
+
+        if (flashcardRequestDTO.getFrontContent() == null || flashcardRequestDTO.getFrontContent().isEmpty()) {
+            throw new FlashcardServiceLogicException("FrontContent cannot be empty");
         }
 
-        FlashcardDeck deck = FlashcardDeck.builder()
-                // TODO: use Spring Security context to get username@deckName since decks may have the same name
-                .name(flashcardDeck.getName())
-                .description(flashcardDeck.getDescription())
-                .created_at(LocalDateTime.now())
-                // TODO: use spring security context to get user here too.
+        if (flashcardRequestDTO.getBackContent() == null || flashcardRequestDTO.getBackContent().isEmpty()) {
+            throw new FlashcardServiceLogicException("BackContent cannot be empty");
+        }
+
+        Flashcard flashcard = Flashcard.builder()
+                .deck(deck)
+                .frontContent(flashcardRequestDTO.getFrontContent())
+                .backContent(flashcardRequestDTO.getBackContent())
+                .audioUrl(flashcardRequestDTO.getAudioUrl())
                 .build();
 
         try {
-            return flashcardDeckRepository.save(deck);
+           return flashcardRepository.save(flashcard);
         } catch (Exception e) {
             throw new FlashcardServiceLogicException(e.getMessage());
         }
+    }
 
+
+    @Transactional
+    public void deleteFlashcard(Integer deckId, Long flashcardId) {
+
+        Flashcard flashcard = flashcardRepository.findById(flashcardId).orElseThrow(
+                () -> new ResourceNotFoundException("Flashcard with id " + flashcardId + " doesn't exist")
+        );
+
+        if (flashcard.getDeck().getId().equals(deckId)) {
+            flashcardRepository.delete(flashcard);
+        } else {
+            throw new FlashcardServiceLogicException("Flashcard with id " + flashcardId + " is not in the deck");
+        }
+    }
+
+    @Transactional
+    public Flashcard updateFlashcard(Integer deckId, Long id, FlashcardRequestDTO flashcardRequestDTO)
+        throws ResourceNotFoundException, FlashcardServiceLogicException {
+
+        Flashcard flashcard = flashcardRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Flashcard with id " + id + " doesn't exist")
+        );
+
+        if (!flashcard.getDeck().getId().equals(deckId)) {
+            throw new FlashcardServiceLogicException("Flashcard with id " + id + " is not in the deck");
+        }
+
+        if (flashcardRequestDTO.getFrontContent() == null || flashcardRequestDTO.getFrontContent().isEmpty()) {
+            throw new FlashcardServiceLogicException("FrontContent cannot be empty");
+        }
+
+        if (flashcardRequestDTO.getBackContent() == null || flashcardRequestDTO.getBackContent().isEmpty()) {
+            throw new FlashcardServiceLogicException("BackContent cannot be empty");
+        }
+
+        flashcard.setFrontContent(flashcardRequestDTO.getFrontContent());
+        flashcard.setBackContent(flashcardRequestDTO.getBackContent());
+
+        try {
+            return flashcardRepository.save(flashcard);
+        } catch (Exception e) {
+            throw new FlashcardServiceLogicException(e.getMessage());
+        }
     }
 }
