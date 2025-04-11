@@ -1,5 +1,6 @@
 package com.example.toiyeuit.config;
 
+import com.example.toiyeuit.filter.JwtTokenFilter;
 import com.example.toiyeuit.service.security.CustomUseDetailService;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -22,7 +23,10 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 // basic spring security config
 @Configuration
@@ -33,9 +37,11 @@ public class SecurityConfig {
     @Autowired
     private  CustomUseDetailService useDetailService;
 
+    private final JwtTokenFilter tokenFilter;
 
-    public SecurityConfig(RsaKeyProperties jwtConfigProperties){
+    public SecurityConfig(RsaKeyProperties jwtConfigProperties, JwtTokenFilter tokenFilter){
         this.jwtConfigProperties = jwtConfigProperties;
+        this.tokenFilter = tokenFilter;
     }
 
 
@@ -44,9 +50,8 @@ public class SecurityConfig {
             "/api/auth/signup",
             "/api/auth/refresh",
             "/api/auth/logout",
-            "/api/courses/**",
-            "/api/courses/{id}",
-            "/api/users/**",
+//            "/api/courses/**",
+            "/api/users/create-user",
             "/api/payment/**",
             "/api/lessons/**",
             "/api/flashcards/**",
@@ -65,29 +70,19 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINT).permitAll()
-                        .requestMatchers("api/admin/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("api/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session
                         -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> {
-                    ex.authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint());
-                    ex.accessDeniedHandler(new BearerTokenAccessDeniedHandler());
+                    ex.authenticationEntryPoint(new JwtAuthenticationEntryPoint());
+                    //ex.accessDeniedHandler(new BearerTokenAccessDeniedHandler());
                     //  CustomAuthenticationEntryPoint
                     //  CustomAccessHandler
                 })
-                .userDetailsService(useDetailService)
+                .addFilterAfter(tokenFilter, BearerTokenAuthenticationFilter.class)
         .build();
     }
-    @Bean
-    JwtEncoder jwtEncoder(){
-        JWK jwk = new RSAKey.Builder(jwtConfigProperties.publicKey()).privateKey(jwtConfigProperties.privateKey()).build();
-        JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
-        return new NimbusJwtEncoder(jwks);
-    }
 
-    @Bean
-    JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withPublicKey(jwtConfigProperties.publicKey()).build();
-    }
 }

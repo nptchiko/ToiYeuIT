@@ -17,7 +17,9 @@ public interface InvalidTokenRepository extends JpaRepository<InvalidToken, UUID
     @Modifying
     @Query(
             nativeQuery = true,
-            value = "delete from invalid_token as i where i.expiry_time > NOW()"
+            value = "delete from invalid_token as i where i.expiry_time < NOW()"
     )
     void deleteInvalidTokenSince();
+
+    boolean existsById(String uuid);
 }

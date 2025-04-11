@@ -35,5 +35,9 @@ public class Question {
     @Column(columnDefinition = "varchar(32) default 'MULTICHOICE'")
     QuestionType questionType = QuestionType.MULTICHOICE;
 
+    @Column(name = "img_src")
+    String imageSource;
 
+    @Column(name = "audio_src")
+    String audioSource;
 }
