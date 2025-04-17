@@ -31,7 +31,6 @@ const Footer = () => {
         <div className="space-y-4  md:pl-0 pl-10">
           <h1 className="text-sm font-semibold uppercase">Chương trình học</h1>
           <ul className="space-y-4 text-gray-700">
-            <li>IELTS</li>
             <li>TOEIC</li>
             <li>Tiếng anh giao tiếp</li>
           </ul>
@@ -40,12 +39,12 @@ const Footer = () => {
           <h1 className="text-sm font-semibold uppercase">tính năng nổi bật</h1>
           <ul className="space-y-4 text-gray-700">
             <li>Luyện đề TOEIC 4 kỹ năng</li>
-            <li>Phòng luyện viết IELTS PREP AI</li>
-            <li>Phòng luyện nói IELTS PREP AI</li>
+            <li>Luyện viết TOEIC ENGHUB</li>
+            <li>Luyện nói TOEIC ENGHUB</li>
           </ul>
         </div>
         <div className="space-y-4 md:pt-0 pt-5 md:pl-0 pl-10">
-          <h1 className="text-sm font-semibold uppercase">VỀ PREP</h1>
+          <h1 className="text-sm font-semibold uppercase">VỀ ENGHUB</h1>
           <ul className="space-y-4 text-gray-700">
             <li>Giới thiệu</li>
             <li>Chính sách dùng AI</li>

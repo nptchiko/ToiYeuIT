@@ -1,9 +1,6 @@
-"use client";
-
 import { useState, useEffect, useRef } from "react";
 import { AiFillStar } from "react-icons/ai"; // Star (Ant Design)
 import { FaThumbsUp } from "react-icons/fa"; // Thumbs Up (FontAwesome)
-
 const DataComment = [
   {
     id: 1,
@@ -133,19 +130,50 @@ const Parents = () => {
   }, [isPaused, direction]);
 
   return (
-    <div className="min-h-[720px] w-full bg-[#00429D] relative rounded-[70px] mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-2">
-        <div className="text-white py-[50px] px-12 lg:px-24 md:text-start text-center md:py-[250px] font-sent space-y-3">
-          <div className="text-lg font-bold">Sự tin tưởng</div>
-          <div className="text-3xl font-bold md:text-5xl">
-            Từ phía học viên và phụ huynh
+    <div className="relative min-h-[720px] w-full bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 rounded-[40px] overflow-hidden">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+        {/* Left column - Text content */}
+        <div className="text-white py-12 px-8 lg:px-16 md:text-start text-center md:py-[150px]">
+          <div className="inline-block px-4 py-1 bg-blue-700 bg-opacity-50 rounded-full text-sm font-semibold mb-6">
+            Sự tin tưởng
           </div>
-          <div className="text-base">
+
+          <h2 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
+            Từ phía học viên và phụ huynh
+          </h2>
+
+          <div className="w-20 h-1 bg-blue-400 mb-6 md:mx-0 mx-auto"></div>
+
+          <p className="text-lg text-blue-100 max-w-md">
             Những tình cảm, niềm tin từ học viên chính là sự ghi nhận lớn nhất
             dành cho Prep.
+          </p>
+
+          <div className="flex flex-wrap items-center gap-6 mt-10">
+            <div className="flex flex-col">
+              <span className="text-4xl font-bold text-white">10K+</span>
+              <span className="text-sm text-blue-200">Học viên</span>
+            </div>
+
+            <div className="w-px h-12 bg-blue-700 opacity-50"></div>
+
+            <div className="flex flex-col">
+              <span className="text-4xl font-bold text-white">4.9</span>
+              <div className="flex">
+                {[1, 2, 3, 4, 5].map((num) => (
+                  <AiFillStar key={num} className="text-yellow-400 w-4 h-4" />
+                ))}
+              </div>
+            </div>
+
+            <div className="w-px h-12 bg-blue-700 opacity-50"></div>
+
+            <div className="flex flex-col">
+              <span className="text-4xl font-bold text-white">97%</span>
+              <span className="text-sm text-blue-200">Đạt mục tiêu</span>
+            </div>
           </div>
         </div>
-
         {/* comment section with auto-scrolling */}
         <div className="flex items-center justify-center md:py-[50px]">
           <div className="relative w-[400px] h-[620px] md:w-full md:max-w-[720px] md:h-[620px] overflow-hidden">
