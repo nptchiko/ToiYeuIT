@@ -1,11 +1,11 @@
 package com.example.toiyeuit.entity;
 
+import com.example.toiyeuit.entity.key.Key;
 import com.example.toiyeuit.enums.AnswerKey;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.io.Serializable;
 
 @Entity
 @Getter // auto get
@@ -19,7 +19,8 @@ public class MultichoiceDetail {
     @EmbeddedId
     Key id;
 
-    @ManyToOne
+    @ManyToOne()
+    @JsonIgnore
     @MapsId("question_id")
     @JoinColumn(name = "ques_id")
     Question question;

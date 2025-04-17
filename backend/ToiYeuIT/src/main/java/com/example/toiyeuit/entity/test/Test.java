@@ -1,6 +1,9 @@
-package com.example.toiyeuit.entity;
+package com.example.toiyeuit.entity.test;
 
 
+import com.example.toiyeuit.entity.TestCollection;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,11 +25,14 @@ public class Test {
 
     Integer id;
 
-    String name;
+    @Column(name = "title")
+    String title;
 
     int index;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonIgnore
+    @Getter(AccessLevel.NONE)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(
             name = "test_collection_id"
     )

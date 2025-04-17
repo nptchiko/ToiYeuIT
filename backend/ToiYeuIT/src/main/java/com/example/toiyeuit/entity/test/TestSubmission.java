@@ -1,5 +1,6 @@
-package com.example.toiyeuit.entity;
+ package com.example.toiyeuit.entity.test;
 
+import com.example.toiyeuit.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -14,8 +15,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor //constructor ko tham so
 @AllArgsConstructor // constructor all tham so
 @FieldDefaults(level = AccessLevel.PRIVATE) //E
-@Table(name = "exercise_submission")
-public class ExerciseSubmission {
+@Table(name = "test_submission")
+public class TestSubmission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "submission_id")
@@ -23,9 +24,9 @@ public class ExerciseSubmission {
 
     @OneToOne()
     @JoinColumn(
-            name = "ex_id"
+            name = "test_id"
     )
-    Exercise exercise;
+    Test test;
 
     @OneToOne
     @JoinColumn(

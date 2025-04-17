@@ -1,7 +1,7 @@
 package com.example.toiyeuit.service;
 
 import com.example.toiyeuit.dto.request.UserCreationRequest;
-import com.example.toiyeuit.dto.response.UserResponseDTO;
+import com.example.toiyeuit.dto.response.UserResponse;
 import com.example.toiyeuit.entity.Role;
 import com.example.toiyeuit.entity.User;
 import com.example.toiyeuit.exception.AppException;
@@ -14,6 +14,7 @@ import com.example.toiyeuit.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,21 +43,30 @@ public class UserService {
 
     }
 
-    public List<UserResponseDTO> getAllUsers() {
+    public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(userMapper::toUserResponse)
                 .collect(Collectors.toList());
     }
 
-    public UserResponseDTO getUserById(long id) throws ResourceNotFoundException {
-        User u = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return userMapper.toUserResponse(u);
+    public UserResponse getUserById(long id){
+        return userMapper.toUserResponse(
+                userRepository.findById(id).orElseThrow(
+                        () -> new AppException(ErrorCode.USER_NOT_FOUND)
+                )
+        );
     }
 
-    public UserResponseDTO getUserByEmail(String email) throws ResourceNotFoundException {
+    public UserResponse getInfo(){
+        var context = SecurityContextHolder.getContext();
+        String email = context.getAuthentication().getName();
+
+        return getUserByEmail(email);
+    }
+
+    public UserResponse getUserByEmail(String email){
          User u = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         return userMapper.toUserResponse(u);
     }
 
@@ -69,7 +79,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDTO createUser(UserCreationRequest userCreationRequest) throws UserAlreadyExistsException {
+    public UserResponse createUser(UserCreationRequest userCreationRequest) throws UserAlreadyExistsException {
 
         if (userRepository.existsByEmail(userCreationRequest.getEmail().toLowerCase()))
             throw new AppException(ErrorCode.USER_EMAIL_EXISTED);
@@ -93,9 +103,9 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(long id) throws ResourceNotFoundException {
+    public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found");
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
         userRepository.deleteById(id);
     }

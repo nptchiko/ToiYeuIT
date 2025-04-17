@@ -7,6 +7,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+@Slf4j
 @Configuration
 public class CorsConfiguration {
 
@@ -28,10 +30,11 @@ public class CorsConfiguration {
     private String FRONTEND_PORT;
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(CourseRepository courseRepository) {
+   public CorsConfigurationSource corsConfigurationSource() {
+        log.info("[CorsConfiguration] " + FRONTEND_PORT);
         org.springframework.web.cors.CorsConfiguration corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost: " + FRONTEND_PORT));
-        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3003", "http://localhost:5173", "http://localhost:3000", "http://localhost:5174"));
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "x-no-retry", "Access-Control-Allow-Origin"));
         corsConfiguration.setExposedHeaders(List.of("Authorization", "Content-Type"));
         corsConfiguration.setAllowCredentials(true);

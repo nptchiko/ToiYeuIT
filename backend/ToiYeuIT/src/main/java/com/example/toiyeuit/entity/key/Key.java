@@ -1,4 +1,4 @@
-package com.example.toiyeuit.entity;
+package com.example.toiyeuit.entity.key;
 
 import com.example.toiyeuit.enums.AnswerKey;
 import jakarta.persistence.Embeddable;

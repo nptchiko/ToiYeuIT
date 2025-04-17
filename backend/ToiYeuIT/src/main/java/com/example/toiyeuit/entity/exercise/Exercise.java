@@ -1,5 +1,7 @@
-package com.example.toiyeuit.entity;
+package com.example.toiyeuit.entity.exercise;
 
+import com.example.toiyeuit.entity.Lesson;
+import com.example.toiyeuit.entity.Question;
 import com.example.toiyeuit.enums.QuestionType;
 import jakarta.persistence.*;
 import lombok.Getter;

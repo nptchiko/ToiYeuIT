@@ -19,11 +19,12 @@ CREATE TABLE `user` (
 CREATE TABLE `course` (
   `course_id` int PRIMARY KEY AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
-  `description` text,
-  `level` enum('BASIC', 'INTERMEDIATE', 'ADVANCED'),
-  `price` int NOT NULL,
+  `description` text NOT NULL ,
+  `level`       enum ('Cơ bản', 'Trung cấp', 'Nâng cao') not null,
+  `price` decimal(10,2) NOT NULL,
   `enabled` boolean,
-  `duration` int
+  `duration` int,
+  'tag' varchar(50)
 );
 
 CREATE TABLE `skill` (
@@ -100,10 +101,8 @@ CREATE TABLE `multichoice_detail` (
 
 CREATE TABLE `test_collection` (
   `id` int PRIMARY KEY,
-  `course_id` int,
   `name` varchar(255),
   `skill_id` int,
-  FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`),
   FOREIGN KEY (`skill_id`) REFERENCES `skill` (`id`)
 );
 
@@ -170,7 +169,7 @@ CREATE TABLE `flashcards` (
 CREATE TABLE `enrollment` (
   `user_id` bigint,
   `course_id` int,
-  `status` enum('COMPLETED', 'PROGRESSING', 'EXPIRED'),
+  `status` enum('COMPLETED', 'PENDING', 'EXPIRED'),
   `enrolled_at` timestamp DEFAULT CURRENT_TIMESTAMP,
   `expired_at` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`, `course_id`),
@@ -188,3 +187,5 @@ CREATE TABLE `order_course` (
   FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
   FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`)
 );
+alter table course
+    collate = utf8mb4_vietnamese_ci

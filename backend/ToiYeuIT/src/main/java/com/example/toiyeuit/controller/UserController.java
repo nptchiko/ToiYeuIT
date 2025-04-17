@@ -2,12 +2,12 @@ package com.example.toiyeuit.controller;
 
 import com.example.toiyeuit.dto.request.UserCreationRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
-import com.example.toiyeuit.dto.response.UserResponseDTO;
+import com.example.toiyeuit.dto.response.UserResponse;
+import com.example.toiyeuit.repository.UserRepository;
 import com.example.toiyeuit.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,44 +19,55 @@ public class UserController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final UserService userService;
+    private final UserRepository userRepository;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
+        this.userRepository = userRepository;
+    }
+///  ADMIN ///
+    @DeleteMapping("/{id}")
+    public ApiResponse<?> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ApiResponse.builder()
+                .code(HttpStatus.OK.value())
+                .build();
+    }
+    @GetMapping("/{id}")
+    public UserResponse getUserByID(@PathVariable("id") Long id){
+        var info = userService.getUserById(id);
+
+        return info;
     }
 
-//    @GetMapping
-//    public ResponseEntity<List<UserCreationRequest>> getAllUsers() {
-//        return ResponseEntity.ok(userService.getAllUsers());
-//    }
-//
-//    @GetMapping("/{id}")
-//    public ResponseEntity<UserCreationRequest> getUserById(@PathVariable Long id) {
-//        try {
-//            return ResponseEntity.ok(userService.getUserById(id));
-//        } catch (Exception e) {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
-//
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+/// ADMIN ///
 
+
+
+
+/// USER ///
     @PostMapping("/create-user")
-    public ApiResponse<UserResponseDTO> createUser(@RequestBody UserCreationRequest userCreationRequest) {
+    public ApiResponse<UserResponse> createUser(@RequestBody UserCreationRequest userCreationRequest) {
         var userResponse = userService.createUser(userCreationRequest);
 
-        return ApiResponse.<UserResponseDTO>builder()
+        return ApiResponse.<UserResponse>builder()
                 .code(HttpStatus.CREATED.value())
                 .message("Created successfully")
                 .body(userResponse)
                 .build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
-        try {
-            userService.deleteUser(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping("/user-info")
+    public ApiResponse<UserResponse> info() {
+        return ApiResponse.<UserResponse>builder()
+                .message("User information")
+                .code(200)
+                .body(userService.getInfo())
+                .build();
     }
+/// USER ///
 }

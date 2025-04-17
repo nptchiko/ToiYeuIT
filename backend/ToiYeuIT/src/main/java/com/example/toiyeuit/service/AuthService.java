@@ -8,9 +8,11 @@ import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.dto.response.AuthTokenResponse;
 import com.example.toiyeuit.entity.InvalidToken;
 import com.example.toiyeuit.entity.User;
+import com.example.toiyeuit.entity.VerificationToken;
 import com.example.toiyeuit.exception.AppException;
 import com.example.toiyeuit.exception.ErrorCode;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
+import com.example.toiyeuit.mapper.UserMapper;
 import com.example.toiyeuit.repository.InvalidTokenRepository;
 import com.example.toiyeuit.repository.UserRepository;
 import com.nimbusds.jose.JOSEException;
@@ -19,8 +21,10 @@ import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -59,6 +63,13 @@ public class AuthService {
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private VerificationService verificationService;
+    @Autowired
+    private JavaMailSenderImpl mailSender;
+    @Autowired
+    private UserMapper userMapper;
 
     public AuthTokenResponse authenticate(LoginRequest loginRequest){
 
@@ -102,7 +113,7 @@ public class AuthService {
         String jid = signedJwt.getJWTClaimsSet().getJWTID();
         java.util.Date expiry = signedJwt.getJWTClaimsSet().getExpirationTime();
 
-        if(!invalidTokenRepo.existsById(jid))
+        if (!invalidTokenRepo.existsById(jid))
             invalidTokenRepo.save(
                     InvalidToken.builder()
                             .expiryTime(expiry)
@@ -111,6 +122,10 @@ public class AuthService {
             );
         return "User has been logged out!";
     }
+    public void forgetPassword(String email) {
+        verificationService.createNewPassword(email);
+    }
+
     // reuse if permission present
     //private String buildScope(User user) {
     //    StringJoiner stringJoiner = new StringJoiner(" ");

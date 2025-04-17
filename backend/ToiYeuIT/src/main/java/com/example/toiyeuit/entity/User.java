@@ -50,4 +50,7 @@ public class User {
 
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL)
     Set<FlashcardDeck> flashcardDeck;
+
+    @Column(name = "enabled")
+    private Boolean enabled = false;
 }

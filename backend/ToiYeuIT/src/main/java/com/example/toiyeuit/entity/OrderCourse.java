@@ -1,13 +1,11 @@
 package com.example.toiyeuit.entity;
 
+import com.example.toiyeuit.entity.key.OrderKey;
 import com.example.toiyeuit.enums.PaymentMethod;
 import com.example.toiyeuit.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.ColumnDefault;
-
-import java.io.Serializable;
 
 @Entity
 @Getter // auto get

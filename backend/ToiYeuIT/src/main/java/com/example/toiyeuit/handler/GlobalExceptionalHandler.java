@@ -4,6 +4,8 @@ package com.example.toiyeuit.handler;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.exception.AppException;
 import com.example.toiyeuit.exception.ErrorCode;
+import io.swagger.v3.oas.annotations.Hidden;
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,6 +17,7 @@ import java.nio.file.AccessDeniedException;
 
 
 // Auto bat exception roi tra ve client, khong can den try catch
+@Hidden
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionalHandler {
@@ -65,5 +68,17 @@ public class GlobalExceptionalHandler {
                 .code(errorCode.getCode())
                 .message(errorCode.getMessage())
                 .build();
+    }
+
+    @ExceptionHandler(value = MessagingException.class)
+    ResponseEntity<ApiResponse<?>> handlingEmailException(MessagingException e){
+        log.error(e.getMessage());
+
+        ErrorCode errorCode = ErrorCode.INVALID_EMAIL_DELIVERY;
+        return ResponseEntity.badRequest().body(ApiResponse.builder()
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .build()
+        );
     }
 }

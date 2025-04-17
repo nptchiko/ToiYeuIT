@@ -1,8 +1,8 @@
 package com.example.toiyeuit.repository;
 
-import com.example.toiyeuit.entity.Exercise;
-import com.example.toiyeuit.entity.ExerciseDetail;
-import com.example.toiyeuit.entity.ExerciseKey;
+import com.example.toiyeuit.entity.exercise.Exercise;
+import com.example.toiyeuit.entity.exercise.ExerciseDetail;
+import com.example.toiyeuit.entity.key.ExerciseKey;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

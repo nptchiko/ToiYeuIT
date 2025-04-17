@@ -1,6 +1,6 @@
 package com.example.toiyeuit.repository;
 
-import com.example.toiyeuit.entity.Test;
+import com.example.toiyeuit.entity.test.Test;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,5 +12,4 @@ public interface TestRepository extends JpaRepository<Test, Long> {
     @Override
     List<Test> findAll();
     Optional<Test> findById(Long id);
-
 }

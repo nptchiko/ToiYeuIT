@@ -1,10 +1,10 @@
-package com.example.toiyeuit.entity;
+package com.example.toiyeuit.entity.exercise;
 
+import com.example.toiyeuit.entity.Question;
+import com.example.toiyeuit.entity.key.ResultKey;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.io.Serializable;
 
 @Entity
 @Getter // auto get

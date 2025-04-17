@@ -1,14 +1,13 @@
 package com.example.toiyeuit.entity;
 
+import com.example.toiyeuit.entity.key.EnrollmentKey;
 import com.example.toiyeuit.enums.CourseStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 
 @Entity
@@ -34,8 +33,8 @@ public class Enrollment {
     @JoinColumn(name = "course_id")
     Course course;
 
-    @Enumerated(value = EnumType.ORDINAL)
-    @Column(name = "status")
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "status", columnDefinition = "enum('COMPLETED', 'PENDING', 'EXPIRED')")
     CourseStatus status;
 
     @CreationTimestamp

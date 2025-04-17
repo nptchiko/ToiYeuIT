@@ -16,7 +16,7 @@ public class CourseRequestDTO {
     private String title;
     private String description;
     private String level;
-    private BigDecimal price;
+    private Double price;
     private Boolean enabled;
     private Integer duration;
 }

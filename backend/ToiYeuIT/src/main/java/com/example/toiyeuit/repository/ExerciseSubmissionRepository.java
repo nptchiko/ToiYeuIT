@@ -1,7 +1,6 @@
 package com.example.toiyeuit.repository;
 
-import com.example.toiyeuit.entity.ExerciseSubmission;
-import com.example.toiyeuit.entity.User;
+import com.example.toiyeuit.entity.exercise.ExerciseSubmission;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

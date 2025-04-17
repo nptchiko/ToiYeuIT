@@ -27,6 +27,10 @@ public class CourseService {
         return courseRepository.findAll();
     }
 
+    public List<Course> findAllActiveCourse(){
+        return courseRepository.findAllActiveCourse();
+    }
+
     public Course findById(Integer id) throws ResourceNotFoundException {
         return courseRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Course not found with id " + id)

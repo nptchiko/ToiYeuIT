@@ -1,10 +1,9 @@
 package com.example.toiyeuit.service;
 
-import com.example.toiyeuit.entity.Exercise;
+import com.example.toiyeuit.entity.exercise.Exercise;
 import com.example.toiyeuit.exception.ExerciseServiceLogicException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
 import com.example.toiyeuit.repository.ExerciseRepository;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
