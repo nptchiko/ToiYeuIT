@@ -18,11 +18,10 @@ import { Routes, Route, Navigate } from "react-router-dom";
 const RoutersConfig = () => {
   return (
     <Routes>
-      {/* Route mặc định - chuyển hướng đến trang đăng nhập */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
-
       {/* Route đăng nhập - có thể truy cập mà không cần xác thực */}
       <Route path="/login" element={<LoginPage />} />
+      {/* Route mặc định - chuyển hướng đến trang đăng nhập */}
+      <Route path="/" element={<Navigate to="/xay-dung" replace />} />
 
       {/* Các trang chính cần xác thực */}
       <Route
