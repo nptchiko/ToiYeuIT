@@ -1,21 +1,30 @@
 import { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
-import Icon from "/ToiYeuIT/frontend/public/icon.png";
+import {
+  FaHome,
+  FaProjectDiagram,
+  FaBookOpen,
+  FaRegCommentDots,
+  FaUserCircle,
+} from "react-icons/fa";
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("TOEIC");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  const [show, setShow] = useState(false);
   const handleSelected = (option) => {
     setSelectedOption(option);
     setIsOpen(false);
   };
 
   return (
-    <nav className="flex justify-between items-center p-5 font-semibold bg-slate-50 relative">
+    <nav className="flex justify-between items-center p-4 font-semibold bg-slate-50 relative">
       <div className="flex items-center gap-4">
-        <div className="flex justify-center items-center h-20 w-40 rounded-[140px]">
-          <img src={Icon} className="h-full w-full object-cover" />
+        <div className="flex items-center">
+          <div className="bg-blue-700 text-white p-1 rounded">
+            <span className="font-bold text-xl">ET</span>
+          </div>
+          <span className="font-bold text-blue-700 text-xl ml-1">ENGHUB</span>
         </div>
         <div className="relative">
           <button
@@ -179,9 +188,32 @@ const Header = () => {
           </NavLink>
         </div>
       </div>
-      <button className="px-4 py-2.5 text-base text-center text-white bg-blue-600 rounded-[32px] hover:bg-blue-700 transition-colors duration-200">
-        Bắt đầu
-      </button>
+      <div
+        className="flex items-center ml-auto text-blue-700 relative"
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+      >
+        <FaUserCircle className="h-10 w-10 cursor-pointer" />
+
+        {show && (
+          <div className="absolute top-10 right-0 bg-white border-gray-100 border shadow-lg rounded-lg w-[220px] p-4 z-50">
+            <div className="flex flex-col space-y-2">
+              <div className="flex items-center gap-4">
+                <FaUserCircle className="h-10 w-10" />
+                <div className="text-gray-800 font-semibold">
+                  Nguyễn Văn Hậu
+                </div>
+              </div>
+              <button className="text-gray-600 font-medium text-sm text-left hover:text-blue-500 px-4 py-1 hover:bg-blue-100 rounded-xl">
+                Hồ sơ
+              </button>
+              <button className="text-gray-600 text-sm font-medium text-left hover:text-red-600 px-4 py-1 hover:bg-red-100 rounded-xl">
+                Đăng xuất
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </nav>
   );
 };
