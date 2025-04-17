@@ -1,12 +1,10 @@
-package com.example.toiyeuit.entity;
+package com.example.toiyeuit.entity.exercise;
 
+import com.example.toiyeuit.entity.Question;
+import com.example.toiyeuit.entity.key.ExerciseKey;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.io.Serializable;
-import java.util.Objects;
 
 @Entity
 @Getter // auto get
@@ -15,26 +13,23 @@ import java.util.Objects;
 @NoArgsConstructor //constructor ko tham so
 @AllArgsConstructor // constructor all tham so
 @FieldDefaults(level = AccessLevel.PRIVATE) //E
-@Table(name = "test_detail")
+@Table(name = "exercise_detail")
 // có thể dùng khóa phức nhưng dài ko làm
-public class TestDetail {
+public class ExerciseDetail {
     @EmbeddedId
-    TestKey id;
+    ExerciseKey id;
 
     @ManyToOne
-    @JoinColumn(name = "belong_to")
-    @MapsId(value = "test_id")
-    Test test;
+    @JoinColumn(name = "ex_id")
+    @MapsId(value = "exercise_id")
+    Exercise excerise;
 
     @ManyToOne
     @JoinColumn(name = "question_id")
-    @MapsId(value = "ques_id")
+    @MapsId(value = "question_id")
     Question question;
 
     @Column(nullable = false)
     int index;
-
-    @Size(min = 1, max = 7)
-    int part;
 }
 

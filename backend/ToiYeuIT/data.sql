@@ -4,14 +4,16 @@ INSERT INTO skill (name) VALUES
                              ('Grammar'),
                              ('Reading'),
                              ('Speaking');
-INSERT INTO course
-    (title, description, level, price, enabled, duration) VALUES
-    ('IELTS Writing Task 2', 'Master essay writing for the IELTS exam.', 'INTERMEDIATE', 49.99, TRUE, 30),
-    ('TOEFL Listening Practice', 'Improve your listening skills for the TOEFL test.', 'ADVANCED', 59.99, TRUE, 40),
-    ('Grammar for Competitive Exams', 'Essential grammar rules and practice exercises.', 'BASIC', 39.99, TRUE, 25),
-    ('Reading Comprehension for Exams', 'Techniques to improve reading speed and understanding.', 'INTERMEDIATE', 45.99, TRUE, 35),
-    ('Speaking Fluency for IELTS & TOEFL', 'Develop fluency and confidence in English speaking.', 'ADVANCED', 69.99, TRUE, 50);
 
+INSERT INTO ToiYeuIT.course (title, description, level, price, enabled, duration, tag) VALUES ('TOEIC 450+ Cơ Bản', 'Nền tảng từ vựng, ngữ pháp và kỹ năng làm bài cơ bản.', 'BASIC', 1200000.00, 1, 6, 'Phổ biến');
+INSERT INTO ToiYeuIT.course (title, description, level, price, enabled, duration, tag) VALUES ('TOEIC 650+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.', 'INTERMEDIATE', 1800000.00, 1, 8, 'Bestseller');
+INSERT INTO ToiYeuIT.course (title, description, level, price, enabled, duration, tag) VALUES ('TOEIC 800+ Nâng Cao', 'Tăng tốc luyện đề và kỹ năng phản xạ đề thi thực tế.', 'ADVANCED', 2400000.00, 1, 10, 'Premium');
+INSERT INTO ToiYeuIT.course (title, description, level, price, enabled, duration, tag) VALUES ('TOEIC 750+ Cơ Bản', 'Nền tảng từ vựng, ngữ pháp và kỹ năng làm bài cơ bản.', 'BASIC', 1200000.00, 1, 6, 'Mới');
+INSERT INTO ToiYeuIT.course (title, description, level, price, enabled, duration, tag) VALUES ('TOEIC 850+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.', 'INTERMEDIATE', 1800000.00, 1, 8, 'Đề xuất');
+INSERT INTO ToiYeuIT.course (title, description, level, price, enabled, duration, tag) VALUES ('TOEIC 900+ Nâng Cao', 'Tăng tốc luyện đề và kỹ năng phản xạ đề thi thực tế.', 'ADVANCED', 2400000.00, 1, 10, 'VIP');
+
+INSERT INTO `question` (`ques_id`, `description`, `correct_ans`, `question_scope`, `question_type`, `audio_src`, `img_src`) VALUES (1, 'Câu hỏi 1.', '(D)', 'TEST', 'MULTIPLECHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/30449101.mp3', 'https://estudyme.hoc102.com/legacy-data/kslearning/images/418922160-1620725865601-pic1.png');
+INSERT INTO `multichoice_detail` (`ques_id`, `key`, `answer_description`) VALUES (1, 'A', '(A)');
 
 INSERT INTO lessons (title, video_url, image_url, description, course_id, skill_id) VALUES
 ('Understanding Essay Structures', 'https://example.com/ielts-essay.mp4', 'https://example.com/ielts-essay.jpg', 'Learn different essay structures for IELTS Writing Task 2.', 1, 1),

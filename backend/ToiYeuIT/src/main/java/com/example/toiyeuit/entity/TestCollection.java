@@ -1,10 +1,13 @@
 package com.example.toiyeuit.entity;
 
+import com.example.toiyeuit.entity.test.Test;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+
+import java.util.Set;
 
 @Entity
 @Getter
@@ -16,15 +19,16 @@ public class TestCollection {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
-    String name;
+    @Column(name = "title")
+    String title;
 
-    @ManyToOne
+    @Column(name = "description")
+    String description;
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "skill_id")
     Skill skill;
 
-    @ManyToOne
-    @JoinColumn(name = "course_id")
-    Course course;
-
-
+    @OneToMany(mappedBy = "testCollection", cascade = CascadeType.ALL)
+    Set<Test> tests;
 }

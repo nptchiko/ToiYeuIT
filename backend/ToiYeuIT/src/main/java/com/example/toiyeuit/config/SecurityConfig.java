@@ -39,22 +39,29 @@ public class SecurityConfig {
 
     private final JwtTokenFilter tokenFilter;
 
-    public SecurityConfig(RsaKeyProperties jwtConfigProperties, JwtTokenFilter tokenFilter){
+    private final CorsConfiguration corsConfiguration;
+
+    public SecurityConfig(RsaKeyProperties jwtConfigProperties, JwtTokenFilter tokenFilter, CorsConfiguration corsConfiguration){
         this.jwtConfigProperties = jwtConfigProperties;
         this.tokenFilter = tokenFilter;
+        this.corsConfiguration = corsConfiguration;
     }
 
 
     private static final String[] PUBLIC_ENDPOINT = {
-            "/api/auth/login",
-            "/api/auth/signup",
-            "/api/auth/refresh",
-            "/api/auth/logout",
-//            "/api/courses/**",
-            "/api/users/create-user",
-            "/api/payment/**",
-            "/api/lessons/**",
-            "/api/decks/**",
+ //           "/api/auth/login",
+ //           "/api/auth/signup",
+ //           "/api/auth/refresh",
+ //           "/api/auth/logout",
+////            "/api/courses/**",
+ //           "/api/users/**",
+ ////           "/api/users/create-user",
+ //           "/api/payment/**",
+ //           "/api/lessons/**",
+ //           "/api/decks/**",
+            "/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
     };
 
     @Bean
@@ -68,6 +75,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(c -> c.configurationSource(corsConfiguration.corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINT).permitAll()
                         .requestMatchers("api/admin/**").hasAuthority("ADMIN")

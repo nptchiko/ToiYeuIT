@@ -1,4 +1,4 @@
-package com.example.toiyeuit.entity;
+package com.example.toiyeuit.entity.key;
 
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Setter
 @Embeddable
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ResultKey implements Serializable {
-    Long submit_id;
+public class TResultKey implements Serializable {
+    Long test_id;
     Long ques_id;
 }

@@ -1,6 +1,8 @@
 package com.example.toiyeuit.entity;
 
+import com.example.toiyeuit.enums.CourseType;
 import com.example.toiyeuit.enums.Level;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
@@ -29,11 +31,17 @@ public class Course {
     @Enumerated(value = EnumType.STRING)
     private Level level = Level.BASIC;
 
-    private BigDecimal price;
+    @Column(columnDefinition = "DECIMAL(10,2) NOT NULL")
+    private Double price;
 
     private Boolean enabled;
 
     private Integer duration;
 
+    @Column(name = "tag")
+    private String tag;
+
+    @Enumerated(value = EnumType.STRING)
+    private CourseType type;
 
 }

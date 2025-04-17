@@ -1,4 +1,4 @@
-package com.example.toiyeuit.entity;
+package com.example.toiyeuit.entity.key;
 
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
