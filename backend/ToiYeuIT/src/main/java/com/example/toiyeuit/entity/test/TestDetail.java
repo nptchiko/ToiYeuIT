@@ -20,7 +20,7 @@ public class TestDetail {
     @EmbeddedId
     TestKey id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "belong_to")
     @MapsId(value = "test_id")
     Test test;

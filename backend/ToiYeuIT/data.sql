@@ -14,6 +14,10 @@ INSERT INTO ToiYeuIT.course (title, description, level, price, enabled, duration
 
 INSERT INTO `question` (`ques_id`, `description`, `correct_ans`, `question_scope`, `question_type`, `audio_src`, `img_src`) VALUES (1, 'Câu hỏi 1.', '(D)', 'TEST', 'MULTIPLECHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/30449101.mp3', 'https://estudyme.hoc102.com/legacy-data/kslearning/images/418922160-1620725865601-pic1.png');
 INSERT INTO `multichoice_detail` (`ques_id`, `key`, `answer_description`) VALUES (1, 'A', '(A)');
+INSERT INTO `multichoice_detail` (`ques_id`, `key`, `answer_description`) VALUES (1, 'B', '(B)');
+INSERT INTO `multichoice_detail` (`ques_id`, `key`, `answer_description`) VALUES (1, 'C', '(C)');
+INSERT INTO `multichoice_detail` (`ques_id`, `key`, `answer_description`) VALUES (1, 'D', '(D)');
+
 
 INSERT INTO lessons (title, video_url, image_url, description, course_id, skill_id) VALUES
 ('Understanding Essay Structures', 'https://example.com/ielts-essay.mp4', 'https://example.com/ielts-essay.jpg', 'Learn different essay structures for IELTS Writing Task 2.', 1, 1),
@@ -35,3 +39,6 @@ INSERT INTO role (name) VALUES
 ('STUDENT'),
 ('TEACHER'),
 ('USER');
+
+
+## CREATE A WHOLE TEST

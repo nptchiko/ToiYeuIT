@@ -22,6 +22,8 @@ import com.nimbusds.jwt.JWTClaimsSet;
 
 import com.nimbusds.jwt.SignedJWT;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -71,7 +73,7 @@ public class AuthService {
     @Autowired
     private UserMapper userMapper;
 
-    public AuthTokenResponse authenticate(LoginRequest loginRequest){
+    public AuthTokenResponse authenticate(LoginRequest loginRequest, HttpServletResponse response){
 
        var user = userRepository.findByEmail(loginRequest.getEmail())
                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -82,13 +84,23 @@ public class AuthService {
 
        String token = jwtService.generateToken(user, false);
 
+       response.addCookie(setCookie("jwt", token));
+
        return AuthTokenResponse.builder()
                .role(user.getRole().getName())
                .token(token)
                .build();
     }
 
+    private Cookie setCookie(String key, String value){
+        Cookie cookie = new Cookie(key, value);
 
+        cookie.setMaxAge(24*60*60);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+
+        return cookie;
+    }
 
     public AuthTokenResponse refresh(RefreshTokenRequest token) throws ParseException, JOSEException {
         var signedToken = jwtService.verifyToken(token.getToken());
