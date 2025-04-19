@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserCreationRequest {
-    private String username;
+    private String username = "Unknown";
     private String email;
     private String password;
-    private Gender gender; // xai primary
+    private Gender gender = Gender.m; // xai primary
     private String phone;
 }

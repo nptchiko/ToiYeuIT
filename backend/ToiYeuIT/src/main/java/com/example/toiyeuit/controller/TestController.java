@@ -2,9 +2,9 @@ package com.example.toiyeuit.controller;
 
 import com.example.toiyeuit.dto.request.TestDetailRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
+import com.example.toiyeuit.dto.response.TestDetailsResponse;
 import com.example.toiyeuit.entity.test.Test;
 import com.example.toiyeuit.service.TestService;
-import jakarta.persistence.FieldResult;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,18 +18,18 @@ public class TestController {
 
     TestService testService;
 
-    @GetMapping("/detail/{id}")
-    public ApiResponse<Test> testByID(@PathVariable("id") Long id){
-        var result = testService.getByID(id);
+    @GetMapping("/detail")
+    public ApiResponse<TestDetailsResponse> testByID(@RequestParam("id") Long id){
+        var result = testService.getTestByID(id);
 
-        return ApiResponse.<Test>builder()
+        return ApiResponse.<TestDetailsResponse>builder()
                 .code(200)
                 .message("Successfully")
                 .body(result)
                 .build();
     }
-   @GetMapping("/detail/part/{part}")
-    public ApiResponse<Test> getTestDetailByPart(@PathVariable("part") int part, @RequestBody TestDetailRequest request){
+   @GetMapping("/detail/part")
+    public ApiResponse<Test> getTestDetailByPart(@RequestParam("part") int part, @RequestBody TestDetailRequest request){
         return null;
 
    }

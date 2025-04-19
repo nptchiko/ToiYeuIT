@@ -7,6 +7,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.PackagePrivate;
 
+import java.util.Set;
+
 
 @Entity
 @Table(name = "Question")
@@ -28,11 +30,9 @@ public class Question {
     String correctAnswer;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "varchar(32) default 'TEST'")
     QuestionScope questionScope = QuestionScope.TEST;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "varchar(32) default 'MULTICHOICE'")
     QuestionType questionType = QuestionType.MULTICHOICE;
 
     @Column(name = "img_src")
@@ -40,4 +40,7 @@ public class Question {
 
     @Column(name = "audio_src")
     String audioSource;
+
+    @OneToMany(mappedBy = "question", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    Set<MultichoiceDetail> options;
 }

@@ -16,11 +16,23 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     @Query(
             nativeQuery = true,
-            value = "SELECT q.ques_id, q.description, q.correct_ans, audio_src, img_src " +
+            value = "SELECT q.*  " +
                     "FROM ToiYeuIT.question q " +
                     "JOIN ToiYeuIT.test_detail td " +
                     "ON q.ques_id = td.question_id " +
-                    "AND td.belong_to = :testId"
+                    "WHERE td.belong_to = :testId " +
+                    "AND td.part = :part"
     )
-    List<Question> findAllByTestID(Long testId);
+    List<Question> findAllByTestIDAndPart(Long testId, Integer part);
+
+
+    @Query(
+            nativeQuery = true,
+            value = "SELECT * FROM ToiYeuIT.question q " +
+                    "WHERE q.question_cluster_id IN (SELECT qc.id FROM ToiYeuIT.question_cluster qc " +
+                    "WHERE qc.test_id = ?1 " +
+                    "AND qc.part = ?2 " +
+                    "AND qc.indexes = ?3)"
+    )
+    List<Question> findAllByQuestionCluster(long testId, int part, int index);
 }
