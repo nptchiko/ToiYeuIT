@@ -11,6 +11,7 @@ import com.example.toiyeuit.service.AuthService;
 import com.example.toiyeuit.service.EmailService;
 import com.example.toiyeuit.service.UserService;
 import com.nimbusds.jose.JOSEException;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +37,8 @@ public class AuthController {
     private EmailService emailService;
 
     @PostMapping("/login")
-    public ApiResponse<AuthTokenResponse> login(@RequestBody LoginRequest request){
-        var result = authService.authenticate(request);
+    public ApiResponse<AuthTokenResponse> login(@RequestBody LoginRequest request, HttpServletResponse response){
+        var result = authService.authenticate(request, response);
 
         return ApiResponse.<AuthTokenResponse>builder()
                 .code(HttpStatus.CREATED.value())

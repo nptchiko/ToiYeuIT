@@ -5,6 +5,7 @@ import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.dto.response.UserResponse;
 import com.example.toiyeuit.repository.UserRepository;
 import com.example.toiyeuit.service.UserService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

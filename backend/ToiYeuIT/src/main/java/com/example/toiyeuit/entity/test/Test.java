@@ -31,7 +31,6 @@ public class Test {
     int index;
 
     @JsonIgnore
-    @Getter(AccessLevel.NONE)
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(
             name = "test_collection_id"

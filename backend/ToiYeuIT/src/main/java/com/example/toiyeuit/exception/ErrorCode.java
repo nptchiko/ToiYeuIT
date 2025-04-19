@@ -31,8 +31,11 @@ public enum ErrorCode {
     ROLE_NOT_FOUND(4042, "Role not found", HttpStatus.NOT_FOUND),
     SKILL_NOT_FOUND(4043, "Skill not found", HttpStatus.NOT_FOUND),
     TEST_NOT_FOUND(4044, "Test not found", HttpStatus.NOT_FOUND),
-    VERIFYING_TOKEN_NOT_FOUND(4045, "Verification token is not found", HttpStatus.NOT_FOUND);
-    private final int code;
+    VERIFYING_TOKEN_NOT_FOUND(4045, "Verification token is not found", HttpStatus.NOT_FOUND),
+    QUESTION_NOT_FOUND(4046, "Question not found", HttpStatus.NOT_FOUND)
+    ;
+
+    int code;
     private final String message;
     private final HttpStatusCode statusCode;
 

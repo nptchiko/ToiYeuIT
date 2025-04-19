@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.experimental.FieldDefaults;
 import java.math.BigDecimal;
+import java.util.Random;
 
 import lombok.*;
 @Entity
@@ -31,7 +32,7 @@ public class Course {
     @Enumerated(value = EnumType.STRING)
     private Level level = Level.BASIC;
 
-    @Column(columnDefinition = "DECIMAL(10,2) NOT NULL")
+    @Column
     private Double price;
 
     private Boolean enabled;
@@ -44,4 +45,9 @@ public class Course {
     @Enumerated(value = EnumType.STRING)
     private CourseType type;
 
+    // temporary
+    @JsonProperty("rating")
+    double getRating(){
+        return 5.0;
+    }
 }
