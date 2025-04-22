@@ -1,8 +1,8 @@
 "use client";
 
+import { useToast } from "../components/toast-context";
 import { AuthService, TokenService } from "../utils/auth-service";
 import { AuthContext } from "./auth-context";
-import { useToast } from "./toast-context";
 import { useState, useEffect } from "react";
 
 export function AuthProvider({ children }) {
@@ -13,18 +13,23 @@ export function AuthProvider({ children }) {
   // Kiểm tra trạng thái đăng nhập khi component mount
   useEffect(() => {
     const checkAuthStatus = async () => {
+      setLoading(true); // Set loading true at the start
       try {
-        // Kiểm tra xem có token không
         if (TokenService.getToken()) {
-          // Lấy thông tin người dùng từ API
           const userData = await AuthService.getCurrentUser();
-          setUser(userData);
-          // return userData;
+          //Optionally, add a role check here too if needed on refresh
+          if (userData && userData.role !== "ADMIN") {
+            console.warn("Non-admin user token found on refresh, logging out.");
+            TokenService.clearTokens();
+            setUser(null);
+          } else {
+            setUser(userData);
+          }
         }
       } catch (error) {
-        console.error("Failed to get user data:", error);
-        // Nếu có lỗi, xóa token
-        TokenService.clearTokens();
+        console.error("Failed to get user data on mount:", error);
+        TokenService.clearTokens(); // Clear tokens if fetching user fails
+        setUser(null); // Ensure user is null if error
       } finally {
         setLoading(false);
       }
@@ -38,22 +43,28 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const userData = await AuthService.login(email, password);
-      setUser(userData);
-      addToast("Đăng nhập thành công!", "success");
 
-      return userData;
+      // Kiểm tra role
+      if (userData === "ADMIN") {
+        setUser(userData);
+        addToast("Đăng nhập thành công");
+        return userData;
+      } else {
+        // Nếu không phải admin, xóa token và hiển thị thông báo
+        TokenService.clearTokens();
+        addToast("Bạn không có quyền truy cập vào hệ thống này", "error");
+        return null;
+      }
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
         "Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập.";
       addToast(errorMessage, "error");
-      // Xử lý lỗi ở đây thay vì re-throw
       return null;
     } finally {
       setLoading(false);
     }
   };
-
   // Đăng ký
   const register = async (email, password) => {
     setLoading(true);

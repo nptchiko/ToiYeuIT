@@ -1,3 +1,5 @@
+import { useAuth } from "../hooks/auth-context";
+import { LogOut, User } from "lucide-react";
 import { useState } from "react";
 import {
   FaHome,
@@ -6,6 +8,8 @@ import {
   FaRegCommentDots,
   FaUserCircle,
 } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 
 const Header = () => {
@@ -13,11 +17,20 @@ const Header = () => {
   const [selectedOption, setSelectedOption] = useState("TOEIC");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [show, setShow] = useState(false);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const handleSelected = (option) => {
     setSelectedOption(option);
     setIsOpen(false);
   };
-
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
   return (
     <nav className="flex justify-between items-center p-4 font-semibold bg-slate-50 relative">
       <div className="flex items-center gap-4">
@@ -205,11 +218,21 @@ const Header = () => {
                   Nguyễn Văn Hậu
                 </div>
               </div>
-              <button className="text-gray-600 font-medium text-sm text-left hover:text-blue-500 px-4 py-1 hover:bg-blue-100 rounded-xl">
-                Hồ sơ
-              </button>
-              <button className="text-gray-600 text-sm font-medium text-left hover:text-red-600 px-4 py-1 hover:bg-red-100 rounded-xl">
-                Đăng xuất
+              <Link
+                to="/profile"
+                className="flex items-center gap-2 text-primary hover:bg-primary/10 transition-colors px-3 py-2 rounded-lg"
+              >
+                <User className="h-4 w-4" />
+                <span className="text-sm font-medium">View Profile</span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 text-destructive hover:bg-destructive/10 transition-colors px-3 py-2 rounded-lg"
+              >
+                <LogOut className="h-4 w-4" />
+                <span onClick={handleLogout} className="text-sm font-medium">
+                  Logout
+                </span>
               </button>
             </div>
           </div>
