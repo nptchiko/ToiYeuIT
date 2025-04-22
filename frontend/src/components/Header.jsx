@@ -77,7 +77,7 @@ const Header = () => {
         {isMobileMenuOpen && (
           <div className="absolute top-full left-0 w-full bg-white rounded-lg shadow-lg py-2 z-10 md:hidden">
             <NavLink
-              to="xay-dung"
+              to="/"
               className={({ isActive }) =>
                 `block px-4 py-3 ${
                   isActive
@@ -137,7 +137,7 @@ const Header = () => {
 
         <div className="hidden md:flex text-sm font-[650] font-sent gap-10 py-1 pr-7 pl-1 leading-none bg-white rounded-[317px]">
           <NavLink
-            to="/xay-dung"
+            to="/"
             className={({ isActive }) =>
               `px-3 py-5 rounded-[317px] transition-colors duration-200 ${
                 isActive

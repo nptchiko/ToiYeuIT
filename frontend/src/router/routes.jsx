@@ -10,6 +10,7 @@ import Speaking from "../Pages/Practice/Speaking";
 import Commitment from "../Pages/Output_commitment/Output_commitment";
 import Course from "../Pages/By_Course/Course";
 import { BrowserRouter as Router } from "react-router-dom";
+import Roadmap from "../Pages/Roadmap/Roadmap";
 import RouterPublic from "./RouterPublic";
 import RouterPrivate from "./RouterPrivate";
 const RoutersConfig = () => {
@@ -18,7 +19,7 @@ const RoutersConfig = () => {
       <Routes>
         <Route element={<RouterPublic />}>
           {/* Điều hướng mặc định */}
-          <Route path="/" element={<Navigate to="/xay-dung" replace />} />
+          <Route path="/" element={<Roadmap />} />
           {/* Các trang chính */}
           <Route path="/kiem-tra" element={<KT />} />
           <Route path="/xay-dung" element={<Overview />} />
