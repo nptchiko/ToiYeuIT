@@ -1,9 +1,9 @@
 "use client";
 
-import { useAuth } from "../../hooks/auth-context";
-import { useToast } from "../../hooks/toast-context";
-import { TokenService } from "../../utils/auth-service";
-import PasswordStrength from "./password-strength";
+import { useAuth } from "../hooks/auth-context";
+import { TokenService } from "../utils/auth-service";
+import PasswordStrength from "@/components/password-strength";
+import { useToast } from "@/components/toast-context";
 import {
   X,
   ChevronLeft,
@@ -23,6 +23,7 @@ export default function LoginPage() {
   const { addToast } = useToast();
   const { login, register, resetPassword, verifyResetCode, setNewPassword } =
     useAuth();
+
   // Modal state
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
@@ -167,6 +168,7 @@ export default function LoginPage() {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setIsLoginSubmitting(true);
+    // TokenService.removeLegacyToken();
 
     // Reset errors
     const errors = {};
@@ -191,9 +193,15 @@ export default function LoginPage() {
     }
 
     try {
-      await login(loginEmail, loginPassword);
-      closeModals();
-      navigate("/xay-dung");
+      const userRole = await login(loginEmail, loginPassword);
+      console.log("user role : ", userRole);
+      if (userRole === "ADMIN") {
+        closeModals();
+        navigate("/dashboard");
+      } else {
+        TokenService.clearTokens();
+        setLoginErrors("Trang này chỉ dành cho tài khoản admin");
+      }
     } catch (error) {
       console.error("Login failed:", error);
       addToast(
@@ -453,7 +461,7 @@ export default function LoginPage() {
           Tham gia ngay cùng Enghub
         </h1>
         <h2 className="text-lg text-[#0071f9] font-medium mb-4">
-          Nền tảng học và luyện thi thông minh. Tốt nhất hiện nay
+          Nền tảng học và luyện thi thông minh.Tốt nhất hiện nay
         </h2>
         {/* <p className="text-sm text-gray-600 mt-4">
           Bằng cách tham gia, chúng tôi xác nhận bạn đã đọc và đồng ý với{" "}
@@ -748,7 +756,7 @@ export default function LoginPage() {
                 <div className="space-y-1">
                   <label
                     htmlFor="register-email"
-                    className="block text-sm font-medium text-gray-700 "
+                    className="block text-sm font-medium text-gray-700"
                   >
                     Email
                   </label>
@@ -929,7 +937,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={openLoginModal}
-                    className="text-[#0071f9]  hover:underline font-medium"
+                    className="text-[#0071f9] hover:underline font-medium"
                   >
                     Đăng nhập
                   </button>
