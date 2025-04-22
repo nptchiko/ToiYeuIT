@@ -1,31 +1,29 @@
 import React from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 const data = [
   {
     id: 1,
-    name: "TOEIC Full test (Listening + Reading)",
+    name: "TOEIC test Listening",
     time: "Thời gian làm bài:02:00:00",
-    skill: "Bài thi gồm hai phần nghe và đọc",
+    skill:
+      "Bài thi được sử dụng để đánh giá nhanh trình độ của học sinh cho kĩ năng TOEIC Listening",
   },
   {
     id: 2,
-    name: "TOEIC Quick Test (Listening + Reading)",
+    name: "TOEIC Quick Test Reading",
     time: "Thời gian làm bài:00:30:00",
     skill:
-      "Bài thi được sử dụng để đánh giá nhanh trình độ của học sinh cho kĩ năng TOEIC Listening và TOEIC Reading",
-  },
-  {
-    id: 3,
-    name: "TOEIC Entry test 4 KN",
-    time: "Thời gian làm bài:02:00:00",
-    skill:
-      "Bài thi được sử dụng để đánh giá nhanh trình độ của học sinh cho các cặp kĩ năng: Listening và Reading , Speaking và Writing",
+      "Bài thi được sử dụng để đánh giá nhanh trình độ của học sinh cho kĩ năng TOEIC Reading",
   },
 ];
 const Test = () => {
   const [opent, setOpent] = useState(data[0].id);
+  const navigate = useNavigate();
+  const [page, setPage] = useState("/check-input-listening");
   const handlselection = (id) => {
     setOpent(id);
+    setPage(id === 2 ? "/check-input-reading" : "/check-input-listening");
   };
   return (
     <div className="flex flex-col space-y-5 justify-center items-center py-[150px]">
@@ -52,7 +50,10 @@ const Test = () => {
           </div>
         </div>
       ))}
-      <button className="bg-blue-600 h-[50px] w-[300px] text-base text-white font-semibold rounded-2xl font-sent">
+      <button
+        onClick={() => navigate(page)}
+        className="bg-blue-600 h-[50px] w-[300px] text-base text-white font-semibold rounded-2xl font-sent"
+      >
         Bắt đầu làm bài
       </button>
     </div>
