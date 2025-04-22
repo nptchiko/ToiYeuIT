@@ -61,13 +61,16 @@ public class UserService {
         var context = SecurityContextHolder.getContext();
         String email = context.getAuthentication().getName();
 
-        return getUserByEmail(email);
+        return getUserResponseByEmail(email);
     }
 
-    public UserResponse getUserByEmail(String email){
-         User u = userRepository.findByEmail(email)
+    public User getUserByEmail(String email){
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        return userMapper.toUserResponse(u);
+    }
+
+    public UserResponse getUserResponseByEmail(String email){
+        return userMapper.toUserResponse(getUserByEmail(email));
     }
 
     public Boolean existsByEmail(String email) throws ResourceNotFoundException {
@@ -83,8 +86,8 @@ public class UserService {
 
         if (userRepository.existsByEmail(userCreationRequest.getEmail().toLowerCase()))
             throw new AppException(ErrorCode.USER_EMAIL_EXISTED);
-        if (userRepository.existsUserByPhone(userCreationRequest.getPhone()))
-            throw new AppException(ErrorCode.USER_PHONE_EXISTED);
+//        if (userRepository.existsUserByPhone(userCreationRequest.getPhone()))
+//            throw new AppException(ErrorCode.USER_PHONE_EXISTED);
 
         // get role from roleName, default to USER if not found
       //  Role userRole = roleRepository.findByName(userCreationRequest.getRoleName())

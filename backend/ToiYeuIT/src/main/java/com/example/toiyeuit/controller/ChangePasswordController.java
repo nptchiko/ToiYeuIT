@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequestMapping("/api/")
+@RequestMapping("/api/auth")
 public class ChangePasswordController {
 
         ChangePasswordService changePasswordService;
 
-        @PutMapping("/change-password")
+        @PutMapping("/reset-password")
         ApiResponse<?> changePassword(@RequestBody ChangePasswordRequest request){
                 changePasswordService.changePassword(request);
                 return ApiResponse.builder()

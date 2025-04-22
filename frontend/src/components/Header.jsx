@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { useState } from "react";
 import {
   FaHome,
   FaProjectDiagram,
@@ -7,6 +6,8 @@ import {
   FaRegCommentDots,
   FaUserCircle,
 } from "react-icons/fa";
+import { NavLink } from "react-router-dom";
+
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("TOEIC");

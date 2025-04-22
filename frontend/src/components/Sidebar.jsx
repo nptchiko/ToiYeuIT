@@ -1,8 +1,6 @@
-import { NavLink } from "react-router-dom";
 import React from "react";
-import { FaHamburger } from "react-icons/fa";
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { FaHamburger } from "react-icons/fa";
 import {
   FaHome,
   FaProjectDiagram,
@@ -10,8 +8,10 @@ import {
   FaRegCommentDots,
   FaUserCircle,
 } from "react-icons/fa";
+import { NavLink } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
-const layout = () => {
+const sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [show, setShow] = useState(false);
   return (
@@ -124,4 +124,4 @@ const layout = () => {
   );
 };
 
-export default layout;
+export default sidebar;
