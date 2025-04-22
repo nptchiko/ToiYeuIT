@@ -1,5 +1,5 @@
 import axios from "axios";
-import Cookies from "js-cookie";
+import Cookies from "universal-cookie";
 
 // Cấu hình Axios
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8081/api";
@@ -13,6 +13,9 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// Khởi tạo cookies instance
+const cookies = new Cookies();
+
 // Tên cookies
 const TOKEN_COOKIE_NAME = "jwt";
 const REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
@@ -24,39 +27,49 @@ const TOKEN_EXPIRY = 7;
 const TokenService = {
   // Lưu token vào cookies
   setToken: (token) => {
-    Cookies.set(TOKEN_COOKIE_NAME, token, {
-      expires: TOKEN_EXPIRY,
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + TOKEN_EXPIRY);
+
+    cookies.set(TOKEN_COOKIE_NAME, token, {
+      expires: expiryDate,
       secure: import.meta.env.MODE === "production",
-      httpOnly: true,
+      path: "/",
     });
+    console.log("token set :", token);
+    console.log("Cookies:", cookies);
   },
 
   // Lấy token từ cookies
   getToken: () => {
-    return Cookies.get(TOKEN_COOKIE_NAME);
+    const token = cookies.get(TOKEN_COOKIE_NAME);
+    console.log("token Received :", token);
+    return token;
   },
 
   // Xóa token khỏi cookies
-  removeToken: () => {
-    Cookies.remove(TOKEN_COOKIE_NAME);
+  removeToken: (TOKEN_COOKIE_NAME) => {
+    cookies.remove(TOKEN_COOKIE_NAME, { path: "/" });
   },
 
   // Lưu refresh token vào cookies
   setRefreshToken: (token) => {
-    Cookies.set(REFRESH_TOKEN_COOKIE_NAME, token, {
-      expires: TOKEN_EXPIRY,
-      secure: false,
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + TOKEN_EXPIRY);
+
+    cookies.set(REFRESH_TOKEN_COOKIE_NAME, token, {
+      expires: expiryDate,
+      path: "/",
     });
   },
 
   // Lấy refresh token từ cookies
   getRefreshToken: () => {
-    return Cookies.get(REFRESH_TOKEN_COOKIE_NAME);
+    return cookies.get(REFRESH_TOKEN_COOKIE_NAME);
   },
 
   // Xóa refresh token khỏi cookies
   removeRefreshToken: () => {
-    Cookies.remove(REFRESH_TOKEN_COOKIE_NAME);
+    cookies.remove(REFRESH_TOKEN_COOKIE_NAME, { path: "/" });
   },
 
   // Xóa tất cả token
@@ -66,12 +79,12 @@ const TokenService = {
   },
 };
 
-// Thêm interceptor để tự động thêm token vào header của mỗi request
+//  interceptor để tự động thêm token vào header của mỗi request
 api.interceptors.request.use(
   (config) => {
     const token = TokenService.getToken();
     if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -80,7 +93,7 @@ api.interceptors.request.use(
   }
 );
 
-// Thêm interceptor để xử lý lỗi 401 (Unauthorized) và tự động refresh token
+// interceptor để xử lý lỗi 401 (Unauthorized) và tự động refresh token
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -132,13 +145,13 @@ const AuthService = {
 
       const { token, role } = response.data.body;
       console.log("Received token:", token);
-      console.log(response.data);
+      console.log(response.data.body.token);
 
       // Lưu token vào cookies
       TokenService.setToken(token);
       console.log("Token stored:", TokenService.getToken());
 
-      return role; // tra ve role cua tk
+      return role;
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -222,7 +235,7 @@ const AuthService = {
   getCurrentUser: async () => {
     try {
       const response = await api.get("/users/user-info");
-      console.log(response.data);
+      console.log("response data user info:", response.data);
       return response.data;
     } catch (error) {
       console.error("Get current user error:", error);
