@@ -1,3 +1,4 @@
+// import { useToast } from "../components/toast-context";
 import axios from "axios";
 import Cookies from "universal-cookie";
 
@@ -47,7 +48,7 @@ const TokenService = {
   },
 
   // Xóa token khỏi cookies
-  removeToken: (TOKEN_COOKIE_NAME) => {
+  removeToken: () => {
     cookies.remove(TOKEN_COOKIE_NAME, { path: "/" });
   },
 
@@ -99,8 +100,11 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Nếu lỗi là 401 và chưa thử refresh token
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Nếu lỗi là 401 hoặc 500 và chưa thử refresh token
+    if (
+      (error.response?.status === 401 || error.response?.status === 500) &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
 
       try {
@@ -136,16 +140,24 @@ api.interceptors.response.use(
   }
 );
 
-// Các hàm xác thực
 const AuthService = {
   // Đăng nhập
   login: async (email, password) => {
     try {
-      const response = await api.post("/auth/login", { email, password });
+      // Sử dụng axios trực tiếp thay vì api instance để không kèm token
+      const response = await axios.post(
+        `${API_URL}/auth/login`,
+        { email, password },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
 
       const { token, role } = response.data.body;
       console.log("Received token:", token);
-      console.log(response.data.body.token);
 
       // Lưu token vào cookies
       TokenService.setToken(token);
@@ -180,8 +192,12 @@ const AuthService = {
   // Đăng xuất
   logout: () => {
     try {
-      // Gọi API đăng xuất (nếu backend yêu cầu)
-      api.post("/auth/logout");
+      const token = TokenService.getToken();
+
+      // Gọi API đăng xuất
+      if (token) {
+        api.post("/auth/logout", { token });
+      }
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -208,7 +224,7 @@ const AuthService = {
         email,
         code,
       });
-      // console.log(response.data.message);
+
       return response.data;
     } catch (error) {
       console.error("Verify reset code error:", error);

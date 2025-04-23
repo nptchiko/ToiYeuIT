@@ -10,7 +10,7 @@ function App() {
       <AuthProvider>
         <ToastProvider>
           <RoutersConfig />
-          {/* <RouterUser /> */}
+          <RouterUser />
         </ToastProvider>
       </AuthProvider>
     </Router>
