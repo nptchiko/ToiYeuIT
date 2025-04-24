@@ -9,6 +9,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +25,7 @@ import java.text.ParseException;
 
 import static io.micrometer.common.util.StringUtils.isEmpty;
 
+@Slf4j
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter{
 
@@ -67,7 +69,7 @@ public class JwtTokenFilter extends OncePerRequestFilter{
     }
     private String getJwtFromRequest(HttpServletRequest request){
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-
+        log.info("token: " + token);
         if (token != null && token.startsWith("Bearer ")) {
             return token.substring(7);
         }

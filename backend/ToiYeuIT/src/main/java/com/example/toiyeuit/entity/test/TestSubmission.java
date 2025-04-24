@@ -39,7 +39,4 @@ public class TestSubmission {
 
     @Column(name = "score")
     Float score;
-
-    @Column(name = "part")
-    int part;
 }

@@ -33,7 +33,12 @@ public class CorsConfiguration {
    public CorsConfigurationSource corsConfigurationSource() {
         log.info("[CorsConfiguration] " + FRONTEND_PORT);
         org.springframework.web.cors.CorsConfiguration corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3003", "http://localhost:5173", "http://localhost:3000", "http://localhost:5174"));
+        corsConfiguration.setAllowedOrigins(List.of(
+                "http://localhost:3003",
+                "http://localhost:5173",
+                "http://localhost:3000",
+                "http://localhost:5174",
+                "http://localhost:3001"));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "x-no-retry", "Access-Control-Allow-Origin"));
         corsConfiguration.setExposedHeaders(List.of("Authorization", "Content-Type"));

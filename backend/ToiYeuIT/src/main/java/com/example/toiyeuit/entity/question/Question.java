@@ -1,11 +1,10 @@
-package com.example.toiyeuit.entity;
+package com.example.toiyeuit.entity.question;
 
 import com.example.toiyeuit.enums.QuestionScope;
 import com.example.toiyeuit.enums.QuestionType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.PackagePrivate;
 
 import java.util.Set;
 

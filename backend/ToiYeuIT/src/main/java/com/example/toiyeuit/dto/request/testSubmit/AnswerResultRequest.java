@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnswerSubmitRequest {
+public class AnswerResultRequest {
     long id;
     String answer;
 }

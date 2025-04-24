@@ -42,7 +42,7 @@ env:
   frontend_port: ${FRONTEND_PORT}
 
 jwt:
-  valid-duration: 1 #hours
+  valid-duration: 168 #hours
   refresh-duration: 72 # hours
 credential:
   admin-email: ${ADMIN_EMAIL}
@@ -50,3 +50,11 @@ credential:
 rsa:
   private-key: classpath:certs/private.pem
   public-key: classpath:certs/public.pem
+
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          filter:
+            CommonsRequestLoggingFilter: DEBUG

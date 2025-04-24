@@ -1,15 +1,17 @@
-package com.example.toiyeuit.entity;
+package com.example.toiyeuit.entity.course;
 
-import com.example.toiyeuit.entity.key.EnrollmentKey;
+import com.example.toiyeuit.entity.User;
 import com.example.toiyeuit.enums.CourseStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 
+@Slf4j
 @Entity
 @Table(name = "enrollment")
 @Getter // auto get
@@ -21,15 +23,14 @@ import java.time.LocalDateTime;
 public class Enrollment {
 
     @Id
-    EnrollmentKey id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
     @ManyToOne
-    @MapsId(value = "user_id")
     @JoinColumn(name = "user_id")
     User user;
 
     @ManyToOne
-    @MapsId(value = "course_id")
     @JoinColumn(name = "course_id")
     Course course;
 
@@ -43,5 +44,12 @@ public class Enrollment {
 
     @Column(name = "expired_at")
     LocalDateTime expired_at;
+
+    @PostPersist
+    public void postPersist(){
+        log.info("Expiration operation");
+        if (expired_at == null)
+            this.expired_at = LocalDateTime.now().plusWeeks(course.getDuration());
+    }
 }
 

@@ -1,8 +1,8 @@
 package com.example.toiyeuit.mapper;
 
 import com.example.toiyeuit.dto.response.QuestionResponse;
-import com.example.toiyeuit.entity.MultichoiceDetail;
-import com.example.toiyeuit.entity.Question;
+import com.example.toiyeuit.entity.question.MultichoiceDetail;
+import com.example.toiyeuit.entity.question.Question;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

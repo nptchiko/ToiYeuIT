@@ -1,7 +1,10 @@
 package com.example.toiyeuit.service;
 
 import com.example.toiyeuit.dto.request.UserCreationRequest;
+import com.example.toiyeuit.dto.response.OverviewResponse;
+import com.example.toiyeuit.dto.response.TestResponse;
 import com.example.toiyeuit.dto.response.UserResponse;
+import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.entity.Role;
 import com.example.toiyeuit.entity.User;
 import com.example.toiyeuit.exception.AppException;
@@ -9,8 +12,12 @@ import com.example.toiyeuit.exception.ErrorCode;
 import com.example.toiyeuit.exception.UserAlreadyExistsException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
 import com.example.toiyeuit.mapper.UserMapper;
+import com.example.toiyeuit.repository.CourseRepository;
 import com.example.toiyeuit.repository.RoleRepository;
+import com.example.toiyeuit.repository.TestRepository;
 import com.example.toiyeuit.repository.UserRepository;
+import com.example.toiyeuit.service.test.TestService;
+import com.example.toiyeuit.utils.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +40,12 @@ public class UserService {
     private UserMapper userMapper;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    @Autowired
+    private CourseRepository courseRepository;
+    @Autowired
+    private TestService testService;
+    @Autowired
+    private TestRepository testRepository;
 
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
@@ -119,5 +132,18 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    public OverviewResponse getOverviewInfo(){
+        String email = SecurityUtils.getCurrentUserLogin();
+        var user = getUserByEmail("mikudeptrai@gmail.com");
+
+        List<Course> cor = courseRepository.retrieveAllCourseOfUser(user.getId());
+        List<TestResponse> tests = testRepository.retrieveBySubmission(user.getId());
+
+        return OverviewResponse.builder()
+                .courses(cor)
+                .tests(tests)
+                .build();
     }
 }

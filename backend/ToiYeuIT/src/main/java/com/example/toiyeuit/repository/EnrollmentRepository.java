@@ -1,8 +1,7 @@
 package com.example.toiyeuit.repository;
 
-import com.example.toiyeuit.entity.Course;
-import com.example.toiyeuit.entity.Enrollment;
-import com.example.toiyeuit.entity.key.EnrollmentKey;
+import com.example.toiyeuit.entity.course.Course;
+import com.example.toiyeuit.entity.course.Enrollment;
 import com.example.toiyeuit.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface EnrollmentRepository extends JpaRepository<Enrollment, EnrollmentKey> {
+public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     Boolean existsByCourseAndUser(Course course, User user);
 

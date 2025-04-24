@@ -1,6 +1,6 @@
 package com.example.toiyeuit.repository;
 
-import com.example.toiyeuit.entity.Question;
+import com.example.toiyeuit.entity.question.Question;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,7 +13,7 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findAll();
 
     Optional<Question> findById(Long id);
-
+    
     @Query(
             nativeQuery = true,
             value = "SELECT q.*  " +

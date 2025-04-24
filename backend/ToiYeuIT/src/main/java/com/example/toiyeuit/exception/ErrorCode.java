@@ -18,6 +18,7 @@ public enum ErrorCode {
     INVALID_EMAIL(4006, "Email is not validated", HttpStatus.BAD_REQUEST),
     PASS_EXISTED(4007, "New password can not be same with old password", HttpStatus.BAD_REQUEST),
     INVALID_CONFIRM_LOGIC(4008, "Your confirmation password is wrong", HttpStatus.BAD_REQUEST),
+    TEST_NOT_DONE(4009, "Current user haven never done this test before", HttpStatus.BAD_REQUEST),
     // unauthenticated - 401
     UNAUTHENTICATED(4010, "You need to log in to perform this action.", HttpStatus.UNAUTHORIZED),
     EXPIRED_TOKEN(4011, "Expired token. Please refresh the new one", HttpStatus.UNAUTHORIZED),

@@ -4,7 +4,7 @@ import com.example.toiyeuit.dto.request.TestDetailRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.dto.response.TestDetailsResponse;
 import com.example.toiyeuit.entity.test.Test;
-import com.example.toiyeuit.service.TestService;
+import com.example.toiyeuit.service.test.TestService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;

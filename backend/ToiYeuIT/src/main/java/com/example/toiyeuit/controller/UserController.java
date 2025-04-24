@@ -2,6 +2,7 @@ package com.example.toiyeuit.controller;
 
 import com.example.toiyeuit.dto.request.UserCreationRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
+import com.example.toiyeuit.dto.response.OverviewResponse;
 import com.example.toiyeuit.dto.response.UserResponse;
 import com.example.toiyeuit.repository.UserRepository;
 import com.example.toiyeuit.service.UserService;
@@ -68,6 +69,14 @@ public class UserController {
                 .message("User information")
                 .code(200)
                 .body(userService.getInfo())
+                .build();
+    }
+    @GetMapping("/overview")
+    public ApiResponse<OverviewResponse> overview() {
+        return ApiResponse.<OverviewResponse>builder()
+                .message("Overview")
+                .code(200)
+                .body(userService.getOverviewInfo())
                 .build();
     }
 /// USER ///

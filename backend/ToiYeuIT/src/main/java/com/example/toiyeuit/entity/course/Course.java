@@ -1,12 +1,10 @@
-package com.example.toiyeuit.entity;
+package com.example.toiyeuit.entity.course;
 
 import com.example.toiyeuit.enums.CourseType;
 import com.example.toiyeuit.enums.Level;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.experimental.FieldDefaults;
-import java.math.BigDecimal;
-import java.util.Random;
 
 import lombok.*;
 @Entity
@@ -50,4 +48,6 @@ public class Course {
     double getRating(){
         return 5.0;
     }
+
+
 }

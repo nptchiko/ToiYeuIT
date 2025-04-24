@@ -1,5 +1,6 @@
-package com.example.toiyeuit.entity;
+package com.example.toiyeuit.entity.course;
 
+import com.example.toiyeuit.entity.User;
 import com.example.toiyeuit.entity.key.OrderKey;
 import com.example.toiyeuit.enums.PaymentMethod;
 import com.example.toiyeuit.enums.PaymentStatus;
@@ -15,7 +16,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor // constructor all tham so
 @FieldDefaults(level = AccessLevel.PRIVATE) //E
 @Table(name = "order_course")
-public class OrderCourse {
+public class CourseOrder {
     @EmbeddedId
     OrderKey id;
 
