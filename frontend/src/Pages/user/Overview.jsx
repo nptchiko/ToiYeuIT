@@ -8,92 +8,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-const coursesLR = [
-  {
-    title: "TOEIC 450+ Cơ Bản",
-    description: "Nền tảng từ vựng, ngữ pháp và kỹ năng làm bài cơ bản.",
-    level: "Cơ bản",
-    duration: "6 tuần",
-    rating: "4.5",
-    students: 1200,
-    price: "1.200.000đ",
-    startDate: "15/04/2025",
-    tag: "Phổ biến",
-    features: [
-      "Giảng viên chuyên nghiệp",
-      "Tài liệu độc quyền",
-      "Bài tập thực hành",
-    ],
-  },
-  {
-    title: "TOEIC 650+ Trung Cấp",
-    description: "Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.",
-    level: "Trung cấp",
-    duration: "8 tuần",
-    rating: "4.7",
-    students: 950,
-    price: "1.800.000đ",
-    startDate: "22/04/2025",
-    tag: "Bestseller",
-    features: [
-      "Phân tích chuyên sâu",
-      "Bài tập tương tác",
-      "Mô phỏng thi thật",
-    ],
-  },
-  {
-    title: "TOEIC 800+ Nâng Cao",
-    description: "Tăng tốc luyện đề và kỹ năng phản xạ đề thi thực tế.",
-    level: "Nâng cao",
-    duration: "10 tuần",
-    rating: "4.9",
-    students: 620,
-    price: "2.400.000đ",
-    startDate: "01/05/2025",
-    tag: "Premium",
-    features: ["Giáo trình quốc tế", "Đảm bảo đầu ra", "Hỗ trợ 1-1"],
-  },
-];
-const coursesSW = [
-  {
-    title: "TOEIC 750+ Cơ Bản",
-    description:
-      "Nền tảng từ vựng, ngữ pháp và kỹ thuật làm bài Speaking & Writing.",
-    level: "Cơ bản",
-    duration: "6 tuần",
-    rating: "4.5",
-    students: 1200,
-    price: "1.200.000đ",
-    startDate: "15/04/2025",
-    tag: "Mới",
-    features: ["Rèn luyện phát âm", "Kỹ thuật viết mẫu", "Bài tập theo chủ đề"],
-  },
-  {
-    title: "TOEIC 850+ Trung Cấp",
-    description:
-      "Rèn luyện kỹ năng phản xạ và chiến thuật làm bài thi thực tế.",
-    level: "Trung cấp",
-    duration: "8 tuần",
-    rating: "4.7",
-    students: 950,
-    price: "1.800.000đ",
-    startDate: "22/04/2025",
-    tag: "Đề xuất",
-    features: ["Phản hồi chi tiết", "Bài tập tương tác", "Hỗ trợ trực tuyến"],
-  },
-  {
-    title: "TOEIC 900+ Nâng Cao",
-    description: "Tăng tốc luyện đề và kỹ năng phản xạ đề thi thực tế.",
-    level: "Nâng cao",
-    duration: "10 tuần",
-    rating: "4.9",
-    students: 620,
-    price: "2.400.000đ",
-    startDate: "01/05/2025",
-    tag: "VIP",
-    features: ["Luyện thi trọng tâm", "Tư vấn cá nhân hóa", "Bảo đảm điểm số"],
-  },
-];
+import OverviewAip from "../../api/OverviewApi";
 const tagColors = {
   "Phổ biến": "bg-blue-100 text-blue-600",
   Bestseller: "bg-amber-100 text-amber-600",
@@ -108,33 +23,30 @@ const levelBgs = {
   "Nâng cao": "bg-purple-50",
 };
 
-const test = [
-  {
-    id: 1,
-    plantain: "Đề 1",
-    skill: "Listening",
-  },
-  {
-    id: 2,
-    plantain: "Đề 2",
-    skill: "Reading",
-  },
-  {
-    id: 3,
-    plantain: "Đề 3",
-    skill: "Speaking",
-  },
-  {
-    id: 4,
-    plantain: "Đề 4",
-    skill: "Writing",
-  },
-];
-
-const allCourses = [...coursesLR, ...coursesSW];
-
 const Overview = () => {
   const navigate = useNavigate();
+  const [allCourses, setAllCoures] = useState([]);
+  const [test, setTest] = useState([]);
+  useEffect(() => {
+    async function fetchCourses(params) {
+      try {
+        const res = await OverviewAip.getUserOverview();
+        const coursesWith = res.body.courses.map((course) => ({
+          ...course,
+          features: [
+            "Giảng viên chuyên nghiệp",
+            "Tài liệu độc quyền",
+            "Bài tập thực hành",
+          ],
+        }));
+        setTest(res.body.tests);
+        setAllCoures(coursesWith);
+      } catch (error) {
+        console.error("Lỗi khi lấy dứ liệu khóa học đã mua");
+      }
+    }
+    fetchCourses();
+  }, []);
   const hanldClickMyCoure = () => {
     navigate("/sidebar/my-course");
   };
@@ -206,22 +118,10 @@ const Overview = () => {
                           {course.rating}
                         </span>
                         <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
-                          {course.duration}
+                          {course.duration} tuần
                         </span>
                       </div>
                       <div className="text-sm text-gray-700 space-y-3">
-                        <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4 text-indigo-500" />
-                          <span>
-                            <strong>{course.students}</strong> học viên đã ký
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-indigo-500" />
-                          <span>
-                            Khai giảng: <strong>{course.startDate}</strong>
-                          </span>
-                        </div>
                         <div className="flex items-center gap-2">
                           <DollarSign className="w-4 h-4 text-green-600" />
                           <span>
@@ -278,57 +178,66 @@ const Overview = () => {
           <div className="h-[250px] overflow-y-auto pr-2 pb-6 rounded-lg border border-gray-100">
             <div className="p-4 grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 xl:gap-5 gap-3">
               {test.map((item) => (
-                <>
-                  {" "}
-                  {/* đề thi listening */}
-                  {item.skill === "Listening" && (
-                    <div
-                      key={item.id}
-                      className="flex items-center gap-4 border hover:border-indigo-400 hover:shadow-2xl rounded-2xl overflow-hidden duration-300 hover:-translate-y-1 border-gray-200 p-4 2xl:w-[300px] lg:w-[200px] w-[300px] cursor-pointer"
-                    >
-                      <div className="h-12 w-12 bg-blue-50 flex justify-center items-center rounded-lg">
-                        <img src="https://api.prep.vn/images/skills/test_practice/listening.png" />
-                      </div>
-                      <p className="text-base font-bold">{item.plantain}</p>
-                    </div>
-                  )}
-                  {/* đề thi reading */}
-                  {item.skill === "Reading" && (
-                    <div
-                      key={item.id}
-                      className="flex items-center gap-4 border hover:border-indigo-400 hover:shadow-2xl rounded-2xl overflow-hidden duration-300 hover:-translate-y-1 border-gray-200 p-4 2xl:w-[300px] lg:w-[200px] w-[300px] cursor-pointer"
-                    >
-                      <div className="h-12 w-12 bg-blue-50 flex justify-center items-center rounded-lg">
-                        <img src="https://api.prep.vn/images/skills/test_practice/reading.png" />
-                      </div>
-                      <p className="text-base font-bold">Đề 1</p>
-                    </div>
-                  )}
-                  {/* đề thi writing */}
-                  {item.skill === "Reading" && (
-                    <div
-                      key={item.id}
-                      className="flex items-center gap-4 border hover:border-indigo-400 hover:shadow-2xl rounded-2xl overflow-hidden duration-300 hover:-translate-y-1 border-gray-200 p-4 2xl:w-[300px] lg:w-[200px] w-[300px] cursor-pointer"
-                    >
-                      <div className="h-12 w-12 bg-blue-50 flex justify-center items-center rounded-lg">
-                        <img src="https://api.prep.vn/images/skills/test_practice/writing.png" />
-                      </div>
-                      <p className="text-base font-bold">Đề 1</p>
-                    </div>
-                  )}
-                  {/* đề thi speaking */}
-                  {item.skill === "Reading" && (
-                    <div
-                      key={item.id}
-                      className="flex items-center gap-4 border hover:border-indigo-400 hover:shadow-2xl rounded-2xl overflow-hidden duration-300 hover:-translate-y-1 border-gray-200 p-4 2xl:w-[300px] lg:w-[200px] w-[300px] cursor-pointer"
-                    >
-                      <div className="h-12 w-12 bg-blue-50 flex justify-center items-center rounded-lg">
-                        <img src="https://api.prep.vn/images/skills/test_practice/speaking.png" />
-                      </div>
-                      <p className="text-base font-bold">Đề 1</p>
-                    </div>
-                  )}
-                </>
+                <div
+                  key={item.id}
+                  className="flex items-center gap-4 border hover:border-indigo-400 hover:shadow-2xl rounded-2xl overflow-hidden duration-300 hover:-translate-y-1 border-gray-200 p-4 2xl:w-[300px] lg:w-[200px] w-[300px] cursor-pointer"
+                >
+                  <div className="h-12 w-12 bg-blue-50 flex justify-center items-center rounded-lg">
+                    <img src="https://api.prep.vn/images/skills/test_practice/listening.png" />
+                  </div>
+                  <p className="text-base font-bold">{item.title}</p>
+                </div>
+                // <>
+                //   {" "}
+                //   {/* đề thi listening */}
+                //   {item.skill === "Listening" && (
+                //     <div
+                //       key={item.id}
+                //       className="flex items-center gap-4 border hover:border-indigo-400 hover:shadow-2xl rounded-2xl overflow-hidden duration-300 hover:-translate-y-1 border-gray-200 p-4 2xl:w-[300px] lg:w-[200px] w-[300px] cursor-pointer"
+                //     >
+                //       <div className="h-12 w-12 bg-blue-50 flex justify-center items-center rounded-lg">
+                //         <img src="https://api.prep.vn/images/skills/test_practice/listening.png" />
+                //       </div>
+                //       <p className="text-base font-bold">{item.plantain}</p>
+                //     </div>
+                //   )}
+                //   {/* đề thi reading */}
+                //   {item.skill === "Reading" && (
+                //     <div
+                //       key={item.id}
+                //       className="flex items-center gap-4 border hover:border-indigo-400 hover:shadow-2xl rounded-2xl overflow-hidden duration-300 hover:-translate-y-1 border-gray-200 p-4 2xl:w-[300px] lg:w-[200px] w-[300px] cursor-pointer"
+                //     >
+                //       <div className="h-12 w-12 bg-blue-50 flex justify-center items-center rounded-lg">
+                //         <img src="https://api.prep.vn/images/skills/test_practice/reading.png" />
+                //       </div>
+                //       <p className="text-base font-bold">Đề 1</p>
+                //     </div>
+                //   )}
+                //   {/* đề thi writing */}
+                //   {item.skill === "Reading" && (
+                //     <div
+                //       key={item.id}
+                //       className="flex items-center gap-4 border hover:border-indigo-400 hover:shadow-2xl rounded-2xl overflow-hidden duration-300 hover:-translate-y-1 border-gray-200 p-4 2xl:w-[300px] lg:w-[200px] w-[300px] cursor-pointer"
+                //     >
+                //       <div className="h-12 w-12 bg-blue-50 flex justify-center items-center rounded-lg">
+                //         <img src="https://api.prep.vn/images/skills/test_practice/writing.png" />
+                //       </div>
+                //       <p className="text-base font-bold">Đề 1</p>
+                //     </div>
+                //   )}
+                //   {/* đề thi speaking */}
+                //   {item.skill === "Reading" && (
+                //     <div
+                //       key={item.id}
+                //       className="flex items-center gap-4 border hover:border-indigo-400 hover:shadow-2xl rounded-2xl overflow-hidden duration-300 hover:-translate-y-1 border-gray-200 p-4 2xl:w-[300px] lg:w-[200px] w-[300px] cursor-pointer"
+                //     >
+                //       <div className="h-12 w-12 bg-blue-50 flex justify-center items-center rounded-lg">
+                //         <img src="https://api.prep.vn/images/skills/test_practice/speaking.png" />
+                //       </div>
+                //       <p className="text-base font-bold">Đề 1</p>
+                //     </div>
+                //   )}
+                // </>
               ))}
             </div>
           </div>

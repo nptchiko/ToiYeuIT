@@ -133,10 +133,10 @@ const InputDesign = () => {
               </div>
 
               <div className="absolute z-10 bottom-5 left-5 text-white">
-                <h3 className="text-2xl font-semibold">Bảo Trân</h3>
+                <h3 className="text-2xl font-semibold">Phương Trang</h3>
                 <p className="text-base opacity-90 flex items-center gap-2">
                   <span className="bg-white/20 px-2 py-1 rounded-full text-sm">
-                    26 tuổi
+                    21 tuổi
                   </span>
                   <span className="inline-block w-1 h-1 bg-white rounded-full"></span>
                   <span>Ngày thi: 05.06.2024</span>

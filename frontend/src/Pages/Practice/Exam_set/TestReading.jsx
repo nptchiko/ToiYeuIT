@@ -14,8 +14,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import CheckInputReadingApi from "../../api/CheckInputReadingApi";
+import TestReadingApi from "../../../api/TestReadingApi";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 const checkInputReading = () => {
   const [timeLeft, setTimeLeft] = useState(60 * 60);
   const [showResults, setShowResults] = useState(false);
@@ -26,6 +27,8 @@ const checkInputReading = () => {
   const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
   const [data, setData] = useState([]);
+  const location = useLocation();
+  const { id } = location.state;
   const contestApi = () => {
     const context = [
       { part: 5, answers: [] },
@@ -68,7 +71,7 @@ const checkInputReading = () => {
   const handleReturnAnswer = async () => {
     try {
       const context = contestApi();
-      await CheckInputReadingApi.submitTesAnswers(data.testId, score, context);
+      await TestReadingApi.submitTesAnswers(data.testId, score, context);
       console.log("Nộp bài thành công:", response);
       return response;
     } catch (error) {
@@ -79,7 +82,7 @@ const checkInputReading = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await CheckInputReadingApi.getCheckInputReading();
+        const res = await TestReadingApi.getTestReading(id);
         setData(res.body);
         setQuestions(res.body.context);
       } catch (error) {
@@ -403,7 +406,7 @@ const checkInputReading = () => {
       <header className="flex items-center justify-between px-4 py-2 border-b bg-white">
         <div className="flex items-center gap-2">
           <Button
-            onClick={() => navigate("/kiem-tra")}
+            onClick={() => navigate("/luyen-de/reading")}
             variant="ghost"
             size="icon"
             className="rounded-full"
