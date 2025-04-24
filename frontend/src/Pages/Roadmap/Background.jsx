@@ -14,27 +14,7 @@ import {
   Filter,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-
-// Tạo instance của axios
-const axiosClient = axios.create({
-  baseURL: "http://localhost:8081",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-// Interceptor cho request
-axiosClient.interceptors.request.use(
-  (config) => config,
-  (error) => Promise.reject(error)
-);
-
-// Interceptor cho response
-axiosClient.interceptors.response.use(
-  (response) => response.data,
-  (error) => Promise.reject(error)
-);
+import BackgroundAip from "../../api/BackgroundApi";
 const Background = () => {
   const [selectedCourse, setSelectedCourse] = useState(1);
   const [selectedLevel, setSelectedLevel] = useState("all");
@@ -42,8 +22,7 @@ const Background = () => {
   useEffect(() => {
     async function fetchCourses() {
       try {
-        const res = await axiosClient.get("/api/courses");
-        // Thêm features vào mỗi khóa học
+        const res = await BackgroundAip.getBackground();
         const coursesWithFeatures = res.body.map((course) => ({
           ...course,
           features: [
@@ -54,7 +33,6 @@ const Background = () => {
           rating: "4.9",
         }));
         setCourses(coursesWithFeatures);
-        console.log(coursesWithFeatures);
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu khóa học:", error);
       }

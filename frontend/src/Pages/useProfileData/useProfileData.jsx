@@ -10,31 +10,13 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import axios from "axios";
-const axiosClient = axios.create({
-  baseURL: "http://localhost:8081",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-//Interceptor cho request
-axiosClient.interceptors.request.use(
-  (config) => config,
-  (error) => Promise.reject(error)
-);
-
-// Interceptor cho response
-axiosClient.interceptors.response.use(
-  (response) => response.data,
-  (error) => Promise.reject(error)
-);
-
+import useProfileDataApi from "../../api/useProfileDataApi";
 const useProfileData = () => {
   const [data, setData] = useState({});
   useEffect(() => {
     async function fetchProfile() {
       try {
-        const res = await axiosClient.get("/api/users/2");
+        const res = await useProfileDataApi.getUserProfileData();
         setData(res);
       } catch (error) {
         console.error("lỗi khi lấy dữ liệu profile");

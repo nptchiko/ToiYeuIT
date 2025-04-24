@@ -22,8 +22,8 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useNavigate } from "react-router-dom";
-import CheckInputListeningApi from "../../api/CheckInputListeningApi";
+import { useNavigate, useLocation } from "react-router-dom";
+import TestListeningApi from "../../../api/TestListeningApi";
 const audioFiles = [
   {
     id: 1,
@@ -47,7 +47,7 @@ const audioFiles = [
   },
 ];
 
-export default function checkInputListening() {
+export default function TestListening() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -63,135 +63,137 @@ export default function checkInputListening() {
   const [questions, setQuestions] = useState([]);
   const [data, setData] = useState([]);
   const [apiData, setApiData] = useState([]);
+  const location = useLocation();
+  const { id } = location.state;
   const audioRef = useRef(null);
   const { toast } = useToast();
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await CheckInputListeningApi.getCheckInputListening();
+        const res = await TestListeningApi.getTestListening(id);
         setData(res.body.context);
         setApiData(res.body);
       } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu đề thi");
+        console.error("Lỗi khi lấy dữ liệu đề thi index");
+        setData([
+          {
+            part: 1,
+            questions: [
+              {
+                id: "1",
+                text: "Câu hỏi 1.",
+                audioSource:
+                  "https://storage.googleapis.com/estudyme/dev/2022/06/27/30449101.mp3",
+                imageSource:
+                  "https://estudyme.hoc102.com/legacy-data/kslearning/images/418922160-1620725865601-pic1.png",
+                correctAnswer: "(D)",
+                options: ["(D)", "(B)", "(A)", "(C)"],
+              },
+            ],
+          },
+          {
+            part: 2,
+            questions: [
+              {
+                id: "7",
+                text: "Câu hỏi 7.",
+                audioSource:
+                  "https://storage.googleapis.com/estudyme/dev/2022/06/27/46972225.mp3",
+                correctAnswer: "(B)",
+                options: ["(A)", "(B)", "(C)"],
+              },
+            ],
+          },
+          {
+            part: 3,
+            questions: [
+              {
+                id: "32",
+                text: "What does the woman want to find?",
+                audioSource:
+                  "https://storage.googleapis.com/estudyme/dev/2022/06/27/40438651.mp3",
+                correctAnswer: "(B) A file",
+                options: [
+                  "(C) An office key",
+                  "(A) Some money",
+                  "(B) A file",
+                  "(D) A check",
+                ],
+              },
+              {
+                id: "33",
+                text: "Where most likely is Patrick?",
+                audioSource:
+                  "https://storage.googleapis.com/estudyme/dev/2022/06/27/40438651.mp3",
+                correctAnswer: "(D) On a business trip",
+                options: [
+                  "(A) At his home",
+                  "(D) On a business trip",
+                  "(B) In his office",
+                  "(C) At a restaurant",
+                ],
+              },
+              {
+                id: "34",
+                text: "What will John most likely do next?",
+                audioSource:
+                  "https://storage.googleapis.com/estudyme/dev/2022/06/27/40438651.mp3",
+                correctAnswer: "(A) Check his office",
+                options: [
+                  "(A) Check his office",
+                  "(B) Bring Patrick",
+                  "(C) Postpone a meeting",
+                  "(D) Reply to a letter",
+                ],
+              },
+            ],
+          },
+          {
+            part: 4,
+            questions: [
+              {
+                id: "71",
+                text: "Who most likely is Ted Costello?",
+                audioSource:
+                  "https://storage.googleapis.com/estudyme/dev/2022/06/27/32759585.mp3",
+                correctAnswer: "(C) A radio host",
+                options: [
+                  "(A) A newspaper reporter",
+                  "(C) A radio host",
+                  "(B) A computer scientist",
+                  "(D) A research assistant",
+                ],
+              },
+              {
+                id: "72",
+                text: "What does Dr. Alfson specialize in?",
+                audioSource:
+                  "https://storage.googleapis.com/estudyme/dev/2022/06/27/32759585.mp3",
+                correctAnswer: "(D) The study of language",
+                options: [
+                  "(B) Market research",
+                  "(A) Music education",
+                  "(C) Mergers and acquisitions",
+                  "(D) The study of language",
+                ],
+              },
+              {
+                id: "73",
+                text: "What will happen on August 4?",
+                audioSource:
+                  "https://storage.googleapis.com/estudyme/dev/2022/06/27/32759585.mp3",
+                correctAnswer: "(A) Dr. Alfson’s new book will be available.",
+                options: [
+                  "(C) The radio will broadcast an interview.",
+                  "(D) The results of a study will be announced.",
+                  "(B) A new research project will be launched.",
+                  "(A) Dr. Alfson’s new book will be available.",
+                ],
+              },
+            ],
+          },
+        ]);
       }
-      setData([
-        {
-          part: 1,
-          questions: [
-            {
-              id: "1",
-              text: "Câu hỏi 1.",
-              audioSource:
-                "https://storage.googleapis.com/estudyme/dev/2022/06/27/30449101.mp3",
-              imageSource:
-                "https://estudyme.hoc102.com/legacy-data/kslearning/images/418922160-1620725865601-pic1.png",
-              correctAnswer: "(D)",
-              options: ["(D)", "(B)", "(A)", "(C)"],
-            },
-          ],
-        },
-        {
-          part: 2,
-          questions: [
-            {
-              id: "7",
-              text: "Câu hỏi 7.",
-              audioSource:
-                "https://storage.googleapis.com/estudyme/dev/2022/06/27/46972225.mp3",
-              correctAnswer: "(B)",
-              options: ["(A)", "(B)", "(C)"],
-            },
-          ],
-        },
-        {
-          part: 3,
-          questions: [
-            {
-              id: "32",
-              text: "What does the woman want to find?",
-              audioSource:
-                "https://storage.googleapis.com/estudyme/dev/2022/06/27/40438651.mp3",
-              correctAnswer: "(B) A file",
-              options: [
-                "(C) An office key",
-                "(A) Some money",
-                "(B) A file",
-                "(D) A check",
-              ],
-            },
-            {
-              id: "33",
-              text: "Where most likely is Patrick?",
-              audioSource:
-                "https://storage.googleapis.com/estudyme/dev/2022/06/27/40438651.mp3",
-              correctAnswer: "(D) On a business trip",
-              options: [
-                "(A) At his home",
-                "(D) On a business trip",
-                "(B) In his office",
-                "(C) At a restaurant",
-              ],
-            },
-            {
-              id: "34",
-              text: "What will John most likely do next?",
-              audioSource:
-                "https://storage.googleapis.com/estudyme/dev/2022/06/27/40438651.mp3",
-              correctAnswer: "(A) Check his office",
-              options: [
-                "(A) Check his office",
-                "(B) Bring Patrick",
-                "(C) Postpone a meeting",
-                "(D) Reply to a letter",
-              ],
-            },
-          ],
-        },
-        {
-          part: 4,
-          questions: [
-            {
-              id: "71",
-              text: "Who most likely is Ted Costello?",
-              audioSource:
-                "https://storage.googleapis.com/estudyme/dev/2022/06/27/32759585.mp3",
-              correctAnswer: "(C) A radio host",
-              options: [
-                "(A) A newspaper reporter",
-                "(C) A radio host",
-                "(B) A computer scientist",
-                "(D) A research assistant",
-              ],
-            },
-            {
-              id: "72",
-              text: "What does Dr. Alfson specialize in?",
-              audioSource:
-                "https://storage.googleapis.com/estudyme/dev/2022/06/27/32759585.mp3",
-              correctAnswer: "(D) The study of language",
-              options: [
-                "(B) Market research",
-                "(A) Music education",
-                "(C) Mergers and acquisitions",
-                "(D) The study of language",
-              ],
-            },
-            {
-              id: "73",
-              text: "What will happen on August 4?",
-              audioSource:
-                "https://storage.googleapis.com/estudyme/dev/2022/06/27/32759585.mp3",
-              correctAnswer: "(A) Dr. Alfson’s new book will be available.",
-              options: [
-                "(C) The radio will broadcast an interview.",
-                "(D) The results of a study will be announced.",
-                "(B) A new research project will be launched.",
-                "(A) Dr. Alfson’s new book will be available.",
-              ],
-            },
-          ],
-        },
-      ]);
     }
     fetchData();
   }, []);
@@ -230,11 +232,7 @@ export default function checkInputListening() {
   const handleReturnAnswer = async () => {
     try {
       const context = contestApi();
-      await CheckInputListeningApi.submitTesAnswers(
-        apiData.testId,
-        score,
-        context
-      );
+      await TestListeningApi.submitTesAnswers(apiData.testId, score, context);
       console.log("Nộp bài thành công:", response);
       return response;
     } catch (error) {
@@ -579,7 +577,7 @@ export default function checkInputListening() {
       <header className="flex items-center justify-between px-4 py-2 border-b bg-white">
         <div className="flex items-center gap-2">
           <Button
-            onClick={() => navigate("/kiem-tra")}
+            onClick={() => navigate("/luyen-de/listening")}
             variant="ghost"
             size="icon"
             className="rounded-full"

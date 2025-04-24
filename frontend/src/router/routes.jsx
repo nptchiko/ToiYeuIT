@@ -21,6 +21,10 @@ import UseProfileData from "../Pages/useProfileData/useProfileData";
 import CheckInputListening from "../Pages/test/checkInputListening";
 import CheckInputReading from "../Pages/test/checkInputReading";
 import { Routes, Route, Navigate } from "react-router-dom";
+import TestListening from "../Pages/Practice/Exam_set/TestListening";
+import TestReading from "../Pages/Practice/Exam_set/TestReading";
+import HistoryReaing from "../Pages/Practice/History_test/HistoryReaing";
+import HistoryListening from "../Pages/Practice/History_test/HistoryListening";
 const RoutersConfig = () => {
   return (
     <Routes>
@@ -61,6 +65,10 @@ const RoutersConfig = () => {
         }
       >
         <Route path="/by-course" element={<Course />} />
+        <Route path="/test-listening" element={<TestListening />} />
+        <Route path="/test-reading" element={<TestReading />} />
+        <Route path="/test-history-reading" element={<HistoryReaing />} />
+        <Route path="/test-history-listening" element={<HistoryListening />} />
         <Route
           path="/check-input-listening"
           element={<CheckInputListening />}
