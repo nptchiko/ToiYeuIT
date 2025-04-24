@@ -24,6 +24,7 @@ import com.nimbusds.jwt.SignedJWT;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -43,6 +44,7 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class AuthService {
     // gen token
@@ -73,6 +75,9 @@ public class AuthService {
     @Autowired
     private UserMapper userMapper;
 
+    @Value(value = "${jwt.valid-duration}")
+    private static int VALID_DURATION;
+
     public AuthTokenResponse authenticate(LoginRequest loginRequest, HttpServletResponse response){
 
        var user = userRepository.findByEmail(loginRequest.getEmail())
@@ -95,10 +100,10 @@ public class AuthService {
     private Cookie setCookie(String key, String value){
         Cookie cookie = new Cookie(key, value);
 
-        cookie.setMaxAge(24*60*60);
-        cookie.setHttpOnly(true);
+        cookie.setMaxAge(VALID_DURATION*60*60);
+     //   cookie.setHttpOnly(true);  cai loz nay lam byg nay gio
         cookie.setPath("/");
-
+        cookie.setSecure(false);
         return cookie;
     }
 
@@ -125,13 +130,17 @@ public class AuthService {
         String jid = signedJwt.getJWTClaimsSet().getJWTID();
         java.util.Date expiry = signedJwt.getJWTClaimsSet().getExpirationTime();
 
-        if (!invalidTokenRepo.existsById(jid))
+        if (!invalidTokenRepo.existsById(jid)) {
             invalidTokenRepo.save(
                     InvalidToken.builder()
                             .expiryTime(expiry)
                             .id(jid)
                             .build()
             );
+        }
+        else {
+          log.info("Token has already been invalidated");
+        }
         return "User has been logged out!";
     }
     public void forgetPassword(String email) {

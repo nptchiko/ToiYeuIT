@@ -2,7 +2,7 @@ package com.example.toiyeuit.controller;
 
 
 import com.example.toiyeuit.dto.response.ApiResponse;
-import com.example.toiyeuit.entity.Question;
+import com.example.toiyeuit.entity.question.Question;
 import com.example.toiyeuit.repository.QuestionRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

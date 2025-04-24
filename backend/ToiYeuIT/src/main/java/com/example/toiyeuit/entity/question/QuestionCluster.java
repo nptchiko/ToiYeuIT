@@ -1,4 +1,4 @@
-package com.example.toiyeuit.entity;
+package com.example.toiyeuit.entity.question;
 
 
 import com.example.toiyeuit.entity.test.Test;

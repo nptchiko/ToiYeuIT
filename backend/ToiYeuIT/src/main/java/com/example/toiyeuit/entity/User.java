@@ -1,8 +1,8 @@
 package com.example.toiyeuit.entity;
 
+import com.example.toiyeuit.entity.course.Enrollment;
 import com.example.toiyeuit.enums.Gender;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,7 +25,7 @@ public class User {
     @Column(name="user_id")
     private Long id;
 
-
+    @Column(nullable = true)
     private String username;
 
     private String password;

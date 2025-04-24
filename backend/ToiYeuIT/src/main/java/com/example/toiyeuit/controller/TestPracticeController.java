@@ -1,22 +1,17 @@
 package com.example.toiyeuit.controller;
 
+import com.example.toiyeuit.dto.request.testSubmit.TestSubmitRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
+import com.example.toiyeuit.dto.response.TestDetailsResponse;
 import com.example.toiyeuit.dto.response.TestSetResponse;
-import com.example.toiyeuit.entity.TestCollection;
-import com.example.toiyeuit.mapper.TestSetMapper;
-import com.example.toiyeuit.repository.TestCollectionRepository;
-import com.example.toiyeuit.service.TestCollectionService;
+import com.example.toiyeuit.service.test.TestCollectionService;
+import com.example.toiyeuit.service.test.TestResultService;
+import com.example.toiyeuit.service.test.TestSubmitService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/test-practice")
@@ -24,7 +19,8 @@ import java.util.stream.Collectors;
 public class TestPracticeController {
 
     private final TestCollectionService testsService;
-
+    private final TestSubmitService service;
+    private final TestResultService resultService;
     @GetMapping
     public ApiResponse<List<TestSetResponse>> tests(){
         var result = testsService.getAll();
@@ -43,6 +39,26 @@ public class TestPracticeController {
                 .code(200)
                 .message("Successfully")
                 .body(result)
+                .build();
+    }
+
+    @PostMapping("/submit")
+    public ApiResponse<?> submit(@RequestBody @Valid TestSubmitRequest request){
+        service.submitTest(request);
+
+        return ApiResponse.builder()
+                .code(200)
+                .message("Submit successfully")
+                .build();
+    }
+
+    @GetMapping("/history/{testId}")
+    public ApiResponse<TestDetailsResponse> history(@PathVariable("testId") int testId){
+        var body = resultService.retrieveTestResult(testId);
+        return ApiResponse.<TestDetailsResponse>builder()
+                .code(200)
+                .message("Chan vai lozz")
+                .body(body)
                 .build();
     }
 }

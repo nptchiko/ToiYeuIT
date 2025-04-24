@@ -97,8 +97,10 @@ public class GlobalExceptionalHandler {
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
+        log.error(ex.getMessage());
         return ApiResponse.builder()
                 .code(HttpStatus.BAD_REQUEST.value())
+                .message("Request parameters is not valid")
                 .body(errors)
                 .build();
     }

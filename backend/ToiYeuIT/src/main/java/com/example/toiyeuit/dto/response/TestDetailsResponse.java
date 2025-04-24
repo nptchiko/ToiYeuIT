@@ -19,5 +19,4 @@ public class TestDetailsResponse {
     Long testId;
     String title;
     List<Map<String, Object>> context;
-
 }

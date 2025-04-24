@@ -2,7 +2,7 @@ package com.example.toiyeuit.service;
 
 
 import com.example.toiyeuit.dto.response.QuestionResponse;
-import com.example.toiyeuit.entity.Question;
+import com.example.toiyeuit.entity.question.Question;
 import com.example.toiyeuit.exception.AppException;
 import com.example.toiyeuit.exception.ErrorCode;
 import com.example.toiyeuit.repository.QuestionRepository;

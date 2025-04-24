@@ -18,9 +18,6 @@ public class ChangePasswordRequest {
     String email;
 
     @Size(min = 6, message = "INVALID_PASSWORD")
-    String currentPassword;
-
-    @Size(min = 6, message = "INVALID_PASSWORD")
     String newPassword;
 
     @NotBlank(message = "Confirm password is required")

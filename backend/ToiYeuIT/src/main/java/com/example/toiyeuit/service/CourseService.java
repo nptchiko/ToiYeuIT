@@ -1,6 +1,6 @@
 package com.example.toiyeuit.service;
 
-import com.example.toiyeuit.entity.Course;
+import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.exception.AlreadyExistsException;
 import com.example.toiyeuit.exception.CourseServiceLogicException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;

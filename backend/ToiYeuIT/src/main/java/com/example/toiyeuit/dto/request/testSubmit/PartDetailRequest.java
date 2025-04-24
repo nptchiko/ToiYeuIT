@@ -10,14 +10,10 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TestSubmitRequest {
-    long testId;
+public class PartDetailRequest {
+    @NotNull
+    int part;
 
     @NotNull
-    float score;
-
-    @NotNull
-    List<PartDetailRequest> context;
-
-
+    List<AnswerResultRequest> answers;
 }

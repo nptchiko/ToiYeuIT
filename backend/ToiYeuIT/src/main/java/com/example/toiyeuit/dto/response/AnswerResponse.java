@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
-
 @Setter
 @Getter
 @Builder
@@ -14,11 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class QuestionResponse {
+public class AnswerResponse {
     int id;
-    String text;
-    String audioSource;
-    String imageSource;
-    String correctAnswer;
-    List<String> options;
+    String answer;
 }

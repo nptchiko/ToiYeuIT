@@ -1,4 +1,4 @@
-package com.example.toiyeuit.service;
+package com.example.toiyeuit.service.test;
 
 import com.example.toiyeuit.dto.response.QuestionResponse;
 import com.example.toiyeuit.dto.response.TestDetailsResponse;
@@ -33,47 +33,21 @@ public class TestService {
                 () -> new AppException(ErrorCode.TEST_NOT_FOUND)
         );
     }
-
     public TestDetailsResponse getTestByID(Long id){
 
         var test = getByID(id);
 
         var skillId = test.getTestCollection().getSkill().getId();
 
-        List<Map<String, Object>> context = null;
-
-        if (skillId < 3)
-            context = getLRTest(id, skillId == 1);
-        else
-            context = null;
         return TestDetailsResponse.builder()
                 .testId(id)
                 .title(test.getTitle())
-                .context(context)
+                .context(skillId == 1 ? retrieveListening(id) : retrieveReading(id))
                 .build();
     }
-    private List<Map<String, Object>> getLRTest(Long testId, boolean isListening){
-
+    private List<Map<String, Object>> retrieveReading(long testId){
         List<QuestionResponse> result = null;
         List<Map<String, Object>> context = new LinkedList<>();
-
-        if (isListening){
-            for (int start = 1; start <= 4; start++){
-                log.info("Part: " + start);
-                Map<String, Object> body = new HashMap<>();
-                result = questionRepository
-                        .findAllByTestIDAndPart(testId, start)
-                        .stream().map(questionMapper::toQuestionResponse)
-                        .toList();
-                body.put("part", start);
-                body.put("questions", result);
-                context.add(body);
-            }
-
-            return context;
-        }
-        // part 5
-        log.info("Part 5");
         Map<String, Object> body = new HashMap<>();
         result = questionRepository
                 .findAllByTestIDAndPart(testId, 5)
@@ -83,13 +57,11 @@ public class TestService {
         body.put("questions", result);
         context.add(new HashMap<>(body));
 
-
-
         for (int i = 6; i <= 7; i++) {
-            log.info("Part 6");
             body = new LinkedHashMap<>();
             body.put("part", i);
             var cluster = questionClusterRepository.findAllByTestIdAndPart(testId, i);
+            var list = new LinkedList<>();
             for (var c : cluster) {
                 var id = c.getIndexes();
                 var res = questionRepository.findAllByQuestionCluster(testId, i, id)
@@ -100,8 +72,25 @@ public class TestService {
                 detail.put("paragraph", c.getParagraph());
                 detail.put("questions", res);
 
-                body.put(String.valueOf(id), detail);
+                list.add(detail);
             }
+            body.put("questions", list);
+            context.add(body);
+        }
+        return context;
+    }
+    private List<Map<String, Object>> retrieveListening(long testId){
+        List<QuestionResponse> result = null;
+        List<Map<String, Object>> context = new LinkedList<>();
+        for (int start = 1; start <= 4; start++){
+            log.info("Part: " + start);
+            Map<String, Object> body = new HashMap<>();
+            result = questionRepository
+                    .findAllByTestIDAndPart(testId, start)
+                    .stream().map(questionMapper::toQuestionResponse)
+                    .toList();
+            body.put("part", start);
+            body.put("questions", result);
             context.add(body);
         }
         return context;

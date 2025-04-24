@@ -13,6 +13,14 @@ public interface TestDetailRepository extends JpaRepository<TestDetail, Long> {
 
     @Query(
             nativeQuery = true,
+            value = "SELECT COUNT(td.question_id) " +
+                    "FROM ToiYeuIT.test_detail td " +
+                    "WHERE td.belong_to = ?1"
+    )
+    int countNumberOfQuesOfTest(long testId);
+    
+    @Query(
+            nativeQuery = true,
             value = "SELECT td.part, td.question_id, td.`index`, td.belong_to FROM ToiYeuIT.test_detail td " +
                     "JOIN test t ON td.belong_to = t.id " +
                     "WHERE t.id = ?1"

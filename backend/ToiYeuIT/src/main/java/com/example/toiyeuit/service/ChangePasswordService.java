@@ -10,12 +10,14 @@ import com.example.toiyeuit.utils.SecurityUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -31,14 +33,12 @@ public class ChangePasswordService {
         String email = request.getEmail();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-
-        if (! passwordEncoder.matches(request.getCurrentPassword(), user.getPassword()))
-            throw new AppException(ErrorCode.INVALID_CREDENTIALS);
-
+        log.info("New password: " + request.getNewPassword());
+        log.info("Confirm password: " + request.getConfirmPassword());
         if ( passwordEncoder.matches(request.getNewPassword(), user.getPassword()))
             throw new AppException(ErrorCode.PASS_EXISTED);
 
-        if (!Objects.equals(request.getNewPassword(), request.getConfirmPassword()))
+        if (!request.getNewPassword().equals(request.getConfirmPassword()))
             throw new AppException(ErrorCode.INVALID_CONFIRM_LOGIC);
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));

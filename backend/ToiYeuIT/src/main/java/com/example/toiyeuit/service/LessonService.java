@@ -1,8 +1,8 @@
 package com.example.toiyeuit.service;
 
 import com.example.toiyeuit.dto.request.LessonRequestDTO;
-import com.example.toiyeuit.entity.Course;
-import com.example.toiyeuit.entity.Lesson;
+import com.example.toiyeuit.entity.course.Course;
+import com.example.toiyeuit.entity.course.Lesson;
 import com.example.toiyeuit.entity.Skill;
 import com.example.toiyeuit.exception.AlreadyExistsException;
 import com.example.toiyeuit.exception.LessonServiceLogicException;

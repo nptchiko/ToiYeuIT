@@ -1,6 +1,6 @@
 package com.example.toiyeuit.entity.test;
 
-import com.example.toiyeuit.entity.Question;
+import com.example.toiyeuit.entity.question.Question;
 import com.example.toiyeuit.entity.key.TestKey;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;

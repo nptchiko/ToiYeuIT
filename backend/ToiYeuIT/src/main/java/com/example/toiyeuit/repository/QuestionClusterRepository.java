@@ -1,6 +1,6 @@
 package com.example.toiyeuit.repository;
 
-import com.example.toiyeuit.entity.QuestionCluster;
+import com.example.toiyeuit.entity.question.QuestionCluster;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

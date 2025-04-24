@@ -1,6 +1,8 @@
 package com.example.toiyeuit.repository;
 
-import com.example.toiyeuit.entity.Course;
+import com.example.toiyeuit.entity.course.Course;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -20,4 +22,15 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
             value = "SELECT * FROM course as c where c.enabled = TRUE"
     )
     List<Course> findAllActiveCourse();
+
+    @Query(
+            nativeQuery = true,
+            value = "SELECT c.* FROM course c " +
+                    "LEFT JOIN ToiYeuIT.enrollment e on c.course_id = e.course_id " +
+                    "WHERE e.user_id = :id"
+    )
+    List<Course> retrieveAllCourseOfUser(long id);
+
+    @Override
+    Page<Course> findAll(Pageable pageable);
 }

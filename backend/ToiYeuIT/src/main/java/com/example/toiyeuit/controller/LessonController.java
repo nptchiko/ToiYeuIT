@@ -1,11 +1,10 @@
 package com.example.toiyeuit.controller;
 
 import com.example.toiyeuit.dto.request.LessonRequestDTO;
-import com.example.toiyeuit.entity.Lesson;
+import com.example.toiyeuit.entity.course.Lesson;
 import com.example.toiyeuit.exception.AlreadyExistsException;
 import com.example.toiyeuit.exception.LessonServiceLogicException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
-import com.example.toiyeuit.repository.LessonRepository;
 import com.example.toiyeuit.service.LessonService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

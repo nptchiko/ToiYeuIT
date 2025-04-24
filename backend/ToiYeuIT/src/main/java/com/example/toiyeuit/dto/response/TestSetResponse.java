@@ -20,5 +20,5 @@ public class TestSetResponse {
     String title;
     String description;
     String skill;
-    Set<Test> tests;
+    Set<TestResponse> tests;
 }
