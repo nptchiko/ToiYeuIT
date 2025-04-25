@@ -12,17 +12,22 @@ import Roadmap from "../Pages/Roadmap/Roadmap";
 import KT from "../Pages/test/Test";
 import RouterPrivate from "./RouterPrivate";
 import RouterPublic from "./RouterPublic";
-// Đảm bảo đường dẫn chính xác
+import Sidebar from "../components/Sidebar";
+import Flashcard from "../Pages/user/Flashcard";
+import MyCourses from "../Pages/user/MyCourses";
+import Overview from "../Pages/user/Overview";
+import TestPractice from "../Pages/user/TestPractice";
+import UseProfileData from "../Pages/useProfileData/useProfileData";
+import CheckInputListening from "../Pages/test/checkInputListening";
+import CheckInputReading from "../Pages/test/checkInputReading";
 import { Routes, Route, Navigate } from "react-router-dom";
-
 const RoutersConfig = () => {
   return (
     <Routes>
-      {/* Route mặc định - chuyển hướng đến trang đăng nhập */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
-
       {/* Route đăng nhập - có thể truy cập mà không cần xác thực */}
       <Route path="/login" element={<LoginPage />} />
+      {/* Route mặc định - chuyển hướng đến trang đăng nhập */}
+      <Route path="/" element={<Navigate to="/xay-dung" replace />} />
 
       {/* Các trang chính cần xác thực */}
       <Route
@@ -56,6 +61,19 @@ const RoutersConfig = () => {
         }
       >
         <Route path="/by-course" element={<Course />} />
+        <Route
+          path="/check-input-listening"
+          element={<CheckInputListening />}
+        />
+        <Route path="/check-input-reading" element={<CheckInputReading />} />
+        <Route path="/profile" element={<UseProfileData />} />
+        <Route path="/sidebar" element={<Sidebar />}>
+          <Route index element={<Navigate to="overview" replace />} />
+          <Route path="overview" element={<Overview />} />
+          <Route path="flashcard" element={<Flashcard />} />
+          <Route path="my-course" element={<MyCourses />} />
+          <Route path="test-practice" element={<TestPractice />} />
+        </Route>
       </Route>
     </Routes>
   );

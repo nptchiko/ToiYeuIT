@@ -9,7 +9,6 @@ import {
   FaUserCircle,
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import { Navigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 
 const Header = () => {
@@ -91,7 +90,7 @@ const Header = () => {
         {isMobileMenuOpen && (
           <div className="absolute top-full left-0 w-full bg-white rounded-lg shadow-lg py-2 z-10 md:hidden">
             <NavLink
-              to="/"
+              to="/xay-dung"
               className={({ isActive }) =>
                 `block px-4 py-3 ${
                   isActive
@@ -151,7 +150,7 @@ const Header = () => {
 
         <div className="hidden md:flex text-sm font-[650] font-sent gap-10 py-1 pr-7 pl-1 leading-none bg-white rounded-[317px]">
           <NavLink
-            to="/"
+            to="/xay-dung"
             className={({ isActive }) =>
               `px-3 py-5 rounded-[317px] transition-colors duration-200 ${
                 isActive
@@ -202,6 +201,11 @@ const Header = () => {
           </NavLink>
         </div>
       </div>
+      <NavLink to="/sidebar">
+        <div className="bg-indigo-700 hover:bg-indigo-600 px-3 py-2 text-white rounded-full ml-[350px]">
+          Bắt đầu làm bài
+        </div>
+      </NavLink>
       <div
         className="flex items-center ml-auto text-blue-700 relative"
         onMouseEnter={() => setShow(true)}

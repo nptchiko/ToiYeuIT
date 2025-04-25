@@ -16,9 +16,10 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class QuestionResponse {
+    int id;
     String text;
     String audioSource;
-    String imgSource;
+    String imageSource;
     String correctAnswer;
-    List<MultichoiceDetail> options;
+    List<String> options;
 }

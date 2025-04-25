@@ -1,4 +1,3 @@
-// api/userApi.js - Tạo file riêng để quản lý các API calls
 import axios from "axios";
 
 const apiClient = axios.create({

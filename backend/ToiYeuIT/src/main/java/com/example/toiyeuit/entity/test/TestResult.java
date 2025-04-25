@@ -20,7 +20,7 @@ public class TestResult {
 
     @MapsId(value = "test_id")
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "submit_id")
     TestSubmission testSubmission;
 
     @MapsId(value = "ques_id")
@@ -31,7 +31,5 @@ public class TestResult {
     @Column(length = 30, nullable = false)
     String answer;
 
-    @Column(length = 30, name = "correct_ans", nullable = false)
-    String correct_ans;
 }
 

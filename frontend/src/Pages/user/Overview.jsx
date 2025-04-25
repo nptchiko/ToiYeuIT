@@ -136,10 +136,10 @@ const allCourses = [...coursesLR, ...coursesSW];
 const Overview = () => {
   const navigate = useNavigate();
   const hanldClickMyCoure = () => {
-    navigate("/my-coursew");
+    navigate("/sidebar/my-course");
   };
   const hanldClicTestPractice = () => {
-    navigate("/test-practice");
+    navigate("/sidebar/test-practice");
   };
   return (
     <div className="p-7 font-sent h-full w-full ">

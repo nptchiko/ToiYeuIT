@@ -1,11 +1,11 @@
 package com.example.toiyeuit.dto.response;
 
-import com.example.toiyeuit.entity.test.TestDetail;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Setter
@@ -15,8 +15,9 @@ import java.util.List;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TestDetailResponse {
+public class TestDetailsResponse {
     Long testId;
     String title;
-    List<QuestionResponse> questions;
+    List<Map<String, Object>> context;
+
 }

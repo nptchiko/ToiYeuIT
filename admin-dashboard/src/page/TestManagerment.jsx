@@ -11,27 +11,38 @@ import {
   Eye,
   Plus,
   Search,
-  Filter,
   ChevronDown,
+  ChevronRight,
   AlertCircle,
+  FolderOpen,
+  Trash2,
+  AlertTriangle,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 export default function TestManagement() {
   const [tests, setTests] = useState([]);
+  const [testSets, setTestSets] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteTestModalOpen, setIsDeleteTestModalOpen] = useState(false);
+  const [isDeleteTestSetModalOpen, setIsDeleteTestSetModalOpen] =
+    useState(false);
   const [selectedTest, setSelectedTest] = useState(null);
+  const [selectedTestSet, setSelectedTestSet] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [expandedSets, setExpandedSets] = useState({});
   const [newTest, setNewTest] = useState({
     name: "",
     status: "Active",
     duration: "60 min",
-    course: "",
+    testSet: "",
     questions: 0,
     file: null,
     fileName: "",
+    parsedData: null,
+    isNewTestSet: false,
   });
   const fileInputRef = useRef(null);
   const modalRef = useRef(null);
@@ -49,12 +60,183 @@ export default function TestManagement() {
   const filteredTests = tests.filter(
     (test) =>
       test.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      test.course.toLowerCase().includes(searchTerm.toLowerCase())
+      test.course.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (test.testSet &&
+        test.testSet.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  // Group tests by test set
+  const groupedTests = filteredTests.reduce((acc, test) => {
+    const testSet = test.testSet || "Uncategorized";
+    if (!acc[testSet]) {
+      acc[testSet] = [];
+    }
+    acc[testSet].push(test);
+    return acc;
+  }, {});
+
   useEffect(() => {
-    // Load tests from the JSON file when component mounts
-    setTests(testsData);
+    // Load tests with additional test sets
+    const extendedTestsData = [
+      ...testsData,
+      // Mathematics Test Set
+      {
+        id: 101,
+        name: "Algebra Fundamentals",
+        course: "Mathematics",
+        testSet: "Mathematics",
+        questions: 25,
+        duration: "45 min",
+        status: "Active",
+      },
+      {
+        id: 102,
+        name: "Calculus I",
+        course: "Mathematics",
+        testSet: "Mathematics",
+        questions: 30,
+        duration: "60 min",
+        status: "Active",
+      },
+      {
+        id: 103,
+        name: "Geometry Basics",
+        course: "Mathematics",
+        testSet: "Mathematics",
+        questions: 20,
+        duration: "40 min",
+        status: "Draft",
+      },
+      // Science Test Set
+      {
+        id: 201,
+        name: "Physics Mechanics",
+        course: "Physics",
+        testSet: "Science",
+        questions: 35,
+        duration: "75 min",
+        status: "Active",
+      },
+      {
+        id: 202,
+        name: "Chemistry Fundamentals",
+        course: "Chemistry",
+        testSet: "Science",
+        questions: 40,
+        duration: "90 min",
+        status: "Active",
+      },
+      {
+        id: 203,
+        name: "Biology Cell Structure",
+        course: "Biology",
+        testSet: "Science",
+        questions: 30,
+        duration: "60 min",
+        status: "Inactive",
+      },
+      // Language Test Set
+      {
+        id: 301,
+        name: "English Grammar",
+        course: "English",
+        testSet: "Language",
+        questions: 50,
+        duration: "45 min",
+        status: "Active",
+      },
+      {
+        id: 302,
+        name: "French Vocabulary",
+        course: "French",
+        testSet: "Language",
+        questions: 60,
+        duration: "50 min",
+        status: "Draft",
+      },
+      {
+        id: 303,
+        name: "Spanish Conversation",
+        course: "Spanish",
+        testSet: "Language",
+        questions: 25,
+        duration: "30 min",
+        status: "Active",
+      },
+      // Programming Test Set
+      {
+        id: 401,
+        name: "JavaScript Basics",
+        course: "Web Development",
+        testSet: "Programming",
+        questions: 45,
+        duration: "90 min",
+        status: "Active",
+      },
+      {
+        id: 402,
+        name: "Python Data Structures",
+        course: "Computer Science",
+        testSet: "Programming",
+        questions: 35,
+        duration: "75 min",
+        status: "Active",
+      },
+      {
+        id: 403,
+        name: "Java OOP Concepts",
+        course: "Software Engineering",
+        testSet: "Programming",
+        questions: 30,
+        duration: "60 min",
+        status: "Draft",
+      },
+      // Certification Test Set
+      {
+        id: 501,
+        name: "AWS Solutions Architect",
+        course: "Cloud Computing",
+        testSet: "Certification",
+        questions: 65,
+        duration: "130 min",
+        status: "Active",
+      },
+      {
+        id: 502,
+        name: "CompTIA Security+",
+        course: "Cybersecurity",
+        testSet: "Certification",
+        questions: 90,
+        duration: "180 min",
+        status: "Active",
+      },
+      {
+        id: 503,
+        name: "Cisco CCNA",
+        course: "Networking",
+        testSet: "Certification",
+        questions: 100,
+        duration: "120 min",
+        status: "Active",
+      },
+    ];
+
+    setTests(extendedTestsData);
+
+    // Extract unique test sets
+    const uniqueTestSets = [
+      ...new Set(
+        extendedTestsData.map((test) => test.testSet || "Uncategorized")
+      ),
+    ];
+    setTestSets(uniqueTestSets);
+
+    // Initialize all test sets as expanded
+    const initialExpandedState = uniqueTestSets.reduce((acc, set) => {
+      acc[set] = true;
+      return acc;
+    }, {});
+    setExpandedSets(initialExpandedState);
   }, []);
 
   useEffect(() => {
@@ -65,19 +247,42 @@ export default function TestManagement() {
       }
     }
 
-    if (isModalOpen || isViewModalOpen || isEditModalOpen) {
+    if (
+      isModalOpen ||
+      isViewModalOpen ||
+      isEditModalOpen ||
+      isDeleteTestModalOpen ||
+      isDeleteTestSetModalOpen
+    ) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isModalOpen, isViewModalOpen, isEditModalOpen]);
+  }, [
+    isModalOpen,
+    isViewModalOpen,
+    isEditModalOpen,
+    isDeleteTestModalOpen,
+    isDeleteTestSetModalOpen,
+  ]);
+
+  const toggleTestSet = (testSet) => {
+    setExpandedSets((prev) => ({
+      ...prev,
+      [testSet]: !prev[testSet],
+    }));
+  };
 
   const closeAllModals = () => {
     setIsModalOpen(false);
     setIsViewModalOpen(false);
     setIsEditModalOpen(false);
+    setIsDeleteTestModalOpen(false);
+    setIsDeleteTestSetModalOpen(false);
+    setSelectedTest(null);
+    setSelectedTestSet(null);
   };
 
   const handleAddTest = () => {
@@ -91,10 +296,12 @@ export default function TestManagement() {
       name: "",
       status: "Active",
       duration: "60 min",
-      course: "",
+      testSet: "",
       questions: 0,
       file: null,
       fileName: "",
+      parsedData: null,
+      isNewTestSet: false,
     });
   };
 
@@ -128,19 +335,32 @@ export default function TestManagement() {
           fileName: file.name,
         });
 
-        // Optionally read the file to extract test details
+        // Read the file to extract test details and parse JSON
         const reader = new FileReader();
         reader.onload = (event) => {
           try {
             const jsonData = JSON.parse(event.target.result);
+
+            // Store the parsed data for API submission
+            const parsedData = {
+              testData: jsonData.questions || [],
+              metadata: {
+                totalQuestions: jsonData.questions
+                  ? jsonData.questions.length
+                  : 0,
+                testType: jsonData.testType || "standard",
+                // Add any other metadata you need from the JSON
+              },
+            };
+
             // If the JSON has these fields, use them to populate the form
             setNewTest((prev) => ({
               ...prev,
               name: jsonData.name || prev.name,
-              course: jsonData.course || prev.course,
-              questions: jsonData.questions || prev.questions,
-              // Keep the default duration if not specified
+              testSet: jsonData.testSet || prev.testSet,
+              questions: jsonData.questions ? jsonData.questions.length : 0,
               duration: jsonData.duration || prev.duration,
+              parsedData: parsedData,
             }));
           } catch (error) {
             console.error("Error parsing JSON file:", error);
@@ -168,18 +388,35 @@ export default function TestManagement() {
       return;
     }
 
+    if (!newTest.testSet) {
+      alert("Please select or create a test set");
+      return;
+    }
+
     // Create new test object
     const testToAdd = {
       id: tests.length + 1,
       name: newTest.name,
-      course: newTest.course || "Not specified",
+      testSet: newTest.testSet,
       questions: newTest.questions || 0,
       duration: newTest.duration,
       status: newTest.status,
     };
 
+    // Here you would typically send the parsedData to your API
+    console.log("Data to send to API:", newTest.parsedData);
+
     // Add to tests array
     setTests([...tests, testToAdd]);
+
+    // Update test sets if a new one was added
+    if (newTest.isNewTestSet && !testSets.includes(newTest.testSet)) {
+      setTestSets([...testSets, newTest.testSet]);
+      setExpandedSets((prev) => ({
+        ...prev,
+        [newTest.testSet]: true,
+      }));
+    }
 
     // Close modal and reset form
     closeModal();
@@ -203,6 +440,16 @@ export default function TestManagement() {
     );
 
     setTests(updatedTests);
+
+    // Update test sets if a new one was added
+    if (selectedTest.testSet && !testSets.includes(selectedTest.testSet)) {
+      setTestSets([...testSets, selectedTest.testSet]);
+      setExpandedSets((prev) => ({
+        ...prev,
+        [selectedTest.testSet]: true,
+      }));
+    }
+
     closeEditModal();
 
     // Show success message
@@ -217,6 +464,56 @@ export default function TestManagement() {
   const handleEditTest = (test) => {
     setSelectedTest({ ...test });
     setIsEditModalOpen(true);
+  };
+
+  const handleDeleteTest = (test) => {
+    setSelectedTest(test);
+    setIsDeleteTestModalOpen(true);
+  };
+
+  const handleDeleteTestSet = (testSet) => {
+    setSelectedTestSet(testSet);
+    setIsDeleteTestSetModalOpen(true);
+  };
+
+  const confirmDeleteTest = () => {
+    if (!selectedTest) return;
+
+    // Remove the test from the array
+    const updatedTests = tests.filter((test) => test.id !== selectedTest.id);
+    setTests(updatedTests);
+
+    // Check if this was the last test in its test set
+    const testSet = selectedTest.testSet || "Uncategorized";
+    const remainingTestsInSet = updatedTests.filter(
+      (test) => (test.testSet || "Uncategorized") === testSet
+    );
+
+    // If no tests remain in this set, remove the test set
+    if (remainingTestsInSet.length === 0) {
+      const updatedTestSets = testSets.filter((set) => set !== testSet);
+      setTestSets(updatedTestSets);
+    }
+
+    closeAllModals();
+    alert("Test deleted successfully!");
+  };
+
+  const confirmDeleteTestSet = () => {
+    if (!selectedTestSet) return;
+
+    // Remove all tests in this test set
+    const updatedTests = tests.filter(
+      (test) => (test.testSet || "Uncategorized") !== selectedTestSet
+    );
+    setTests(updatedTests);
+
+    // Remove the test set
+    const updatedTestSets = testSets.filter((set) => set !== selectedTestSet);
+    setTestSets(updatedTestSets);
+
+    closeAllModals();
+    alert("Test set and all its tests deleted successfully!");
   };
 
   const closeViewModal = () => {
@@ -420,114 +717,156 @@ export default function TestManagement() {
               <h2 className="text-2xl font-bold text-foreground">Test list</h2>
             </div>
 
-            {/* Test Table */}
+            {/* Test Sets and Tests */}
             <div className="overflow-x-auto">
-              <table className="min-w-full">
-                <thead>
-                  <tr>
-                    <th className="px-6 py-3.5 bg-muted text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider rounded-tl-lg">
-                      Test Name
-                    </th>
-                    <th className="px-6 py-3.5 bg-muted text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Test set
-                    </th>
-                    <th className="px-6 py-3.5 bg-muted text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Questions
-                    </th>
-                    <th className="px-6 py-3.5 bg-muted text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Duration
-                    </th>
-                    <th className="px-6 py-3.5 bg-muted text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3.5 bg-muted text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider rounded-tr-lg">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {filteredTests.length > 0 ? (
-                    filteredTests.map((test) => (
-                      <tr
-                        key={test.id}
-                        className="bg-card hover:bg-muted/30 transition-colors duration-150"
+              {Object.keys(groupedTests).length > 0 ? (
+                Object.keys(groupedTests).map((testSet) => (
+                  <div
+                    key={testSet}
+                    className="mb-4 border border-border rounded-lg overflow-hidden"
+                  >
+                    {/* Test Set Header */}
+                    <div className="flex items-center justify-between p-4 bg-muted">
+                      <div
+                        className="flex items-center flex-1 cursor-pointer"
+                        onClick={() => toggleTestSet(testSet)}
                       >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
-                              <FileText className="h-5 w-5 text-primary" />
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-foreground">
-                                {test.name}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                ID: {test.id}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                          {test.course}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-foreground">
-                            {test.questions}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            questions
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center text-sm text-foreground">
-                            <Clock className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
-                            {test.duration}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                              test.status
-                            )}`}
-                          >
-                            {test.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => handleViewTest(test)}
-                              className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-primary rounded-lg hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors shadow-sm"
-                            >
-                              <Eye className="h-3.5 w-3.5" />
-                              <span>View</span>
-                            </button>
-                            <button
-                              onClick={() => handleEditTest(test)}
-                              className="flex items-center gap-1 px-3 py-1.5 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors shadow-sm"
-                            >
-                              <Edit className="h-3.5 w-3.5" />
-                              <span>Edit</span>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="6" className="px-6 py-10 text-center">
-                        <div className="flex flex-col items-center justify-center text-muted-foreground">
-                          <AlertCircle className="h-10 w-10 mb-2" />
-                          <p className="text-lg font-medium">No tests found</p>
-                          <p className="text-sm">
-                            Try adjusting your search or add a new test
-                          </p>
+                        <FolderOpen className="h-5 w-5 mr-2 text-primary" />
+                        <h3 className="font-medium text-foreground">
+                          {testSet} ({groupedTests[testSet].length})
+                        </h3>
+                        <div className="ml-2">
+                          {expandedSets[testSet] ? (
+                            <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                          ) : (
+                            <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                          )}
                         </div>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteTestSet(testSet)}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/30 transition-colors shadow-sm ml-2"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span>Delete Set</span>
+                      </button>
+                    </div>
+
+                    {/* Tests Table */}
+                    {expandedSets[testSet] && (
+                      <table className="min-w-full">
+                        <thead>
+                          <tr>
+                            <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                              Test Name
+                            </th>
+                            <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                              Course
+                            </th>
+                            <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                              Questions
+                            </th>
+                            <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                              Duration
+                            </th>
+                            <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                              Status
+                            </th>
+                            <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                              Actions
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border">
+                          {groupedTests[testSet].map((test) => (
+                            <tr
+                              key={test.id}
+                              className="bg-card hover:bg-muted/30 transition-colors duration-150"
+                            >
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center">
+                                  <div className="flex-shrink-0 h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
+                                    <FileText className="h-5 w-5 text-primary" />
+                                  </div>
+                                  <div className="ml-4">
+                                    <div className="text-sm font-medium text-foreground">
+                                      {test.name}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      ID: {test.id}
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                                {test.course}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="text-sm text-foreground">
+                                  {test.questions}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  questions
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center text-sm text-foreground">
+                                  <Clock className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
+                                  {test.duration}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <span
+                                  className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                                    test.status
+                                  )}`}
+                                >
+                                  {test.status}
+                                </span>
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                <div className="flex space-x-2">
+                                  <button
+                                    onClick={() => handleViewTest(test)}
+                                    className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-primary rounded-lg hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors shadow-sm"
+                                  >
+                                    <Eye className="h-3.5 w-3.5" />
+                                    <span>View</span>
+                                  </button>
+                                  <button
+                                    onClick={() => handleEditTest(test)}
+                                    className="flex items-center gap-1 px-3 py-1.5 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors shadow-sm"
+                                  >
+                                    <Edit className="h-3.5 w-3.5" />
+                                    <span>Edit</span>
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteTest(test)}
+                                    className="flex items-center gap-1 px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/30 transition-colors shadow-sm"
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                    <span>Delete</span>
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="px-6 py-10 text-center">
+                  <div className="flex flex-col items-center justify-center text-muted-foreground">
+                    <AlertCircle className="h-10 w-10 mb-2" />
+                    <p className="text-lg font-medium">No tests found</p>
+                    <p className="text-sm">
+                      Try adjusting your search or add a new test
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -623,24 +962,76 @@ export default function TestManagement() {
                   />
                 </div>
 
-                {/* Course */}
+                {/* Test Set Selection */}
                 <div className="space-y-2">
                   <label
-                    htmlFor="course"
+                    htmlFor="testSet"
                     className="block text-sm font-medium text-foreground"
                   >
-                    Course
+                    Test Set
                   </label>
-                  <input
-                    type="text"
-                    id="course"
-                    name="course"
-                    value={newTest.course}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
-                    placeholder="Enter course name"
-                  />
+                  <div className="flex gap-2">
+                    <select
+                      id="testSet"
+                      name="testSet"
+                      value={newTest.isNewTestSet ? "new" : newTest.testSet}
+                      onChange={(e) => {
+                        if (e.target.value === "new") {
+                          setNewTest({
+                            ...newTest,
+                            isNewTestSet: true,
+                            testSet: "",
+                          });
+                        } else {
+                          setNewTest({
+                            ...newTest,
+                            isNewTestSet: false,
+                            testSet: e.target.value,
+                          });
+                        }
+                      }}
+                      className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all appearance-none"
+                      style={{
+                        backgroundImage:
+                          "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' strokeLinecap='round' strokeLinejoin='round' strokeWidth='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")",
+                        backgroundPosition: "right 0.5rem center",
+                        backgroundRepeat: "no-repeat",
+                        backgroundSize: "1.5em 1.5em",
+                        paddingRight: "2.5rem",
+                      }}
+                    >
+                      <option value="">Select a test set</option>
+                      {testSets.map((set) => (
+                        <option key={set} value={set}>
+                          {set}
+                        </option>
+                      ))}
+                      <option value="new">Create new test set</option>
+                    </select>
+                  </div>
                 </div>
+
+                {/* New Test Set Input (conditional) */}
+                {newTest.isNewTestSet && (
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="newTestSet"
+                      className="block text-sm font-medium text-foreground"
+                    >
+                      New Test Set Name
+                    </label>
+                    <input
+                      type="text"
+                      id="newTestSet"
+                      name="testSet"
+                      value={newTest.testSet}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
+                      placeholder="Enter new test set name"
+                      required
+                    />
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-4">
                   {/* Questions Count */}
@@ -770,6 +1161,14 @@ export default function TestManagement() {
 
                 <div className="grid grid-cols-2 gap-6 mt-4">
                   <div className="bg-muted/50 p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Test Set
+                    </p>
+                    <p className="font-medium text-foreground">
+                      {selectedTest.testSet || "Uncategorized"}
+                    </p>
+                  </div>
+                  <div className="bg-muted/50 p-4 rounded-lg">
                     <p className="text-sm text-muted-foreground mb-1">Course</p>
                     <p className="font-medium text-foreground">
                       {selectedTest.course}
@@ -790,14 +1189,6 @@ export default function TestManagement() {
                     <p className="font-medium text-foreground flex items-center">
                       <Clock className="h-4 w-4 mr-1.5 text-muted-foreground" />
                       {selectedTest.duration}
-                    </p>
-                  </div>
-                  <div className="bg-muted/50 p-4 rounded-lg">
-                    <p className="text-sm text-muted-foreground mb-1">
-                      Test ID
-                    </p>
-                    <p className="font-medium text-foreground">
-                      {selectedTest.id}
                     </p>
                   </div>
                 </div>
@@ -863,6 +1254,25 @@ export default function TestManagement() {
                   />
                 </div>
 
+                {/* Test Set */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="edit-testSet"
+                    className="block text-sm font-medium text-foreground"
+                  >
+                    Test Set
+                  </label>
+                  <input
+                    type="text"
+                    id="edit-testSet"
+                    name="testSet"
+                    value={selectedTest.testSet || ""}
+                    onChange={handleEditInputChange}
+                    className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
+                    placeholder="Enter test set name (e.g. Math, Science, etc.)"
+                  />
+                </div>
+
                 {/* Course */}
                 <div className="space-y-2">
                   <label
@@ -884,7 +1294,7 @@ export default function TestManagement() {
 
                 <div className="grid grid-cols-2 gap-4">
                   {/* Questions Count */}
-                  {/* <div className="space-y-2">
+                  <div className="space-y-2">
                     <label
                       htmlFor="edit-questions"
                       className="block text-sm font-medium text-foreground"
@@ -901,7 +1311,7 @@ export default function TestManagement() {
                       placeholder="Enter number"
                       min="0"
                     />
-                  </div> */}
+                  </div>
 
                   {/* Completion Time */}
                   <div className="space-y-2">
@@ -972,6 +1382,120 @@ export default function TestManagement() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Test Confirmation Modal */}
+      {isDeleteTestModalOpen && selectedTest && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
+          <div
+            ref={modalRef}
+            className="bg-card rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-border animate-scaleIn"
+          >
+            <div className="flex justify-between items-center p-6 border-b border-border bg-gradient-to-r from-rose-600 to-red-700 text-white">
+              <h3 className="text-xl font-bold">Delete Test</h3>
+              <button
+                onClick={closeAllModals}
+                className="text-white/80 hover:text-white transition-colors bg-white/10 rounded-full p-1"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="bg-rose-100 dark:bg-rose-900/30 p-3 rounded-full">
+                  <AlertTriangle className="h-6 w-6 text-rose-600 dark:text-rose-400" />
+                </div>
+                <div>
+                  <h4 className="text-lg font-semibold">Confirm Deletion</h4>
+                  <p className="text-muted-foreground">
+                    This action cannot be undone.
+                  </p>
+                </div>
+              </div>
+
+              <p className="mb-6">
+                Are you sure you want to delete the test{" "}
+                <span className="font-semibold">"{selectedTest.name}"</span>?
+              </p>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={closeAllModals}
+                  className="px-4 py-2.5 border border-border rounded-lg text-foreground hover:bg-muted transition-all duration-200 font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDeleteTest}
+                  className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition-all duration-200 font-medium shadow-md hover:shadow-lg"
+                >
+                  Delete Test
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Test Set Confirmation Modal */}
+      {isDeleteTestSetModalOpen && selectedTestSet && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
+          <div
+            ref={modalRef}
+            className="bg-card rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-border animate-scaleIn"
+          >
+            <div className="flex justify-between items-center p-6 border-b border-border bg-gradient-to-r from-rose-600 to-red-700 text-white">
+              <h3 className="text-xl font-bold">Delete Test Set</h3>
+              <button
+                onClick={closeAllModals}
+                className="text-white/80 hover:text-white transition-colors bg-white/10 rounded-full p-1"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="bg-rose-100 dark:bg-rose-900/30 p-3 rounded-full">
+                  <AlertTriangle className="h-6 w-6 text-rose-600 dark:text-rose-400" />
+                </div>
+                <div>
+                  <h4 className="text-lg font-semibold">
+                    Warning: Bulk Deletion
+                  </h4>
+                  <p className="text-muted-foreground">
+                    This will delete all tests in this set.
+                  </p>
+                </div>
+              </div>
+
+              <p className="mb-2">
+                Are you sure you want to delete the test set{" "}
+                <span className="font-semibold">"{selectedTestSet}"</span>?
+              </p>
+              <p className="mb-6 text-sm text-muted-foreground">
+                This will permanently delete{" "}
+                {groupedTests[selectedTestSet]?.length || 0} tests in this set.
+              </p>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={closeAllModals}
+                  className="px-4 py-2.5 border border-border rounded-lg text-foreground hover:bg-muted transition-all duration-200 font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDeleteTestSet}
+                  className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition-all duration-200 font-medium shadow-md hover:shadow-lg"
+                >
+                  Delete Test Set
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
