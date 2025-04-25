@@ -1,7 +1,6 @@
 package com.example.toiyeuit.dto.response;
 
 
-import com.example.toiyeuit.entity.MultichoiceDetail;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

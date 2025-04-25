@@ -14,7 +14,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import axios from "axios";
+import CheckInputReadingApi from "../../api/CheckInputReadingApi";
 import { useNavigate } from "react-router-dom";
 const checkInputReading = () => {
   const [timeLeft, setTimeLeft] = useState(60 * 60);
@@ -24,22 +24,6 @@ const checkInputReading = () => {
   const [activePart, setActivePart] = useState(5);
   const [score, setScore] = useState(0);
   const navigate = useNavigate();
-  const axiosClient = axios.create({
-    baseURL: "http://localhost:8081",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  axiosClient.interceptors.request.use(
-    (config) => config,
-    (error) => Promise.reject(error)
-  );
-
-  axiosClient.interceptors.response.use(
-    (response) => response.data,
-    (error) => Promise.reject(error)
-  );
   const [questions, setQuestions] = useState([]);
   const [data, setData] = useState([]);
   const contestApi = () => {
@@ -84,16 +68,7 @@ const checkInputReading = () => {
   const handleReturnAnswer = async () => {
     try {
       const context = contestApi();
-      const payload = {
-        testId: data.testId,
-        score: score || 0,
-        context,
-      };
-      console.log(payload);
-      const response = await axiosClient.post(
-        "/api/test-practice/submit",
-        payload
-      );
+      await CheckInputReadingApi.submitTesAnswers(data.testId, score, context);
       console.log("Nộp bài thành công:", response);
       return response;
     } catch (error) {
@@ -104,7 +79,7 @@ const checkInputReading = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await axiosClient.get("/api/tests/detail?id=3");
+        const res = await CheckInputReadingApi.getCheckInputReading();
         setData(res.body);
         setQuestions(res.body.context);
       } catch (error) {

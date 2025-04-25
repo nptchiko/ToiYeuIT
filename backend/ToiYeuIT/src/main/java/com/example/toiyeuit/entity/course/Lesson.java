@@ -1,5 +1,6 @@
-package com.example.toiyeuit.entity;
+package com.example.toiyeuit.entity.course;
 
+import com.example.toiyeuit.entity.Skill;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

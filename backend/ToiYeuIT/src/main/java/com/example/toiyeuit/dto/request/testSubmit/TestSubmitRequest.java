@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Setter
 @Getter
@@ -12,15 +11,13 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TestSubmitRequest {
-    long submitId;
     long testId;
 
     @NotNull
     float score;
 
     @NotNull
-    int part;
+    List<PartDetailRequest> context;
 
-    @NotNull
-    List<AnswerSubmitRequest> answers;
+
 }

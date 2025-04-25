@@ -1,9 +1,7 @@
 package com.example.toiyeuit.entity.test;
 
 
-import com.example.toiyeuit.entity.TestCollection;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -31,9 +29,12 @@ public class Test {
     int index;
 
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "test_collection_id"
     )
     TestCollection testCollection;
+
+    @Column(name = "enabled", columnDefinition = "bit = TRUE")
+    boolean enabled;
 }

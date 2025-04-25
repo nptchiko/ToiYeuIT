@@ -1,10 +1,9 @@
-package com.example.toiyeuit.entity;
+package com.example.toiyeuit.entity.question;
 
 import com.example.toiyeuit.entity.key.Key;
 import com.example.toiyeuit.enums.AnswerKey;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

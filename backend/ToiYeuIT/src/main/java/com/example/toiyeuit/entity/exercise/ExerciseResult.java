@@ -1,6 +1,6 @@
 package com.example.toiyeuit.entity.exercise;
 
-import com.example.toiyeuit.entity.Question;
+import com.example.toiyeuit.entity.question.Question;
 import com.example.toiyeuit.entity.key.ResultKey;
 import jakarta.persistence.*;
 import lombok.*;

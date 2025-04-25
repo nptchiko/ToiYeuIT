@@ -89,7 +89,7 @@ public class SecurityConfig {
                     //  CustomAuthenticationEntryPoint
                     //  CustomAccessHandler
                 })
-                .addFilterAfter(tokenFilter, BearerTokenAuthenticationFilter.class)
+                .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
     }
 

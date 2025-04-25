@@ -1,33 +1,30 @@
 import React from "react";
-import axios from "axios";
 import { useState, useEffect } from "react";
-{
-  /* create Reading */
-}
-const axiosClient = axios.create({
-  baseURL: "http://localhost:8081",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-axiosClient.interceptors.request.use(
-  (config) => config,
-  (error) => Promise.reject(error)
-);
-
-axiosClient.interceptors.response.use(
-  (response) => response.data,
-  (error) => Promise.reject(error)
-);
+import ReadingApi from "../../api/ReadingApi";
+import { useNavigate } from "react-router-dom";
+import { Clock } from "lucide-react";
 const Reading = () => {
   const [data, setData] = useState([]);
+  const navigate = useNavigate();
+  const handleOnClick = (test) => {
+    navigate("/test-reading", {
+      state: {
+        id: test.id,
+      },
+    });
+  };
+  const handleOnClickHistory = (test) => {
+    navigate("/test-history-reading", {
+      state: {
+        id: test.id,
+      },
+    });
+  };
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await axiosClient.get("/api/test-practice/reading");
+        const res = await ReadingApi.getReadingAip();
         setData(res.body);
-        console.log(body);
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu đề thi");
       }
@@ -69,7 +66,18 @@ const Reading = () => {
                 <div className="h-12 w-12 bg-blue-50 flex justify-center items-center rounded-lg">
                   <img src="https://api.prep.vn/images/skills/test_practice/reading.png" />
                 </div>
-                <p className="text-base font-bold">{test.title}</p>
+                <p
+                  onClick={() => handleOnClick(test)}
+                  className="text-base font-bold hover:text-blue-600"
+                >
+                  {test.title}
+                </p>
+                {test.submitted === 1 && (
+                  <Clock
+                    onClick={() => handleOnClickHistory(test)}
+                    className="h-10 w-10 text-red-600"
+                  />
+                )}
               </div>
             ))}
           </div>

@@ -23,7 +23,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import CheckInputListeningApi from "../../api/CheckInputListeningApi";
 const audioFiles = [
   {
     id: 1,
@@ -65,24 +65,10 @@ export default function checkInputListening() {
   const [apiData, setApiData] = useState([]);
   const audioRef = useRef(null);
   const { toast } = useToast();
-  const axiosClient = axios.create({
-    baseURL: "http://localhost:8081",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  axiosClient.interceptors.request.use(
-    (config) => config,
-    (error) => Promise.reject(error)
-  );
-  axiosClient.interceptors.response.use(
-    (response) => response.data,
-    (error) => Promise.reject(error)
-  );
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await axiosClient.get("/api/tests/detail?id=1");
+        const res = await CheckInputListeningApi.getCheckInputListening();
         setData(res.body.context);
         setApiData(res.body);
       } catch (error) {
@@ -244,15 +230,10 @@ export default function checkInputListening() {
   const handleReturnAnswer = async () => {
     try {
       const context = contestApi();
-      const payload = {
-        testId: apiData.testId,
-        score: score || 0,
-        context,
-      };
-      console.log(payload);
-      const response = await axiosClient.post(
-        "/api/test-practice/submit",
-        payload
+      await CheckInputListeningApi.submitTesAnswers(
+        apiData.testId,
+        score,
+        context
       );
       console.log("Nộp bài thành công:", response);
       return response;

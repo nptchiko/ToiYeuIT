@@ -1,6 +1,6 @@
-package com.example.toiyeuit.entity;
+package com.example.toiyeuit.entity.test;
 
-import com.example.toiyeuit.entity.test.Test;
+import com.example.toiyeuit.entity.Skill;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
