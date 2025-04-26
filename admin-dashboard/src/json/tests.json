@@ -4,7 +4,7 @@
     "name": "Grammar Fundamentals",
     "course": "English Grammar 101",
     "questions": 25,
-    "duration": "45 mins",
+    "duration": "60 mins",
     "status": "Active"
   },
   {
@@ -20,7 +20,7 @@
     "name": "Reading Comprehension",
     "course": "Advanced English",
     "questions": 15,
-    "duration": "30 mins",
+    "duration": "60 mins",
     "status": "Active"
   }
 ]

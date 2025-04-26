@@ -1,5 +1,6 @@
 "use client";
 
+import { AuthService } from "../utils/auth-service";
 import { Mail, Phone, LogOut, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -36,6 +37,7 @@ export default function ProfileMini() {
   const handleLogout = () => {
     // Implement logout functionality here
     console.log("Logging out...");
+    AuthService.logout();
     // clear session & token hear
   };
 

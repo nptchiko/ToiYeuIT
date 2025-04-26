@@ -13,21 +13,21 @@ export function AuthProvider({ children }) {
   // Kiểm tra trạng thái đăng nhập khi component mount
   useEffect(() => {
     const checkAuthStatus = async () => {
-      setLoading(true); // Set loading true at the start
       try {
-        if (TokenService.getToken()) {
+        const token = TokenService.getToken();
+        if (token) {
           const userData = await AuthService.getCurrentUser();
-          //Optionally, add a role check here too if needed on refresh
-          if (userData && userData.role !== "ADMIN") {
-            console.warn("Non-admin user token found on refresh, logging out.");
+          if (userData && userData.body) {
+            setUser(userData.body.role);
+          } else {
             TokenService.clearTokens();
             setUser(null);
-          } else {
-            setUser(userData);
           }
+        } else {
+          setUser(null);
         }
       } catch (error) {
-        console.error("Failed to get user data on mount:", error);
+        console.error("Authentication initialization error:", error);
         TokenService.clearTokens(); // Clear tokens if fetching user fails
         setUser(null); // Ensure user is null if error
       } finally {

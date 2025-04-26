@@ -1,3 +1,4 @@
+// import { useToast } from "../components/toast-context";
 import axios from "axios";
 import Cookies from "universal-cookie";
 
@@ -23,7 +24,7 @@ const REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
 // Thời gian hết hạn cookies (7 ngày)
 const TOKEN_EXPIRY = 7;
 
-// Quản lý token trong cookies
+// Improve the TokenService to ensure cookies are properly set
 const TokenService = {
   // Lưu token vào cookies
   setToken: (token) => {
@@ -34,9 +35,9 @@ const TokenService = {
       expires: expiryDate,
       secure: import.meta.env.MODE === "production",
       path: "/",
+      sameSite: "lax", // Add this to ensure cookies work across same-site requests
     });
     console.log("token set :", token);
-    console.log("Cookies:", cookies);
   },
 
   // Lấy token từ cookies
@@ -47,7 +48,7 @@ const TokenService = {
   },
 
   // Xóa token khỏi cookies
-  removeToken: (TOKEN_COOKIE_NAME) => {
+  removeToken: () => {
     cookies.remove(TOKEN_COOKIE_NAME, { path: "/" });
   },
 
@@ -59,6 +60,7 @@ const TokenService = {
     cookies.set(REFRESH_TOKEN_COOKIE_NAME, token, {
       expires: expiryDate,
       path: "/",
+      sameSite: "strict", // Add this to ensure cookies work across same-site requests
     });
   },
 
@@ -93,14 +95,17 @@ api.interceptors.request.use(
   }
 );
 
-// interceptor để xử lý lỗi 401 (Unauthorized) và tự động refresh token
+// Update the interceptor to better handle token refresh
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Nếu lỗi là 401 và chưa thử refresh token
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Nếu lỗi là 401 hoặc 500 và chưa thử refresh token
+    if (
+      (error.response?.status === 401 || error.response?.status === 500) &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
 
       try {
@@ -136,16 +141,24 @@ api.interceptors.response.use(
   }
 );
 
-// Các hàm xác thực
 const AuthService = {
   // Đăng nhập
   login: async (email, password) => {
     try {
-      const response = await api.post("/auth/login", { email, password });
+      // Sử dụng axios  thay vì api instance để không kèm token
+      const response = await axios.post(
+        `${API_URL}/auth/login`,
+        { email, password },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
 
       const { token, role } = response.data.body;
       console.log("Received token:", token);
-      console.log(response.data.body.token);
 
       // Lưu token vào cookies
       TokenService.setToken(token);
@@ -180,8 +193,12 @@ const AuthService = {
   // Đăng xuất
   logout: () => {
     try {
-      // Gọi API đăng xuất (nếu backend yêu cầu)
-      api.post("/auth/logout");
+      const token = TokenService.getToken();
+
+      // Gọi API đăng xuất
+      if (token) {
+        api.post("/auth/logout", { token });
+      }
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -208,7 +225,7 @@ const AuthService = {
         email,
         code,
       });
-      // console.log(response.data.message);
+
       return response.data;
     } catch (error) {
       console.error("Verify reset code error:", error);
@@ -239,6 +256,12 @@ const AuthService = {
       return response.data;
     } catch (error) {
       console.error("Get current user error:", error);
+
+      // Chỉ xóa token nếu lỗi là 401 (Unauthorized)
+      if (error.response && error.response.status === 401) {
+        TokenService.clearTokens();
+      }
+
       throw error;
     }
   },
