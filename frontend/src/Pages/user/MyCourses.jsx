@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BookOpen,
   Clock,
@@ -13,92 +13,7 @@ import {
   Book,
   Filter,
 } from "lucide-react";
-const coursesLR = [
-  {
-    title: "TOEIC 450+ Cơ Bản",
-    description: "Nền tảng từ vựng, ngữ pháp và kỹ năng làm bài cơ bản.",
-    level: "Cơ bản",
-    duration: "6 tuần",
-    rating: "4.5",
-    students: 1200,
-    price: "1.200.000đ",
-    startDate: "15/04/2025",
-    tag: "Phổ biến",
-    features: [
-      "Giảng viên chuyên nghiệp",
-      "Tài liệu độc quyền",
-      "Bài tập thực hành",
-    ],
-  },
-  {
-    title: "TOEIC 650+ Trung Cấp",
-    description: "Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.",
-    level: "Trung cấp",
-    duration: "8 tuần",
-    rating: "4.7",
-    students: 950,
-    price: "1.800.000đ",
-    startDate: "22/04/2025",
-    tag: "Bestseller",
-    features: [
-      "Phân tích chuyên sâu",
-      "Bài tập tương tác",
-      "Mô phỏng thi thật",
-    ],
-  },
-  {
-    title: "TOEIC 800+ Nâng Cao",
-    description: "Tăng tốc luyện đề và kỹ năng phản xạ đề thi thực tế.",
-    level: "Nâng cao",
-    duration: "10 tuần",
-    rating: "4.9",
-    students: 620,
-    price: "2.400.000đ",
-    startDate: "01/05/2025",
-    tag: "Premium",
-    features: ["Giáo trình quốc tế", "Đảm bảo đầu ra", "Hỗ trợ 1-1"],
-  },
-];
-const coursesSW = [
-  {
-    title: "TOEIC 750+ Cơ Bản",
-    description:
-      "Nền tảng từ vựng, ngữ pháp và kỹ thuật làm bài Speaking & Writing.",
-    level: "Cơ bản",
-    duration: "6 tuần",
-    rating: "4.5",
-    students: 1200,
-    price: "1.200.000đ",
-    startDate: "15/04/2025",
-    tag: "Mới",
-    features: ["Rèn luyện phát âm", "Kỹ thuật viết mẫu", "Bài tập theo chủ đề"],
-  },
-  {
-    title: "TOEIC 850+ Trung Cấp",
-    description:
-      "Rèn luyện kỹ năng phản xạ và chiến thuật làm bài thi thực tế.",
-    level: "Trung cấp",
-    duration: "8 tuần",
-    rating: "4.7",
-    students: 950,
-    price: "1.800.000đ",
-    startDate: "22/04/2025",
-    tag: "Đề xuất",
-    features: ["Phản hồi chi tiết", "Bài tập tương tác", "Hỗ trợ trực tuyến"],
-  },
-  {
-    title: "TOEIC 900+ Nâng Cao",
-    description: "Tăng tốc luyện đề và kỹ năng phản xạ đề thi thực tế.",
-    level: "Nâng cao",
-    duration: "10 tuần",
-    rating: "4.9",
-    students: 620,
-    price: "2.400.000đ",
-    startDate: "01/05/2025",
-    tag: "VIP",
-    features: ["Luyện thi trọng tâm", "Tư vấn cá nhân hóa", "Bảo đảm điểm số"],
-  },
-];
+import OverviewApi from "../../api/OverviewApi";
 const tagColors = {
   "Phổ biến": "bg-blue-100 text-blue-600",
   Bestseller: "bg-amber-100 text-amber-600",
@@ -114,15 +29,35 @@ const levelBgs = {
   "Trung cấp": "bg-blue-50",
   "Nâng cao": "bg-purple-50",
 };
-const myCourse = [...coursesLR, ...coursesSW];
 
 function MyCourses() {
   const [selectedLevel, setSelectedLevel] = useState("all");
+  const [allCourses, setAllCoures] = useState([]);
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const res = await OverviewApi.getUserOverview();
+        const coursesWith = res.body.courses.map((course) => ({
+          ...course,
+          features: [
+            "Giảng viên chuyên nghiệp",
+            "Tài liệu độc quyền",
+            "Bài tập thực hành",
+          ],
+        }));
+        console.log(allCourses);
+        setAllCoures(coursesWith);
+      } catch (error) {
+        console.error("Lỗi khi lấy dứ liệu khóa học đã mua");
+      }
+    }
+    fetchCourses();
+  }, []);
   const getCurrentCourses = () => {
     if (selectedLevel !== "all") {
-      return myCourse.filter((item) => item.level === selectedLevel);
+      return allCourses.filter((item) => item.level === selectedLevel);
     }
-    return myCourse;
+    return allCourses;
   };
   const findCourse = getCurrentCourses();
   return (
@@ -206,8 +141,8 @@ function MyCourses() {
       )}
       {/* Vertical scrolling container with enhanced styling */}
       {findCourse.length > 0 && (
-        <div className="max-h-[650px] overflow-y-auto pr-2 pb-6 hide-scrollbar rounded-lg">
-          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 p-3">
+        <div className="max-h-[520px] overflow-y-auto pr-2 pb-6 rounded-lg hide-scrollbar border border-gray-100">
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-clos-3 p-3 ">
             {findCourse.map((course, index) => (
               <div
                 key={index}
@@ -215,9 +150,7 @@ function MyCourses() {
                   levelBgs[course.level]
                 } bg-opacity-80 backdrop-blur-md border border-white/40 hover:border-indigo-400 hover:shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 transform hover:-translate-y-1 flex flex-col`}
               >
-                {/* Course header */}
                 <div className="relative">
-                  {/* Tag banner */}
                   <div
                     className={`absolute top-4 right-0 ${
                       tagColors[course.tag]
@@ -225,79 +158,60 @@ function MyCourses() {
                   >
                     {course.tag}
                   </div>
-                  {/* Course header content */}
                   <div className="p-6 pb-4">
                     <h3 className="text-2xl font-bold text-indigo-800 mb-2 drop-shadow-sm">
                       {course.title}
                     </h3>
                     <p className="text-gray-700">{course.description}</p>
                   </div>
-                </div>
-
-                {/* Course details */}
-                <div className="p-6 pt-2 flex-grow">
-                  <div className="mb-4 flex flex-wrap gap-2">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        course.level === "Cơ bản"
-                          ? "bg-green-100 text-green-700"
-                          : course.level === "Trung cấp"
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-purple-100 text-purple-700"
-                      }`}
-                    >
-                      {course.level}
-                    </span>
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
-                      ⭐ {course.rating}
-                    </span>
-                    <span className="px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
-                      {course.duration}
-                    </span>
-                  </div>
-
-                  <div className="text-sm text-gray-700 space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-indigo-500" />
-                      <span>
-                        <strong>{course.students}</strong> học viên đã đăng ký
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-indigo-500" />
-                      <span>
-                        Khai giảng: <strong>{course.startDate}</strong>
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="w-4 h-4 text-green-600" />
-                      <span>
-                        Học phí:{" "}
-                        <strong className="text-green-600 font-semibold">
-                          {course.price}
-                        </strong>
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Course features */}
-                  <div className="mt-4 space-y-2">
-                    {course.features.map((feature, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-2 text-sm"
+                  <div className="p-6 pt-2 flex-grow">
+                    <div className="mb-4 flex flex-wrap gap-2">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-bold ${
+                          course.level === "Cơ bản"
+                            ? "bg-green-100 text-green-700"
+                            : course.level === "Trung cấp"
+                            ? "bg-blue-100 text-blue-700"
+                            : "bg-purple-100 text-purple-700"
+                        }`}
                       >
-                        <CheckCircle className="w-4 h-4 text-green-600" />
-                        <span>{feature}</span>
+                        {course.level}
+                      </span>
+                      <span className="flex items-center  gap-1 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-400">
+                        <Star className="h-4 w-4" />
+                        {course.rating}
+                      </span>
+                      <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
+                        {course.duration} tuần
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-700 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-green-600" />
+                        <span>
+                          Học phí:{" "}
+                          <strong className="text-green-600 font-semibold">
+                            {course.price}
+                          </strong>
+                        </span>
                       </div>
-                    ))}
+                    </div>
+                    <div className="mt-4 space-y-2">
+                      {course.features.map((features, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-2 text-sm"
+                        >
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                          <span>{features}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-
-                {/* Call to action */}
                 <div className="p-4 bg-gradient-to-r from-indigo-50 to-blue-50 border-t border-indigo-100">
                   <button className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-medium px-6 py-3 rounded-xl text-sm transition-all shadow-md hover:shadow-lg">
-                    Đăng ký ngay
+                    Thông tin khóa học
                   </button>
                 </div>
               </div>

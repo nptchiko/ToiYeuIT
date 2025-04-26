@@ -1,16 +1,17 @@
 import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Clock } from "lucide-react";
 const data = [
   {
-    id: 1,
+    id: 6,
     name: "TOEIC test Listening",
     time: "Thời gian làm bài:02:00:00",
     skill:
       "Bài thi được sử dụng để đánh giá nhanh trình độ của học sinh cho kĩ năng TOEIC Listening",
   },
   {
-    id: 2,
+    id: 7,
     name: "TOEIC Quick Test Reading",
     time: "Thời gian làm bài:00:30:00",
     skill:
@@ -21,9 +22,29 @@ const Test = () => {
   const [opent, setOpent] = useState(data[0].id);
   const navigate = useNavigate();
   const [page, setPage] = useState("/check-input-listening");
+  const [pageHistory, setPageHistory] = useState(
+    "/test-input-history-listeing"
+  );
   const handlselection = (id) => {
     setOpent(id);
-    setPage(id === 2 ? "/check-input-reading" : "/check-input-listening");
+    setPage(id === 7 ? "/check-input-reading" : "/check-input-listening");
+    setPageHistory(
+      id === 7 ? "/test-input-history-reading" : "/test-input-history-listeing"
+    );
+  };
+  const handleOnClick = (test) => {
+    navigate(page, {
+      state: {
+        id: test,
+      },
+    });
+  };
+  const handleOnClickHistory = (test) => {
+    navigate(pageHistory, {
+      state: {
+        id: test,
+      },
+    });
   };
   return (
     <div className="flex flex-col space-y-5 justify-center items-center py-[150px]">
@@ -31,7 +52,7 @@ const Test = () => {
         <div
           onClick={() => handlselection(item.id)}
           key={item.id}
-          className={`bg-white w-[700px]  border-[2px] rounded-xl flex gap-3 cursor-pointer ${
+          className={`bg-white w-[700px] relative border-[2px] rounded-xl flex gap-3 cursor-pointer ${
             opent === item.id
               ? "border-spacing-x-2 border-b-8 border-blue-700 items-start p-4"
               : "p-4 border-gray-200"
@@ -48,10 +69,18 @@ const Test = () => {
             <p>{item.time}</p>
             {opent == item.id && <p>{item.skill}</p>}
           </div>
+          <div
+            onClick={() => handleOnClickHistory(opent)}
+            className={`absolute flex gap-2 right-10 font-bold ${
+              opent === item.id ? "text-blue-500" : "text-black"
+            } `}
+          >
+            <Clock /> Xem lịch sử làm bài{" "}
+          </div>
         </div>
       ))}
       <button
-        onClick={() => navigate(page)}
+        onClick={() => handleOnClick(opent)}
         className="bg-blue-600 h-[50px] w-[300px] text-base text-white font-semibold rounded-2xl font-sent"
       >
         Bắt đầu làm bài

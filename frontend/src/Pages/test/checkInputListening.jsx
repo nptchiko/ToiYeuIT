@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import CheckInputListeningApi from "../../api/CheckInputListeningApi";
 const audioFiles = [
   {
@@ -63,12 +63,14 @@ export default function checkInputListening() {
   const [questions, setQuestions] = useState([]);
   const [data, setData] = useState([]);
   const [apiData, setApiData] = useState([]);
+  const location = useLocation();
+  const { id } = location.state;
   const audioRef = useRef(null);
   const { toast } = useToast();
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await CheckInputListeningApi.getCheckInputListening();
+        const res = await CheckInputListeningApi.getCheckInputListening(id);
         setData(res.body.context);
         setApiData(res.body);
       } catch (error) {
@@ -235,8 +237,7 @@ export default function checkInputListening() {
         score,
         context
       );
-      console.log("Nộp bài thành công:", response);
-      return response;
+      console.log("Nộp bài thành công:");
     } catch (error) {
       console.error("Lỗi khi nộp bài:", error.message);
       console.log(error);

@@ -72,8 +72,7 @@ const checkInputReading = () => {
     try {
       const context = contestApi();
       await TestReadingApi.submitTesAnswers(data.testId, score, context);
-      console.log("Nộp bài thành công:", response);
-      return response;
+      console.log("Nộp bài thành công:");
     } catch (error) {
       console.error("Lỗi khi nộp bài:", error.message);
       throw error;
@@ -550,7 +549,7 @@ const checkInputReading = () => {
             <div className="text-center p-4 bg-gray-100 rounded-lg mb-4">
               <h3 className="text-xl font-bold mb-2">Kết quả bài thi</h3>
               <p className="text-3xl font-bold text-blue-600">
-                {score.toFixed(2)} /100 điểm
+                {Math.round(score)} /100 điểm
               </p>
               <p className="mt-2">
                 Số câu đúng:{" "}
