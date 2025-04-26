@@ -38,7 +38,8 @@ public class CorsConfiguration {
                 "http://localhost:5173",
                 "http://localhost:3000",
                 "http://localhost:5174",
-                "http://localhost:3001"));
+                "http://localhost:3001",
+                "http://localhost:8001"));
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         corsConfiguration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "x-no-retry", "Access-Control-Allow-Origin"));
         corsConfiguration.setExposedHeaders(List.of("Authorization", "Content-Type"));
