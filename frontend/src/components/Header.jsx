@@ -1,21 +1,40 @@
-import { useState, useEffect } from "react";
+import { AuthService } from "@/utils/auth-service";
+import { LogOut, User } from "lucide-react";
+import { useState } from "react";
+import {
+  FaHome,
+  FaProjectDiagram,
+  FaBookOpen,
+  FaRegCommentDots,
+  FaUserCircle,
+} from "react-icons/fa";
+import { Link } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import Icon from "/ToiYeuIT/frontend/public/icon.png";
+
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("TOEIC");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  const [show, setShow] = useState(false);
+  // const { logout } = useAuth();
+  // const navigate = useNavigate();
   const handleSelected = (option) => {
     setSelectedOption(option);
     setIsOpen(false);
   };
-
+  const handleLogout = () => {
+    console.log("Logging out...");
+    AuthService.logout();
+    // clear session & token hear
+  };
   return (
-    <nav className="flex justify-between items-center p-5 font-semibold bg-slate-50 relative">
+    <nav className="flex justify-between items-center p-4 font-semibold bg-slate-50 relative">
       <div className="flex items-center gap-4">
-        <div className="flex justify-center items-center h-20 w-40 rounded-[140px]">
-          <img src={Icon} className="h-full w-full object-cover" />
+        <div className="flex items-center">
+          <div className="bg-blue-700 text-white p-1 rounded">
+            <span className="font-bold text-xl">ET</span>
+          </div>
+          <span className="font-bold text-blue-700 text-xl ml-1">ENGHUB</span>
         </div>
         <div className="relative">
           <button
@@ -68,7 +87,7 @@ const Header = () => {
         {isMobileMenuOpen && (
           <div className="absolute top-full left-0 w-full bg-white rounded-lg shadow-lg py-2 z-10 md:hidden">
             <NavLink
-              to="xay-dung"
+              to="/xay-dung"
               className={({ isActive }) =>
                 `block px-4 py-3 ${
                   isActive
@@ -179,9 +198,48 @@ const Header = () => {
           </NavLink>
         </div>
       </div>
-      <button className="px-4 py-2.5 text-base text-center text-white bg-blue-600 rounded-[32px] hover:bg-blue-700 transition-colors duration-200">
-        Bắt đầu
-      </button>
+      <NavLink to="/sidebar">
+        <div className="bg-indigo-700 hover:bg-indigo-600 px-3 py-2 text-white rounded-full ml-[350px]">
+          Bắt đầu làm bài
+        </div>
+      </NavLink>
+      <div
+        className="flex items-center ml-auto text-blue-700 relative"
+        onMouseEnter={() => setShow(true)}
+        onMouseLeave={() => setShow(false)}
+      >
+        <FaUserCircle className="h-10 w-10 cursor-pointer" />
+
+        {show && (
+          <div className="absolute top-10 right-0 bg-white border-gray-100 border shadow-lg rounded-lg w-[220px] p-4 z-50">
+            <div className="flex flex-col space-y-2">
+              <div className="flex items-center gap-4">
+                <FaUserCircle className="h-10 w-10" />
+                <div className="text-gray-800 font-semibold">
+                  Nguyễn Văn Hậu
+                </div>
+              </div>
+              <Link
+                to="/profile"
+                className="flex items-center gap-2 text-primary hover:bg-primary/10 transition-colors px-3 py-2 rounded-lg"
+              >
+                <User className="h-4 w-4" />
+                <span className="text-sm font-medium">View Profile</span>
+              </Link>
+              <Link
+                to="/login"
+                onClick={handleLogout}
+                className="flex items-center gap-2 text-destructive hover:bg-destructive/10 transition-colors px-3 py-2 rounded-lg"
+              >
+                <LogOut className="h-4 w-4" />
+                <span onClick={handleLogout} className="text-sm font-medium">
+                  Logout
+                </span>
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
     </nav>
   );
 };

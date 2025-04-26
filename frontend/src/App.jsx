@@ -1,17 +1,18 @@
-import React from "react";
+import { AuthProvider } from "./hooks/auth-provider";
+import { ToastProvider } from "./hooks/toast-provider";
+import RoutersConfig from "./router/routes";
 import { BrowserRouter as Router } from "react-router-dom";
-import Roadmap from "./Pages/Roadmap/Roadmap";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
-import Routes from "./routes/routes";
-const App = () => {
+
+function App() {
   return (
     <Router>
-      <Header />
-      <Routes />
-      <Footer />
+      <AuthProvider>
+        <ToastProvider>
+          <RoutersConfig />
+        </ToastProvider>
+      </AuthProvider>
     </Router>
   );
-};
+}
 
 export default App;

@@ -55,12 +55,12 @@ const Output_commitment = () => {
                 </h2>
                 <p className="mt-2 text-gray-600">
                   Kính gửi các bạn học viên đăng ký các khóa học TOEIC của
-                  Prepedu.com
+                  Enghub.com
                 </p>
               </div>
               <div className="p-6">
                 <p className="mb-6">
-                  Prep cam kết đảm bảo đầu ra TOEIC cặp kỹ năng Listening +
+                  Enghub cam kết đảm bảo đầu ra TOEIC cặp kỹ năng Listening +
                   Reading ("LR") cho học viên theo từng chặng học như sau:
                 </p>
                 <div className="space-y-4">
@@ -225,7 +225,7 @@ const Output_commitment = () => {
                       <ol className="list-decimal list-inside space-y-2 mt-2">
                         <li>
                           Học viên bắt buộc xem 100% các video bài giảng trên
-                          Prepedu.com từ đầu đến cuối video.
+                          Enghub.com từ đầu đến cuối video.
                         </li>
                         <li>
                           Làm đầy đủ 100% bài tập đi kèm và đạt số điểm tương
@@ -264,9 +264,9 @@ const Output_commitment = () => {
                       <h3 className="font-medium">Về thời lượng học:</h3>
                       <ol className="list-decimal list-inside space-y-2 mt-2">
                         <li>
-                          Trong suốt thời gian kể từ khi đăng ký học ở PREP, học
-                          viên cần tham gia học liên tục chương trình tối thiểu
-                          1 tiếng/ngày trong ít nhất 3 ngày/tuần.
+                          Trong suốt thời gian kể từ khi đăng ký học ở Enghub,
+                          học viên cần tham gia học liên tục chương trình tối
+                          thiểu 1 tiếng/ngày trong ít nhất 3 ngày/tuần.
                         </li>
                         <li>
                           Trong khoảng thời gian 02 tuần trước thời điểm chính
@@ -276,9 +276,9 @@ const Output_commitment = () => {
                         </li>
                         <li>
                           Khuyến khích tham gia đầy đủ các chương trình hỗ trợ
-                          kiến thức dành riêng cho học viên Prep, được thầy cô
+                          kiến thức dành riêng cho học viên Enghub, được thầy cô
                           tổ chức trên các nền tảng Online và đã thông báo trên
-                          Fanpage chính thức: Prep For TOEIC.
+                          Fanpage chính thức: Enghub For TOEIC.
                         </li>
                       </ol>
                     </div>
@@ -371,13 +371,13 @@ const Output_commitment = () => {
                         Học viên cần học hết toàn bộ lộ trình để đủ điều kiện
                         cam kết. Trong trường hợp Học viên đáp ứng các điều kiện
                         tại Mục I, II của cam kết này mà không đạt band điểm như
-                        đúng mục tiêu đầu ra của khóa học, PREP cam kết hoàn lại
-                        100% chi phí của khoá học không đạt đầu ra.
+                        đúng mục tiêu đầu ra của khóa học, Enghub cam kết hoàn
+                        lại 100% chi phí của khoá học không đạt đầu ra.
                       </p>
                       <p>
                         Đối với những trường hợp mua lộ trình từ hai chặng trở
-                        lên, Học viên đi thi không đạt ở chặng học nào, Prep sẽ
-                        hoàn tiền ở chặng học đó và chặng học liền kề cao hơn
+                        lên, Học viên đi thi không đạt ở chặng học nào, Enghub
+                        sẽ hoàn tiền ở chặng học đó và chặng học liền kề cao hơn
                         (nếu có), căn cứ theo Lộ trình mà học viên đã mua.
                       </p>
 
@@ -386,9 +386,9 @@ const Output_commitment = () => {
                         <ul className="list-disc list-inside mt-2 space-y-1">
                           <li>
                             Học viên không đáp ứng một trong các nghĩa vụ/điều
-                            kiện đã nêu trên, Prep không có trách nhiệm đảm bảo
-                            đầu ra cho Học viên, nhưng vẫn sẽ hỗ trợ tối đa để
-                            Học viên đạt điểm số cao nhất có thể.
+                            kiện đã nêu trên, Enghub không có trách nhiệm đảm
+                            bảo đầu ra cho Học viên, nhưng vẫn sẽ hỗ trợ tối đa
+                            để Học viên đạt điểm số cao nhất có thể.
                           </li>
                           <li>
                             Học viên hoàn thành khóa học nhưng không đảm bảo
@@ -404,11 +404,11 @@ const Output_commitment = () => {
                   <div className="space-y-3 mt-4">
                     <p>
                       Gửi thông tin theo tiêu đề: "Yêu cầu hoàn tiền - Tên chặng
-                      học" tới email support@prepedu.com kèm thông tin như sau:
+                      học" tới email support@Enghub.com kèm thông tin như sau:
                     </p>
                     <ul className="list-disc list-inside space-y-2">
                       <li>
-                        Thông tin tài khoản của Học viên đăng ký học tại Prep.
+                        Thông tin tài khoản của Học viên đăng ký học tại Enghub.
                       </li>
                       <li>
                         Bản Scan kết quả thi chính thức TOEIC từ IIG và các giấy
@@ -416,7 +416,7 @@ const Output_commitment = () => {
                       </li>
                     </ul>
                     <p>
-                      Đội ngũ PREP sẽ check lại toàn bộ thông tin và phản hồi
+                      Đội ngũ Enghub sẽ check lại toàn bộ thông tin và phản hồi
                       Học viên một cách chi tiết, đầy đủ nhất về việc Học viên
                       đã đáp ứng đủ điều kiện của Chính sách Cam kết hoàn tiền
                       hay chưa trong vòng 03 ngày làm việc.
@@ -424,7 +424,7 @@ const Output_commitment = () => {
                     <p>
                       Nếu đủ điều kiện hoàn tiền, số tiền được hoàn sẽ được trả
                       về tài khoản của Học viên trong vòng 30 ngày, kể từ ngày
-                      Prep xác nhận thông tin tới email của Học viên.
+                      Enghub xác nhận thông tin tới email của Học viên.
                     </p>
                     <p className="font-medium mt-4">
                       Chúc quý học viên có kết quả học tập thật tốt và hoàn
@@ -448,12 +448,12 @@ const Output_commitment = () => {
                 </h2>
                 <p className="mt-2 text-gray-600">
                   Kính gửi các bạn học viên đăng ký các khóa học TOEIC của
-                  Prepedu.com
+                  Enghub.com
                 </p>
               </div>
               <div className="p-6">
                 <p className="mb-6">
-                  Prep cam kết đảm bảo đầu ra TOEIC cặp kỹ năng Speaking +
+                  Enghub cam kết đảm bảo đầu ra TOEIC cặp kỹ năng Speaking +
                   Writing ("SW") cho học viên theo từng chặng học như sau:
                 </p>
                 <div className="space-y-4">
@@ -618,7 +618,7 @@ const Output_commitment = () => {
                       <ol className="list-decimal list-inside space-y-2 mt-2">
                         <li>
                           Học viên bắt buộc xem 100% các video bài giảng trên
-                          Prepedu.com từ đầu đến cuối video.
+                          Enghub.com từ đầu đến cuối video.
                         </li>
                         <li>
                           Làm đầy đủ 100% bài tập đi kèm và đạt số điểm tương
@@ -657,9 +657,9 @@ const Output_commitment = () => {
                       <h3 className="font-medium">Về thời lượng học:</h3>
                       <ol className="list-decimal list-inside space-y-2 mt-2">
                         <li>
-                          Trong suốt thời gian kể từ khi đăng ký học ở PREP, học
-                          viên cần tham gia học liên tục chương trình tối thiểu
-                          1 tiếng/ngày trong ít nhất 3 ngày/tuần.
+                          Trong suốt thời gian kể từ khi đăng ký học ở Enghub,
+                          học viên cần tham gia học liên tục chương trình tối
+                          thiểu 1 tiếng/ngày trong ít nhất 3 ngày/tuần.
                         </li>
                         <li>
                           Trong khoảng thời gian 02 tuần trước thời điểm chính
@@ -669,9 +669,9 @@ const Output_commitment = () => {
                         </li>
                         <li>
                           Khuyến khích tham gia đầy đủ các chương trình hỗ trợ
-                          kiến thức dành riêng cho học viên Prep, được thầy cô
+                          kiến thức dành riêng cho học viên Enghub, được thầy cô
                           tổ chức trên các nền tảng Online và đã thông báo trên
-                          Fanpage chính thức: Prep For TOEIC.
+                          Fanpage chính thức: Enghub For TOEIC.
                         </li>
                       </ol>
                     </div>
@@ -764,13 +764,13 @@ const Output_commitment = () => {
                         Học viên cần học hết toàn bộ lộ trình để đủ điều kiện
                         cam kết. Trong trường hợp Học viên đáp ứng các điều kiện
                         tại Mục I, II của cam kết này mà không đạt band điểm như
-                        đúng mục tiêu đầu ra của khóa học, PREP cam kết hoàn lại
-                        100% chi phí của khoá học không đạt đầu ra.
+                        đúng mục tiêu đầu ra của khóa học, Enghub cam kết hoàn
+                        lại 100% chi phí của khoá học không đạt đầu ra.
                       </p>
                       <p>
                         Đối với những trường hợp mua lộ trình từ hai chặng trở
-                        lên, Học viên đi thi không đạt ở chặng học nào, Prep sẽ
-                        hoàn tiền ở chặng học đó và chặng học liền kề cao hơn
+                        lên, Học viên đi thi không đạt ở chặng học nào, Enghub
+                        sẽ hoàn tiền ở chặng học đó và chặng học liền kề cao hơn
                         (nếu có), căn cứ theo Lộ trình mà học viên đã mua.
                       </p>
 
@@ -779,9 +779,9 @@ const Output_commitment = () => {
                         <ul className="list-disc list-inside mt-2 space-y-1">
                           <li>
                             Học viên không đáp ứng một trong các nghĩa vụ/điều
-                            kiện đã nêu trên, Prep không có trách nhiệm đảm bảo
-                            đầu ra cho Học viên, nhưng vẫn sẽ hỗ trợ tối đa để
-                            Học viên đạt điểm số cao nhất có thể.
+                            kiện đã nêu trên, Enghub không có trách nhiệm đảm
+                            bảo đầu ra cho Học viên, nhưng vẫn sẽ hỗ trợ tối đa
+                            để Học viên đạt điểm số cao nhất có thể.
                           </li>
                           <li>
                             Học viên hoàn thành khóa học nhưng không đảm bảo
@@ -797,11 +797,11 @@ const Output_commitment = () => {
                   <div className="space-y-3 mt-4">
                     <p>
                       Gửi thông tin theo tiêu đề: "Yêu cầu hoàn tiền - Tên chặng
-                      học" tới email support@prepedu.com kèm thông tin như sau:
+                      học" tới email support@Enghub.com kèm thông tin như sau:
                     </p>
                     <ul className="list-disc list-inside space-y-2">
                       <li>
-                        Thông tin tài khoản của Học viên đăng ký học tại Prep.
+                        Thông tin tài khoản của Học viên đăng ký học tại Enghub.
                       </li>
                       <li>
                         Bản Scan kết quả thi chính thức TOEIC từ IIG và các giấy
@@ -809,7 +809,7 @@ const Output_commitment = () => {
                       </li>
                     </ul>
                     <p>
-                      Đội ngũ PREP sẽ check lại toàn bộ thông tin và phản hồi
+                      Đội ngũ Enghub sẽ check lại toàn bộ thông tin và phản hồi
                       Học viên một cách chi tiết, đầy đủ nhất về việc Học viên
                       đã đáp ứng đủ điều kiện của Chính sách Cam kết hoàn tiền
                       hay chưa trong vòng 03 ngày làm việc.
@@ -817,7 +817,7 @@ const Output_commitment = () => {
                     <p>
                       Nếu đủ điều kiện hoàn tiền, số tiền được hoàn sẽ được trả
                       về tài khoản của Học viên trong vòng 30 ngày, kể từ ngày
-                      Prep xác nhận thông tin tới email của Học viên.
+                      Enghub xác nhận thông tin tới email của Học viên.
                     </p>
                     <p className="font-medium mt-4">
                       Chúc quý học viên có kết quả học tập thật tốt và hoàn
@@ -841,12 +841,12 @@ const Output_commitment = () => {
                 </h2>
                 <p className="mt-2 text-gray-600">
                   Kính gửi các bạn học viên đăng ký các khóa học TOEIC của
-                  Prepedu.com
+                  Enghub.com
                 </p>
               </div>
               <div className="p-6">
                 <p className="mb-6">
-                  Prep cam kết đảm bảo đầu ra TOEIC 4 kỹ năng theo từng chặng
+                  Enghub cam kết đảm bảo đầu ra TOEIC 4 kỹ năng theo từng chặng
                   cho học viên như sau:
                 </p>
                 <div className="space-y-4">
@@ -1011,7 +1011,7 @@ const Output_commitment = () => {
                       <ol className="list-decimal list-inside space-y-2 mt-2">
                         <li>
                           Học viên bắt buộc xem 100% các video bài giảng trên
-                          Prepedu.com từ đầu đến cuối video.
+                          Enghub.com từ đầu đến cuối video.
                         </li>
                         <li>
                           Làm đầy đủ 100% bài tập đi kèm và đạt số điểm tương
@@ -1050,9 +1050,9 @@ const Output_commitment = () => {
                       <h3 className="font-medium">Về thời lượng học:</h3>
                       <ol className="list-decimal list-inside space-y-2 mt-2">
                         <li>
-                          Trong suốt thời gian kể từ khi đăng ký học ở PREP, học
-                          viên cần tham gia học liên tục chương trình tối thiểu
-                          1 tiếng/ngày trong ít nhất 3 ngày/tuần.
+                          Trong suốt thời gian kể từ khi đăng ký học ở Enghub,
+                          học viên cần tham gia học liên tục chương trình tối
+                          thiểu 1 tiếng/ngày trong ít nhất 3 ngày/tuần.
                         </li>
                         <li>
                           Trong khoảng thời gian 02 tuần trước thời điểm chính
@@ -1062,9 +1062,9 @@ const Output_commitment = () => {
                         </li>
                         <li>
                           Khuyến khích tham gia đầy đủ các chương trình hỗ trợ
-                          kiến thức dành riêng cho học viên Prep, được thầy cô
+                          kiến thức dành riêng cho học viên Enghub, được thầy cô
                           tổ chức trên các nền tảng Online và đã thông báo trên
-                          Fanpage chính thức: Prep For TOEIC.
+                          Fanpage chính thức: Enghub For TOEIC.
                         </li>
                       </ol>
                     </div>
@@ -1157,13 +1157,13 @@ const Output_commitment = () => {
                         Học viên cần học hết toàn bộ lộ trình để đủ điều kiện
                         cam kết. Trong trường hợp Học viên đáp ứng các điều kiện
                         tại Mục I, II của cam kết này mà không đạt band điểm như
-                        đúng mục tiêu đầu ra của khóa học, PREP cam kết hoàn lại
-                        100% chi phí của khoá học không đạt đầu ra.
+                        đúng mục tiêu đầu ra của khóa học, Enghub cam kết hoàn
+                        lại 100% chi phí của khoá học không đạt đầu ra.
                       </p>
                       <p>
                         Đối với những trường hợp mua lộ trình từ hai chặng trở
-                        lên, Học viên đi thi không đạt ở chặng học nào, Prep sẽ
-                        hoàn tiền ở chặng học đó và chặng học liền kề cao hơn
+                        lên, Học viên đi thi không đạt ở chặng học nào, Enghub
+                        sẽ hoàn tiền ở chặng học đó và chặng học liền kề cao hơn
                         (nếu có), căn cứ theo Lộ trình mà học viên đã mua.
                       </p>
 
@@ -1172,9 +1172,9 @@ const Output_commitment = () => {
                         <ul className="list-disc list-inside mt-2 space-y-1">
                           <li>
                             Học viên không đáp ứng một trong các nghĩa vụ/điều
-                            kiện đã nêu trên, Prep không có trách nhiệm đảm bảo
-                            đầu ra cho Học viên, nhưng vẫn sẽ hỗ trợ tối đa để
-                            Học viên đạt điểm số cao nhất có thể.
+                            kiện đã nêu trên, Enghub không có trách nhiệm đảm
+                            bảo đầu ra cho Học viên, nhưng vẫn sẽ hỗ trợ tối đa
+                            để Học viên đạt điểm số cao nhất có thể.
                           </li>
                           <li>
                             Học viên hoàn thành khóa học nhưng không đảm bảo
@@ -1190,11 +1190,11 @@ const Output_commitment = () => {
                   <div className="space-y-3 mt-4">
                     <p>
                       Gửi thông tin theo tiêu đề: "Yêu cầu hoàn tiền - Tên chặng
-                      học" tới email support@prepedu.com kèm thông tin như sau:
+                      học" tới email support@Enghub.com kèm thông tin như sau:
                     </p>
                     <ul className="list-disc list-inside space-y-2">
                       <li>
-                        Thông tin tài khoản của Học viên đăng ký học tại Prep.
+                        Thông tin tài khoản của Học viên đăng ký học tại Enghub.
                       </li>
                       <li>
                         Bản Scan kết quả thi chính thức TOEIC từ IIG và các giấy
@@ -1202,7 +1202,7 @@ const Output_commitment = () => {
                       </li>
                     </ul>
                     <p>
-                      Đội ngũ PREP sẽ check lại toàn bộ thông tin và phản hồi
+                      Đội ngũ Enghub sẽ check lại toàn bộ thông tin và phản hồi
                       Học viên một cách chi tiết, đầy đủ nhất về việc Học viên
                       đã đáp ứng đủ điều kiện của Chính sách Cam kết hoàn tiền
                       hay chưa trong vòng 03 ngày làm việc.
@@ -1210,7 +1210,7 @@ const Output_commitment = () => {
                     <p>
                       Nếu đủ điều kiện hoàn tiền, số tiền được hoàn sẽ được trả
                       về tài khoản của Học viên trong vòng 30 ngày, kể từ ngày
-                      Prep xác nhận thông tin tới email của Học viên.
+                      Enghub xác nhận thông tin tới email của Học viên.
                     </p>
                     <p className="font-medium mt-4">
                       Chúc quý học viên có kết quả học tập thật tốt và hoàn

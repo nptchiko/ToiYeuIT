@@ -1,329 +1,373 @@
-import React, { useState } from "react";
-import { FaCheckCircle } from "react-icons/fa";
-function Background() {
-  const [couponBasic, setCouponBasic] = useState("");
-  const [couponPremium, setCouponPremium] = useState("");
-  const [selectedCourse, setSelectedCourse] = useState("LR");
-  const [selectedLevel, setSelectedLevel] = useState(0); // Index of selected level
-  const [selectedTarget, setSelectedTarget] = useState(0); // Index of selected target
-
-  // Content mapping for different courses
-  const courseContent = {
-    LR: {
-      title: "TOEIC Listening & Reading",
-      levels: ["TOEIC LR 1-295", "TOEIC LR 300-595", "TOEIC LR 600-650"],
-      target: ["TOEIC LR 300", "TOEIC LR 600", "TOEIC LR 800+"],
-    },
-    SW: {
-      title: "TOEIC Speaking & Writing",
-      levels: ["TOEIC SW 1-99", "TOEIC SW 100-199", "TOEIC SW 200-250"],
-      target: ["TOEIC SW 100", "TOEIC SW 200", "TOEIC SW 300+"],
-    },
-    ALL: {
-      title: "TOEIC 4 kỹ năng",
-      levels: [
-        "TOEIC LR 1-295 & SW 1-99",
-        "TOEIC LR 300-595 & SW 100-199",
-        "TOEIC LR 600-650 & SW 200-250",
-      ],
-      target: [
-        "TOEIC LR 300 & SW 100",
-        "TOEIC LR 600 & SW 200",
-        "TOEIC LR 800+ và SW 300+",
-      ],
-    },
-  };
-
-  // Price mapping based on level
-  const priceMapping = {
-    0: { basic: "1.000.000", premium: "1.750.000" },
-    1: { basic: "1.200.000", premium: "2.000.000" },
-    2: { basic: "1.500.000", premium: "2.500.000" },
-  };
-
-  const handleCourseSelect = (course) => {
-    setSelectedCourse(course);
-    setSelectedLevel(0);
-    setSelectedTarget(0);
-  };
-
-  const handleLevelSelect = (index) => {
-    setSelectedLevel(index);
-    // Update target to match level if it's lower
-    if (selectedTarget < index) {
-      setSelectedTarget(index);
+import React from "react";
+import { useState, useEffect } from "react";
+import {
+  BookOpen,
+  Clock,
+  Star,
+  Users,
+  Calendar,
+  DollarSign,
+  CheckCircle,
+  Award,
+  Bookmark,
+  Book,
+  Filter,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import BackgroundAip from "../../api/BackgroundApi";
+const Background = () => {
+  const [selectedCourse, setSelectedCourse] = useState(1);
+  const [selectedLevel, setSelectedLevel] = useState("all");
+  const [courses, setCourses] = useState([]);
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const res = await BackgroundAip.getBackground();
+        const coursesWithFeatures = res.body.map((course) => ({
+          ...course,
+          features: [
+            "Giảng viên chuyên nghiệp",
+            "Tài liệu độc quyền",
+            "Bài tập thực hành",
+          ],
+          rating: "4.9",
+        }));
+        setCourses(coursesWithFeatures);
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu khóa học:", error);
+      }
     }
-  };
 
-  const handleTargetSelect = (index) => {
-    // Only allow selecting targets higher than or equal to current level
-    if (index >= selectedLevel) {
-      setSelectedTarget(index);
+    fetchCourses();
+  }, []);
+  // Combined courses for "4 kỹ năng" option
+  const allCourses = [...courses];
+
+  // Get current courses based on selection
+  const getCurrentCourses = () => {
+    let filtered = [];
+
+    if (selectedCourse === 1) {
+      filtered = courses.filter((course) => course.type === "LR");
+    } else if (selectedCourse === 2) {
+      filtered = courses.filter((course) => course.type === "SW");
+    } else {
+      filtered = allCourses;
     }
+
+    if (selectedLevel !== "all") {
+      return filtered.filter((course) => course.level === selectedLevel);
+    }
+
+    return filtered;
   };
 
-  const dataBasic = [
-    {
-      id: 1,
-      title: "Học & tương tác chủ động với video bài giảng",
-    },
-    {
-      id: 2,
-      title: "Làm bài tập liên tục, không giới hạn",
-    },
-    {
-      id: 3,
-      title: "Học & Luyện đề theo kế hoạch học tập được cá nhân hóa",
-    },
-    {
-      id: 4,
-      title: "Nắm trọn bí kíp & chiến lược làm đề TOEIC hiệu quả",
-    },
-  ];
+  // Mapping tag colors
+  const tagColors = {
+    "Phổ biến": "bg-blue-100 text-blue-600",
+    Bestseller: "bg-amber-100 text-amber-600",
+    Premium: "bg-purple-100 text-purple-600",
+    Mới: "bg-green-100 text-green-600",
+    "Đề xuất": "bg-rose-100 text-rose-600",
+    VIP: "bg-indigo-100 text-indigo-600",
+  };
 
-  const dataPrimium = [
-    {
-      id: 1,
-      title: "Học & tương tác chủ động với video bài giảng",
-    },
-    {
-      id: 2,
-      title: "Làm bài tập liên tục, không giới hạn",
-    },
-    {
-      id: 3,
-      title: "Học & Luyện đề theo kế hoạch học tập được cá nhân hóa",
-    },
-    {
-      id: 4,
-      title: "Nắm trọn bí kíp & chiến lược làm đề TOEIC hiệu quả",
-    },
-    {
-      id: 5,
-      title: "Thực chiến với bộ đề TOEIC độc quyền, sát đề thi thật",
-    },
-  ];
+  // Level backgrounds
+  const levelBgs = {
+    "Cơ bản": "bg-green-50",
+    "Trung cấp": "bg-blue-50",
+    "Nâng cao": "bg-purple-50",
+  };
+
+  // Get filtered courses
+  const filteredCourses = getCurrentCourses();
+  const navigate = useNavigate();
+  const handleClickCourse = (course) => {
+    navigate("/by-course", {
+      state: {
+        title: course.title,
+        price: course.price,
+      },
+    });
+  };
   return (
-    <main className="flex flex-col py-20 px-12 bg-blue-800 rounded-[48px] max-md:px-5 max-md:py-24">
-      {/* Header and image section remains the same */}
-      <div className="flex justify-between">
-        <div className="text-white w-[60%] py-[62px] pr-[133px]">
-          <div className="text-xl font-semibold leading-snug max-md:ml-2.5">
-            Xin chào Bạn!
+    <div className="flex flex-col py-20 px-12 bg-gradient-to-br from-blue-800 to-indigo-900 rounded-[48px] max-md:px-5 max-md:py-24 shadow-2xl">
+      {/* Header section with enhanced styling */}
+      <div className="flex justify-between items-center">
+        <div className="text-white w-[60%] py-[62px] pr-[133px] max-md:py-10 max-md:pr-5">
+          <div className="flex items-center mb-3">
+            <Award className="w-6 h-6 text-yellow-300 mr-2" />
+            <div className="text-xl font-semibold leading-snug max-md:ml-2.5 text-yellow-200">
+              Xin chào Bạn!
+            </div>
           </div>
-          <div className="mt-5 text-5xl font-bold leading-[60px] max-md:max-w-full max-md:text-4xl max-md:leading-[56px]">
-            Thiết kế lộ trình học dành riêng cho bạn, ngay tại đây!
+          <div className="mt-5 text-5xl font-bold leading-[60px] max-md:max-w-full max-md:text-4xl max-md:leading-[56px] text-white drop-shadow-lg">
+            Thiết kế lộ trình học{" "}
+            <span className="text-yellow-300">dành riêng</span> cho bạn, ngay
+            tại đây!
           </div>
+          <p className="mt-4 text-blue-100 opacity-90 text-lg max-w-lg">
+            Đạt mục tiêu TOEIC với lộ trình được cá nhân hóa và đội ngũ giảng
+            viên chuyên nghiệp
+          </p>
         </div>
-        <div className="items-center w-[40%]">
+        <div className="items-center w-[40%] relative">
+          <div className="absolute -top-16 right-0 w-32 h-32 bg-yellow-300 rounded-full opacity-20 blur-xl"></div>
           <img
             src="https://prepedu.com/images/bee/bee_select_level_2.png"
-            className="w-full"
+            className="w-full relative z-10 drop-shadow-xl"
             alt="Bee mascot"
           />
         </div>
       </div>
 
-      <div className="bg-white rounded-xl">
-        {/* Course Options Section */}
-
-        <div className="flex max-md:flex-col text-lg max-lg:text-base border border-solid font-bold gap-6 rounded-full max-md:rounded-md p-3 justify-around items-center bg-gray-100 m-10">
-          {Object.entries(courseContent).map(([key, content]) => (
-            <div
-              onClick={() => handleCourseSelect(key)}
-              className={`px-[90px] py-[30px] max-lg:px-[50px] text-center rounded-full cursor-pointer duration-300 hover:bg-opacity-90 ${
-                selectedCourse === key
-                  ? "text-black bg-blue-300"
-                  : "text-blue-800 bg-sky-100"
-              }`}
-            >
-              {content.title}
-            </div>
-          ))}
+      {/* Course type tabs with enhanced styling */}
+      <div className="flex max-md:flex-col text-lg max-lg:text-base border border-solid shadow-lg font-bold gap-6 rounded-full max-md:rounded-md p-3 justify-around items-center bg-white/90 backdrop-blur-md mx-10 mb-8">
+        <div
+          onClick={() => {
+            setSelectedCourse(1);
+            setSelectedLevel("all");
+          }}
+          className={`px-[90px] py-[30px] max-lg:px-[50px] text-center rounded-full cursor-pointer duration-300 hover:shadow-md flex items-center justify-center gap-2 ${
+            selectedCourse === 1
+              ? "text-white bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg"
+              : "text-blue-800 bg-blue-50 hover:bg-blue-100"
+          }`}
+        >
+          <BookOpen className="w-5 h-5" />
+          TOEIC Listening & Reading
         </div>
-
-        {/* Level Assessment Section */}
-        <div className="flex flex-col items-center py-14 font-bold text-center  rounded-none text-gray-950 max-md:max-w-full">
-          <h2 className="text-3xl max-md:max-w-full">
-            Trình độ của tôi{" "}
-            <span className="text-[#00429D]">
-              {courseContent[selectedCourse].levels[selectedLevel]}
-            </span>
-          </h2>
-
-          <div className="flex items-center p-2.5 mt-5 w-full text-xl justify-around font-semibold text-gray-500 bg-gray-100 rounded-full border border-solid max-w-[1288px] max-md:max-w-full">
-            {courseContent[selectedCourse].levels.map((level, index) => (
-              <div
-                key={index}
-                onClick={() => handleLevelSelect(index)}
-                className={` flex py-7 px-10 rounded-full ${
-                  index === 0 ? "px-10 py-7 rounded-full  " : ""
-                } ${
-                  selectedLevel === index
-                    ? "bg-white text-gray-950 shadow-sm"
-                    : "hover:text-gray-700 cursor-pointer"
-                }`}
-              >
-                {level}
-              </div>
-            ))}
-          </div>
-
-          <p className="mt-5 text-sm font-medium tracking-normal leading-none">
-            Bạn chưa rõ trình độ bản thân?{" "}
-            <a href="#" className="font-bold underline text-[#0071F9]">
-              Kiểm tra đầu vào
-            </a>
-          </p>
-
-          <hr className="self-stretch mt-9 h-px bg-gray-200 max-md:max-w-full" />
-
-          <h2 className="mt-14 text-3xl leading-loose max-md:mt-10 max-md:max-w-full">
-            Mục tiêu của tôi
-            <span className="text-[#00429D]">
-              {" "}
-              {courseContent[selectedCourse].target[selectedTarget]}
-            </span>
-          </h2>
-
-          <div className="flex justify-around items-center p-2.5 mt-5 w-full text-xl font-semibold text-gray-500 bg-gray-100 rounded-full border border-solid max-w-[1288px] max-md:max-w-full">
-            {courseContent[selectedCourse].target.map((target, index) => (
-              <div
-                key={index}
-                onClick={() => handleTargetSelect(index)}
-                className={`flex py-7 px-10 rounded-full${
-                  index === 0 ? "px-10 py-7 rounded-full" : ""
-                } ${
-                  selectedTarget === index
-                    ? "bg-white text-gray-950"
-                    : index >= selectedLevel
-                    ? "hover:text-gray-700 cursor-pointer"
-                    : "opacity-15"
-                }`}
-              >
-                {target}
-              </div>
-            ))}
-          </div>
+        <div
+          onClick={() => {
+            setSelectedCourse(2);
+            setSelectedLevel("all");
+          }}
+          className={`px-[90px] py-[30px] max-lg:px-[50px] text-center rounded-full cursor-pointer duration-300 hover:shadow-md flex items-center justify-center gap-2 ${
+            selectedCourse === 2
+              ? "text-white bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg"
+              : "text-blue-800 bg-blue-50 hover:bg-blue-100"
+          }`}
+        >
+          <Book className="w-5 h-5" />
+          TOEIC Speaking & Writing
+        </div>
+        <div
+          onClick={() => {
+            setSelectedCourse(3);
+            setSelectedLevel("all");
+          }}
+          className={`px-[90px] py-[30px] max-lg:px-[50px] text-center rounded-full cursor-pointer duration-300 hover:shadow-md flex items-center justify-center gap-2 ${
+            selectedCourse === 3
+              ? "text-white bg-gradient-to-r from-blue-600 to-indigo-700 shadow-lg"
+              : "text-blue-800 bg-blue-50 hover:bg-blue-100"
+          }`}
+        >
+          <Bookmark className="w-5 h-5" />
+          TOEIC 4 kỹ năng
         </div>
       </div>
 
-      {/* Pricing Plans Section */}
-      <section className="mt-24 max-md:mt-10 max-md:max-w-full">
-        <div className="flex gap-10 max-md:flex-col">
-          {/* Basic Plan */}
-          <div className="w-1/2 max-md:ml-0 max-md:w-full">
-            <article className="flex flex-col items-center px-6 pt-10 pb-6 mx-auto w-full text-indigo-900 bg-blue-50 border-blue-50 border-solid border-[5px] rounded-[36px] max-md:px-5 max-md:mt-10 max-md:max-w-full">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets/TEMP/9d7bc642cdd1bb85662df1b8534cf195ce40cfe2c3f37d39818cffcb8833a801?placeholderIfAbsent=true&apiKey=9e9f0f5bc003468d96b652940abb163a"
-                alt="Basic plan"
-                className="object-contain aspect-[0.82] w-[90px]"
-              />
-              <h3 className="mt-3 text-3xl font-bold leading-none text-center">
-                Tự học chủ động
-              </h3>
-              <div className="flex gap-1 mt-16 max-w-full font-bold text-center">
-                <span className="text-4xl leading-none">
-                  {priceMapping[selectedLevel].basic}
-                </span>
-                <span className="self-start mt-3 text-2xl">VND</span>
-              </div>
+      {/* Main content area */}
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-100 py-10 px-6 rounded-xl shadow-xl">
+        <h2 className="text-4xl font-bold text-center mb-8 text-indigo-800 drop-shadow flex items-center justify-center gap-3">
+          <BookOpen className="w-8 h-8 text-indigo-600" />
+          Danh sách khóa học TOEIC{" "}
+          <span className="bg-indigo-700 text-white py-1 px-4 rounded-full text-2xl">
+            {selectedCourse === 1 && "Listening & Reading"}
+            {selectedCourse === 2 && "Speaking & Writing"}
+            {selectedCourse === 3 && "4 kỹ năng"}
+          </span>
+        </h2>
 
-              <div className="flex gap-5 justify-between py-1 pr-1.5 pl-4 mt-11 max-w-full text-base tracking-normal text-gray-400 bg-white border border-gray-100 border-solid rounded-[32px] w-[364px] max-md:mt-10">
-                <input
-                  type="text"
-                  placeholder="Nhập mã Coupon"
-                  className="my-auto font-medium bg-transparent outline-none"
-                  value={couponBasic}
-                  onChange={(e) => setCouponBasic(e.target.value)}
-                />
-                <button className="px-4 py-4 font-semibold text-center bg-gray-100 rounded-[32px]">
-                  Áp dụng
-                </button>
-              </div>
-
-              <button className="self-stretch px-16 py-5 mt-8 text-base font-bold text-center text-blue-900 bg-gray-200 hover:text-white hover:bg-blue-800 rounded-[32px] max-md:px-5 max-md:max-w-full">
-                Đăng ký học ngay
-              </button>
-
-              <div className="flex flex-col items-start self-stretch pt-6 pr-14 pb-10 pl-4 mt-6 w-full text-lg font-medium tracking-normal leading-loose bg-white rounded-3xl max-md:pr-5 max-md:max-w-full">
-                <h4 className="font-bold">Quyền lợi:</h4>
-                <ul className="w-full mt-6 space-y-6">
-                  {dataBasic.map((item) => (
-                    <li className="flex gap-2">
-                      <div className="flex items-center text-yellow-500">
-                        <FaCheckCircle />
-                      </div>
-                      <span className="flex-auto">{item.title}</span>
-                    </li>
-                  ))}
-                  <li className="flex gap-2">
-                    <div className="flex items-center text-gray-200">
-                      <FaCheckCircle />
-                    </div>
-                    <span className="flex-auto">
-                      Thực chiến với bộ đề TOEIC độc quyền, sát đề thi thật
-                    </span>
-                  </li>
-                </ul>
-              </div>
-            </article>
-          </div>
-
-          {/* Premium Plan */}
-          <div className="w-1/2 max-md:ml-0 max-md:w-full">
-            <article className="flex flex-col items-center px-6 pt-10 pb-6 mx-auto w-full text-indigo-900 bg-blue-50 border-yellow-500 border-solid border-[5px] rounded-[36px] max-md:px-5 max-md:mt-10 max-md:max-w-full">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets/TEMP/2d2a16cdaec599093004e2c7bd903a369f5206d14437989b3939f92a1a350e7b?placeholderIfAbsent=true&apiKey=9e9f0f5bc003468d96b652940abb163a"
-                alt="Premium plan"
-                className="object-contain aspect-[0.82] w-[90px]"
-              />
-              <h3 className="mt-3 text-3xl font-bold leading-none text-center">
-                Học và luyện đề toàn diện
-              </h3>
-              <div className="flex gap-1 mt-16 max-w-full font-bold text-center">
-                <span className="text-4xl leading-none">
-                  {priceMapping[selectedLevel].premium}
-                </span>
-                <span className="self-start mt-3 text-2xl">VND</span>
-              </div>
-
-              <div className="flex gap-5 justify-between py-1 pr-1.5 pl-4 mt-11 max-w-full text-base tracking-normal text-gray-400 bg-white border border-gray-100 border-solid rounded-[32px] w-[364px] max-md:mt-10">
-                <input
-                  type="text"
-                  placeholder="Nhập mã Coupon"
-                  className="my-auto font-medium bg-transparent outline-none"
-                  value={couponPremium}
-                  onChange={(e) => setCouponPremium(e.target.value)}
-                />
-                <button className="px-4 py-4 font-semibold text-center bg-gray-100 rounded-[32px]">
-                  Áp dụng
-                </button>
-              </div>
-
-              <button className="self-stretch px-16 py-5 mt-8 text-base font-bold text-center text-blue-900 bg-gray-200 hover:text-white hover:bg-blue-800 rounded-[32px] max-md:px-5 max-md:max-w-full">
-                Đăng ký học ngay
-              </button>
-
-              <div className="flex flex-col items-start self-stretch pt-6 pr-14 pb-10 pl-4 mt-6 w-full text-lg font-medium tracking-normal leading-loose bg-white rounded-3xl max-md:pr-5 max-md:max-w-full">
-                <h4 className="font-bold">Quyền lợi:</h4>
-                <ul className="w-full mt-6 space-y-6">
-                  {dataPrimium.map((item) => (
-                    <li className="flex gap-2">
-                      <div className="flex items-center text-yellow-500">
-                        <FaCheckCircle />
-                      </div>
-                      <span className="flex-auto">{item.title}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </article>
+        {/* Course filter section - now with active functionality */}
+        <div className="flex justify-center mb-8">
+          <div className="w-full max-w-3xl flex flex-col md:flex-row gap-4 bg-white/60 backdrop-blur-md rounded-lg p-4 shadow-md">
+            <div className="flex items-center text-indigo-800 font-medium">
+              <Filter className="w-5 h-5 mr-2" />
+              <p>Lọc theo cấp độ:</p>
+            </div>
+            <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+              <span
+                onClick={() => setSelectedLevel("all")}
+                className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer hover:bg-blue-200 transition-all ${
+                  selectedLevel === "all"
+                    ? "bg-blue-600 text-white"
+                    : "bg-blue-100 text-blue-700"
+                }`}
+              >
+                Tất cả
+              </span>
+              <span
+                onClick={() => setSelectedLevel("Cơ bản")}
+                className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer hover:bg-green-200 transition-all ${
+                  selectedLevel === "Cơ bản"
+                    ? "bg-green-600 text-white"
+                    : "bg-green-100 text-green-700"
+                }`}
+              >
+                Cơ bản
+              </span>
+              <span
+                onClick={() => setSelectedLevel("Trung cấp")}
+                className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer hover:bg-yellow-200 transition-all ${
+                  selectedLevel === "Trung cấp"
+                    ? "bg-yellow-600 text-white"
+                    : "bg-yellow-100 text-yellow-700"
+                }`}
+              >
+                Trung cấp
+              </span>
+              <span
+                onClick={() => setSelectedLevel("Nâng cao")}
+                className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer hover:bg-purple-200 transition-all ${
+                  selectedLevel === "Nâng cao"
+                    ? "bg-purple-600 text-white"
+                    : "bg-purple-100 text-purple-700"
+                }`}
+              >
+                Nâng cao
+              </span>
+            </div>
           </div>
         </div>
-      </section>
-    </main>
+
+        {/* Courses count and results indicator */}
+        <div className="px-4 mb-6">
+          <p className="text-indigo-700 font-medium">
+            Đang hiển thị {filteredCourses.length} khóa học{" "}
+            {selectedLevel !== "all" ? `cấp độ "${selectedLevel}"` : ""}
+          </p>
+        </div>
+
+        {/* Empty state when no courses match the filter */}
+        {filteredCourses.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-16 px-4 bg-white/70 rounded-xl">
+            <BookOpen className="w-16 h-16 text-indigo-300 mb-4" />
+            <h3 className="text-xl font-bold text-indigo-800 mb-2">
+              Không tìm thấy khóa học
+            </h3>
+            <p className="text-gray-600 text-center max-w-md">
+              Không có khóa học nào phù hợp với bộ lọc hiện tại. Vui lòng thử
+              lại với bộ lọc khác.
+            </p>
+            <button
+              onClick={() => setSelectedLevel("all")}
+              className="mt-6 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              Xem tất cả khóa học
+            </button>
+          </div>
+        )}
+
+        {/* Vertical scrolling container with enhanced styling */}
+        {filteredCourses.length > 0 && (
+          <div className="max-h-[650px] overflow-y-auto pr-2 pb-6 hide-scrollbar rounded-lg">
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 p-3">
+              {filteredCourses.map((course, index) => (
+                <div
+                  key={index}
+                  className={`${
+                    levelBgs[course.level]
+                  } bg-opacity-80 backdrop-blur-md border border-white/40 hover:border-indigo-400 hover:shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 transform hover:-translate-y-1 flex flex-col`}
+                >
+                  {/* Course header */}
+                  <div className="relative">
+                    {/* Tag banner */}
+                    <div
+                      className={`absolute top-4 right-0 ${
+                        tagColors[course.tag]
+                      } px-3 py-1 rounded-l-full text-xs font-bold shadow z-10`}
+                    >
+                      {course.tag}
+                    </div>
+
+                    {/* Course type badge - only shown in "4 kỹ năng" view */}
+                    {selectedCourse === 3 && (
+                      <div className="absolute top-1 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold shadow z-10">
+                        {course.type === "LR" ? "L&R" : "S&W"}
+                      </div>
+                    )}
+
+                    {/* Course header content */}
+                    <div className="p-6 pb-4">
+                      <h3 className="text-2xl font-bold text-indigo-800 mb-2 drop-shadow-sm">
+                        {course.title}
+                      </h3>
+                      <p className="text-gray-700">{course.description}</p>
+                    </div>
+                  </div>
+
+                  {/* Course details */}
+                  <div className="p-6 pt-2 flex-grow">
+                    <div className="mb-4 flex flex-wrap gap-2">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          course.level === "Cơ bản"
+                            ? "bg-green-100 text-green-700"
+                            : course.level === "Trung cấp"
+                            ? "bg-blue-100 text-blue-700"
+                            : "bg-purple-100 text-purple-700"
+                        }`}
+                      >
+                        {course.level}
+                      </span>
+                      <span className="px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                        ⭐ {course.rating}
+                      </span>
+                      <span className="px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">
+                        {course.duration} tuần
+                      </span>
+                    </div>
+
+                    <div className="text-sm text-gray-700 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-indigo-500" />
+                        <span>
+                          <strong>{course.students}</strong> học viên đã đăng ký
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-green-600" />
+                        <span>
+                          Học phí:{" "}
+                          <strong className="text-green-600 font-semibold">
+                            {course.price.toLocaleString("vi-VN")}đ
+                          </strong>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Course features */}
+                    <div className="mt-4 space-y-2">
+                      {course.features.map((feature, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-2 text-sm"
+                        >
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                          <span>{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Call to action */}
+                  <div className="p-4 bg-gradient-to-r from-indigo-50 to-blue-50 border-t border-indigo-100">
+                    <button
+                      onClick={() => handleClickCourse(course)}
+                      className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-medium px-6 py-3 rounded-xl text-sm transition-all shadow-md hover:shadow-lg"
+                    >
+                      Đăng ký ngay
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
-}
+};
 
 export default Background;
