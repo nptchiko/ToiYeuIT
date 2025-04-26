@@ -8,6 +8,8 @@ spring:
     password: ${DB_PASSWORD}
     url: "jdbc:mysql://localhost:3306/${DB_DATABASE}?createDatabaseIfNotExist=true"
     driver-class-name: com.mysql.cj.jdbc.Driver
+  config:
+    import: "env.properties"
   jpa:
     hibernate:
       ddl-auto: update
@@ -58,3 +60,14 @@ logging:
         web:
           filter:
             CommonsRequestLoggingFilter: DEBUG
+
+payment:
+  vnPay:
+    tmnCode: R1K6B5W8
+    secretKey: P2ERZMFRSYGFWKX9HRRZ6PD1TGUKV2DK
+    url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+    version: 2.1.0
+    command: pay
+    orderType: other
+#    change this to frontend port later
+    returnUrl: http://localhost:8081/api/payment/vn-pay-callback
