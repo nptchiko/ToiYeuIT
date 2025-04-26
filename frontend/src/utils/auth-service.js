@@ -14,7 +14,7 @@ const api = axios.create({
 });
 
 // Tên cookies
-const TOKEN_COOKIE_NAME = "jwt";
+const TOKEN_COOKIE_NAME = "token";
 const REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
 
 // Thời gian hết hạn cookies (7 ngày)
@@ -27,7 +27,8 @@ const TokenService = {
     Cookies.set(TOKEN_COOKIE_NAME, token, {
       expires: TOKEN_EXPIRY,
       secure: import.meta.env.MODE === "production",
-      httpOnly: true,
+      path: "/",
+      sameSite: "lax",
     });
   },
 
@@ -128,17 +129,26 @@ const AuthService = {
   // Đăng nhập
   login: async (email, password) => {
     try {
-      const response = await api.post("/auth/login", { email, password });
+      // Sử dụng axios  thay vì api instance để không kèm token
+      const response = await axios.post(
+        `${API_URL}/auth/login`,
+        { email, password },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
 
       const { token, role } = response.data.body;
       console.log("Received token:", token);
-      console.log(response.data);
 
       // Lưu token vào cookies
       TokenService.setToken(token);
       console.log("Token stored:", TokenService.getToken());
 
-      return role; // tra ve role cua tk
+      return role;
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -167,8 +177,12 @@ const AuthService = {
   // Đăng xuất
   logout: () => {
     try {
-      // Gọi API đăng xuất (nếu backend yêu cầu)
-      api.post("/auth/logout");
+      const token = TokenService.getToken();
+
+      // Gọi API đăng xuất
+      if (token) {
+        api.post("/auth/logout", { token });
+      }
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -222,10 +236,16 @@ const AuthService = {
   getCurrentUser: async () => {
     try {
       const response = await api.get("/users/user-info");
-      console.log(response.data);
+      console.log("response data user info:", response.data);
       return response.data;
     } catch (error) {
       console.error("Get current user error:", error);
+
+      // Chỉ xóa token nếu lỗi là 401 (Unauthorized)
+      if (error.response && error.response.status === 401) {
+        TokenService.clearTokens();
+      }
+
       throw error;
     }
   },

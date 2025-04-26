@@ -1,4 +1,4 @@
-import { useAuth } from "../hooks/auth-context";
+import { AuthService } from "@/utils/auth-service";
 import { LogOut, User } from "lucide-react";
 import { useState } from "react";
 import {
@@ -8,7 +8,7 @@ import {
   FaRegCommentDots,
   FaUserCircle,
 } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 
 const Header = () => {
@@ -16,19 +16,16 @@ const Header = () => {
   const [selectedOption, setSelectedOption] = useState("TOEIC");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [show, setShow] = useState(false);
-  const { logout } = useAuth();
-  const navigate = useNavigate();
+  // const { logout } = useAuth();
+  // const navigate = useNavigate();
   const handleSelected = (option) => {
     setSelectedOption(option);
     setIsOpen(false);
   };
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
+  const handleLogout = () => {
+    console.log("Logging out...");
+    AuthService.logout();
+    // clear session & token hear
   };
   return (
     <nav className="flex justify-between items-center p-4 font-semibold bg-slate-50 relative">
@@ -229,7 +226,8 @@ const Header = () => {
                 <User className="h-4 w-4" />
                 <span className="text-sm font-medium">View Profile</span>
               </Link>
-              <button
+              <Link
+                to="/login"
                 onClick={handleLogout}
                 className="flex items-center gap-2 text-destructive hover:bg-destructive/10 transition-colors px-3 py-2 rounded-lg"
               >
@@ -237,7 +235,7 @@ const Header = () => {
                 <span onClick={handleLogout} className="text-sm font-medium">
                   Logout
                 </span>
-              </button>
+              </Link>
             </div>
           </div>
         )}
