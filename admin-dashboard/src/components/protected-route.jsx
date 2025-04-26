@@ -1,10 +1,20 @@
-// protected-route.jsx
+"use client";
 
+// protected-route.jsx
 import { useAuth } from "../hooks/auth-context";
-import { Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export function AdminProtectedRoute({ children }) {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  // Add useEffect to handle navigation after loading completes
+  useEffect(() => {
+    if (!loading && (!user || user !== "ADMIN")) {
+      navigate("/login", { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   // Nếu đang loading, có thể hiển thị spinner
   if (loading) {
@@ -15,9 +25,9 @@ export function AdminProtectedRoute({ children }) {
     );
   }
 
-  // Nếu không phải admin hoặc chưa đăng nhập, chuyển hướng đến trang đăng nhập
+  // Nếu không phải admin hoặc chưa đăng nhập, không render gì cả (navigation handled by useEffect)
   if (!user || user !== "ADMIN") {
-    return <Navigate to="/login" replace />;
+    return null;
   }
 
   // Nếu là admin, hiển thị nội dung

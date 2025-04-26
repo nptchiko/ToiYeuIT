@@ -3,6 +3,10 @@ import LoginPage from "../Pages/Login/Login_Page";
 import ProtectedRoute from "../Pages/Login/protected-route";
 import Commitment from "../Pages/Output_commitment/Output_commitment";
 import AllSkill from "../Pages/Practice/All_skill";
+import TestListening from "../Pages/Practice/Exam_set/TestListening";
+import TestReading from "../Pages/Practice/Exam_set/TestReading";
+import HistoryListening from "../Pages/Practice/History_test/HistoryListening";
+import HistoryReaing from "../Pages/Practice/History_test/HistoryReaing";
 import Listening from "../Pages/Practice/Listening";
 import Practice from "../Pages/Practice/Practice";
 import Reading from "../Pages/Practice/Reading";
@@ -10,28 +14,37 @@ import Speaking from "../Pages/Practice/Speaking";
 import Writing from "../Pages/Practice/Writing";
 import Roadmap from "../Pages/Roadmap/Roadmap";
 import KT from "../Pages/test/Test";
-import RouterPrivate from "./RouterPrivate";
-import RouterPublic from "./RouterPublic";
-import Sidebar from "../components/Sidebar";
+import CheckInputListening from "../Pages/test/checkInputListening";
+import CheckInputReading from "../Pages/test/checkInputReading";
+import UseProfileData from "../Pages/useProfileData/useProfileData";
 import Flashcard from "../Pages/user/Flashcard";
 import MyCourses from "../Pages/user/MyCourses";
 import Overview from "../Pages/user/Overview";
 import TestPractice from "../Pages/user/TestPractice";
-import UseProfileData from "../Pages/useProfileData/useProfileData";
-import CheckInputListening from "../Pages/test/checkInputListening";
-import CheckInputReading from "../Pages/test/checkInputReading";
+import Sidebar from "../components/Sidebar";
+import RouterPrivate from "./RouterPrivate";
+import RouterPublic from "./RouterPublic";
+import { useAuth } from "@/hooks/auth-context";
 import { Routes, Route, Navigate } from "react-router-dom";
-import TestListening from "../Pages/Practice/Exam_set/TestListening";
-import TestReading from "../Pages/Practice/Exam_set/TestReading";
-import HistoryReaing from "../Pages/Practice/History_test/HistoryReaing";
-import HistoryListening from "../Pages/Practice/History_test/HistoryListening";
+
 const RoutersConfig = () => {
+  const { user, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
   return (
     <Routes>
       {/* Route đăng nhập - có thể truy cập mà không cần xác thực */}
       <Route path="/login" element={<LoginPage />} />
       {/* Route mặc định - chuyển hướng đến trang đăng nhập */}
-      <Route path="/" element={<Navigate to="/xay-dung" replace />} />
+      <Route
+        path="/"
+        element={<Navigate to={user ? "/xay-dung" : "/login"} replace />}
+      />
 
       {/* Các trang chính cần xác thực */}
       <Route
