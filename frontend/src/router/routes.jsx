@@ -26,7 +26,12 @@ import RouterPrivate from "./RouterPrivate";
 import RouterPublic from "./RouterPublic";
 import { useAuth } from "@/hooks/auth-context";
 import { Routes, Route, Navigate } from "react-router-dom";
-
+import TestListening from "../Pages/Practice/Exam_set/TestListening";
+import TestReading from "../Pages/Practice/Exam_set/TestReading";
+import HistoryReaing from "../Pages/Practice/History_test/HistoryReaing";
+import HistoryListening from "../Pages/Practice/History_test/HistoryListening";
+import HistoryInputListening from "../Pages/Practice/History_test/HistoryInputListening";
+import HistoryInputRreading from "../Pages/Practice/History_test/HistoryInputRreading";
 const RoutersConfig = () => {
   const { user, loading } = useAuth();
   if (loading) {
@@ -82,6 +87,15 @@ const RoutersConfig = () => {
         <Route path="/test-reading" element={<TestReading />} />
         <Route path="/test-history-reading" element={<HistoryReaing />} />
         <Route path="/test-history-listening" element={<HistoryListening />} />
+        <Route path="/test-history-reading" element={<HistoryReaing />} />
+        <Route
+          path="/test-input-history-reading"
+          element={<HistoryInputRreading />}
+        />
+        <Route
+          path="/test-input-history-listeing"
+          element={<HistoryInputListening />}
+        />
         <Route
           path="/check-input-listening"
           element={<CheckInputListening />}
