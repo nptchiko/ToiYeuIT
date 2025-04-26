@@ -27,7 +27,7 @@ public class QuestionCluster {
     @Column(name = "paragraph", columnDefinition = "text")
     String paragraph;
 
-    @ManyToOne(targetEntity = Test.class)
+    @ManyToOne(targetEntity = Test.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "test_id")
     Test test;
 

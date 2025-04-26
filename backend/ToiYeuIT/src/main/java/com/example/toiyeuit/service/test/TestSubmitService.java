@@ -12,9 +12,11 @@ import com.example.toiyeuit.service.UserService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -42,8 +44,9 @@ public class TestSubmitService {
         var user = userService.getUserByEmail("mikudeptrai@gmail.com");
 
         var submit = testSubmissionRepository.findByWhoMadeIt(test.getId(), user.getId());
-        if  (submit.isPresent())
+        if  (submit.isPresent()) {
             testResultRepository.deleteTestResultsByTestSubmission_Id(submit.get().getId());
+        }
         else {
             submit = java.util.Optional.of(testSubmissionRepository.save(
                     TestSubmission.builder()
@@ -55,6 +58,7 @@ public class TestSubmitService {
         var result = submit.get();
         for( var p : request.getContext()) {
             for (var a : p.getAnswers()) {
+                log.debug("question id: ", a.getId());
                 var question = questionService.getById(a.getId());
                 testResultRepository.save(
                         TestResult.builder()

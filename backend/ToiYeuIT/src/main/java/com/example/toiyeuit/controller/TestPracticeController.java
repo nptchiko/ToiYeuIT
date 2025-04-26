@@ -3,6 +3,7 @@ package com.example.toiyeuit.controller;
 import com.example.toiyeuit.dto.request.testSubmit.TestSubmitRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.dto.response.TestDetailsResponse;
+import com.example.toiyeuit.dto.response.TestResponse;
 import com.example.toiyeuit.dto.response.TestSetResponse;
 import com.example.toiyeuit.service.test.TestCollectionService;
 import com.example.toiyeuit.service.test.TestResultService;
@@ -60,5 +61,11 @@ public class TestPracticeController {
                 .message("Chan vai lozz")
                 .body(body)
                 .build();
+    }
+
+    @GetMapping("/thi-dau-vao")
+    public ApiResponse<List<TestResponse>> testDauVao(){
+      //  var body =
+        return null;
     }
 }

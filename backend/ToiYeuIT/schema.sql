@@ -55,77 +55,117 @@ CREATE TABLE `exercise` (
   FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`lesson_id`)
 );
 
-CREATE TABLE `question` (
-  `ques_id` bigint PRIMARY KEY,
-  `description` varchar(255),
-  `correct_ans` varchar(255)
-);
-
 CREATE TABLE `exercise_detail` (
-  `ex_id` int,
-  `question_id` bigint,
-  `index` int NOT NULL,
-  PRIMARY KEY (`ex_id`, `question_id`),
-  FOREIGN KEY (`ex_id`) REFERENCES `exercise` (`id`),
-  FOREIGN KEY (`question_id`) REFERENCES `question` (`ques_id`)
+                                   `ex_id` int,
+                                   `question_id` bigint,
+                                   `index` int NOT NULL,
+                                   PRIMARY KEY (`ex_id`, `question_id`),
+                                   FOREIGN KEY (`ex_id`) REFERENCES `exercise` (`id`),
+                                   FOREIGN KEY (`question_id`) REFERENCES `question` (`ques_id`)
 );
 
 CREATE TABLE `exercise_submission` (
-  `submission_id` bigint COMMENT 'tsid',
-  `ex_id` int,
-  `last_answered_by` bigint,
-  `last_answered_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  `score` decimal,
-  PRIMARY KEY (`submission_id`),
-  FOREIGN KEY (`ex_id`) REFERENCES `exercise` (`id`),
-  FOREIGN KEY (`last_answered_by`) REFERENCES `user` (`user_id`)
+                                       `submission_id` bigint COMMENT 'tsid',
+                                       `ex_id` int,
+                                       `last_answered_by` bigint,
+                                       `last_answered_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+                                       `score` decimal,
+                                       PRIMARY KEY (`submission_id`),
+                                       FOREIGN KEY (`ex_id`) REFERENCES `exercise` (`id`),
+                                       FOREIGN KEY (`last_answered_by`) REFERENCES `user` (`user_id`)
 );
 
 CREATE TABLE `exercise_result` (
-  `id` bigint,
-  `ques_id` bigint,
-  `answer` varchar(255) NOT NULL,
-  `correct_ans` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`, `ques_id`),
-  FOREIGN KEY (`id`) REFERENCES `exercise_submission` (`submission_id`),
-  FOREIGN KEY (`ques_id`) REFERENCES `question` (`ques_id`)
+                                   `id` bigint,
+                                   `ques_id` bigint,
+                                   `answer` varchar(255) NOT NULL,
+                                   `correct_ans` varchar(255) NOT NULL,
+                                   PRIMARY KEY (`id`, `ques_id`),
+                                   FOREIGN KEY (`id`) REFERENCES `exercise_submission` (`submission_id`),
+                                   FOREIGN KEY (`ques_id`) REFERENCES `question` (`ques_id`)
+);
+create table question_cluster
+(
+    id        int auto_increment
+        primary key,
+    indexes   int  not null,
+    paragraph text null,
+    part      int  not null,
+    test_id   int  null,
+    constraint FKkd53425gk00tlq2lije4tdyll
+        foreign key (test_id) references test (id)
+);
+create table question
+(
+    ques_id  bigint auto_increment                                                      not null
+        primary key,
+    description         varchar(255)                                                null,
+    correct_ans         varchar(255)                                                not null,
+    question_scope      enum ('TEST', 'EXERCISE')             default 'TEST'        not null,
+    question_type       enum ('MULTICHOICE', 'FILLING_BLANK') default 'MULTICHOICE' not null,
+    audio_src           varchar(255)                                                null,
+    img_src             varchar(255)                                                null,
+    question_cluster_id int                                                         null,
+    constraint question_cluster__fk
+        foreign key (question_cluster_id) references question_cluster (id)
 );
 
-CREATE TABLE `multichoice_detail` (
-  `ques_id` bigint,
-  `key` enum('A', 'B', 'C', 'D'),
-  `answer_description` varchar(255),
-  PRIMARY KEY (`ques_id`, `key`),
-  FOREIGN KEY (`ques_id`) REFERENCES `question` (`ques_id`)
+create table multichoice_detail
+(
+    ques_id            bigint                    not null,
+    `key`              enum ('A', 'B', 'C', 'D') not null,
+    answer_description varchar(255)              null,
+    primary key (ques_id, `key`),
+    constraint multichoice_detail_ibfk_1
+        foreign key (ques_id) references question (ques_id)
+            on update cascade
 );
 
-CREATE TABLE `test_collection` (
-  `id` int PRIMARY KEY,
-  `name` varchar(255),
-  `skill_id` int,
-  FOREIGN KEY (`skill_id`) REFERENCES `skill` (`id`)
+create table test_collection
+(
+    id          int auto_increment
+        primary key,
+    skill_id    int          null,
+    description varchar(255) null,
+    title       varchar(255) null,
+    constraint test_collection_ibfk_2
+        foreign key (skill_id) references skill (id)
 );
 
-CREATE TABLE `test` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `test_collection_id` int,
-  `index` int NOT NULL,
-  `name` varchar(255),
-  FOREIGN KEY (`test_collection_id`) REFERENCES `test_collection` (`id`)
+create index skill_id
+    on test_collection (skill_id);
+
+create table test
+(
+    id                 int auto_increment
+        primary key,
+    test_collection_id int              not null,
+    `index`            int              not null,
+    title              varchar(255)     null,
+    enabled            bit default b'1' null,
+    constraint FK34np1jcju9km4vaswfl1oy9cp
+        foreign key (test_collection_id) references test_collection (id)
 );
 
-CREATE TABLE `test_detail` (
-  `belong_to` int,
-  `question_id` bigint,
-  `part` int NOT NULL,
-  `index` int NOT NULL,
-  PRIMARY KEY (`belong_to`, `question_id`),
-  FOREIGN KEY (`belong_to`) REFERENCES `test` (`id`),
-  FOREIGN KEY (`question_id`) REFERENCES `question` (`ques_id`)
+create table test_detail
+(
+    belong_to   int    not null,
+    question_id bigint not null,
+    part        int    not null,
+    `index`     int    not null,
+    primary key (belong_to, question_id),
+    constraint test_detail_ibfk_1
+        foreign key (belong_to) references test (id)
+            on delete cascade,
+    constraint test_detail_ibfk_2
+        foreign key (question_id) references question (ques_id)
 );
+
+create index question_id
+    on test_detail (question_id);
 
 CREATE TABLE `test_submission` (
-  `submission_id` bigint COMMENT 'tsid - Time-Sorted Unique Identifiers',
+  `submission_id` bigint auto_increment,
   `test_id` int,
   `last_answered_by` bigint,
   `last_answered_at` timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -135,15 +175,23 @@ CREATE TABLE `test_submission` (
   FOREIGN KEY (`last_answered_by`) REFERENCES `user` (`user_id`)
 );
 
-CREATE TABLE `test_result` (
-  `id` bigint,
-  `question_id` bigint,
-  `answer` varchar(255) NOT NULL,
-  `correct_ans` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`, `question_id`),
-  FOREIGN KEY (`id`) REFERENCES `test_submission` (`submission_id`),
-  FOREIGN KEY (`question_id`) REFERENCES `question` (`ques_id`)
+create table test_result
+(
+    id          int auto_increment
+        primary key,
+    answer      varchar(150) not null,
+    part        int          not null,
+    question_id bigint       null,
+    submit_id   bigint       null,
+    constraint FK787s15vwqnuckvarfil6r6wsk
+        foreign key (question_id) references question (ques_id)
+            on update cascade,
+    constraint FKqw150dx9te5yl1xh95r05wa0h
+        foreign key (submit_id) references test_submission (submission_id)
+            on update cascade on delete cascade
 );
+
+
 
 CREATE TABLE `flashcard_decks` (
   `deck_id` int PRIMARY KEY AUTO_INCREMENT,

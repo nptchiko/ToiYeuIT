@@ -12,6 +12,10 @@ import java.util.Optional;
 public interface QuestionRepository extends JpaRepository<Question, Long> {
     List<Question> findAll();
 
+    @Query(
+            nativeQuery = true,
+            value = "select * from ToiYeuIT.question q where q.ques_id = :id"
+    )
     Optional<Question> findById(Long id);
     
     @Query(
