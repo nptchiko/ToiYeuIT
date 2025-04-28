@@ -6,7 +6,7 @@ import AllSkill from "../Pages/Practice/All_skill";
 import TestListening from "../Pages/Practice/Exam_set/TestListening";
 import TestReading from "../Pages/Practice/Exam_set/TestReading";
 import HistoryListening from "../Pages/Practice/History_test/HistoryListening";
-import HistoryReaing from "../Pages/Practice/History_test/HistoryReaing";
+import HistoryReading from "../Pages/Practice/History_test/HistoryReaing";
 import Listening from "../Pages/Practice/Listening";
 import Practice from "../Pages/Practice/Practice";
 import Reading from "../Pages/Practice/Reading";
@@ -26,14 +26,15 @@ import RouterPrivate from "./RouterPrivate";
 import RouterPublic from "./RouterPublic";
 import { useAuth } from "@/hooks/auth-context";
 import { Routes, Route, Navigate } from "react-router-dom";
-import TestListening from "../Pages/Practice/Exam_set/TestListening";
-import TestReading from "../Pages/Practice/Exam_set/TestReading";
-import HistoryReaing from "../Pages/Practice/History_test/HistoryReaing";
-import HistoryListening from "../Pages/Practice/History_test/HistoryListening";
 import HistoryInputListening from "../Pages/Practice/History_test/HistoryInputListening";
-import HistoryInputRreading from "../Pages/Practice/History_test/HistoryInputRreading";
+import HistoryInputReading from "../Pages/Practice/History_test/HistoryInputRreading";
+import Vnpay from "../Pages/By_Course/Vnpay";
+import Successfull from "../Pages/By_Course/Successfull";
+import Failure from "../Pages/By_Course/Failure";
+
 const RoutersConfig = () => {
   const { user, loading } = useAuth();
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -41,10 +42,12 @@ const RoutersConfig = () => {
       </div>
     );
   }
+
   return (
     <Routes>
       {/* Route đăng nhập - có thể truy cập mà không cần xác thực */}
       <Route path="/login" element={<LoginPage />} />
+
       {/* Route mặc định - chuyển hướng đến trang đăng nhập */}
       <Route
         path="/"
@@ -85,21 +88,23 @@ const RoutersConfig = () => {
         <Route path="/by-course" element={<Course />} />
         <Route path="/test-listening" element={<TestListening />} />
         <Route path="/test-reading" element={<TestReading />} />
-        <Route path="/test-history-reading" element={<HistoryReaing />} />
+        <Route path="/test-history-reading" element={<HistoryReading />} />
         <Route path="/test-history-listening" element={<HistoryListening />} />
-        <Route path="/test-history-reading" element={<HistoryReaing />} />
         <Route
           path="/test-input-history-reading"
-          element={<HistoryInputRreading />}
+          element={<HistoryInputReading />}
         />
         <Route
-          path="/test-input-history-listeing"
+          path="/test-input-history-listening"
           element={<HistoryInputListening />}
         />
         <Route
           path="/check-input-listening"
           element={<CheckInputListening />}
         />
+        <Route path="/successfull-buy" element={<Successfull />} />
+        <Route path="/failure-buy" element={<Failure />} />
+        <Route path="/vnpay" element={<Vnpay />} />
         <Route path="/check-input-reading" element={<CheckInputReading />} />
         <Route path="/profile" element={<UseProfileData />} />
         <Route path="/sidebar" element={<Sidebar />}>

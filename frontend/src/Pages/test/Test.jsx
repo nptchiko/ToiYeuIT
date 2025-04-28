@@ -1,35 +1,59 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Clock } from "lucide-react";
-const data = [
-  {
-    id: 6,
-    name: "TOEIC test Listening",
-    time: "Thời gian làm bài:02:00:00",
-    skill:
-      "Bài thi được sử dụng để đánh giá nhanh trình độ của học sinh cho kĩ năng TOEIC Listening",
+import { TokenService } from "../../utils/auth-service";
+import axios from "axios";
+const axiosClient = axios.create({
+  baseURL: "http://localhost:8081",
+  headers: {
+    "Content-Type": "application/json",
   },
-  {
-    id: 7,
-    name: "TOEIC Quick Test Reading",
-    time: "Thời gian làm bài:00:30:00",
-    skill:
-      "Bài thi được sử dụng để đánh giá nhanh trình độ của học sinh cho kĩ năng TOEIC Reading",
+});
+axiosClient.interceptors.request.use(
+  (config) => {
+    const token = TokenService.getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
   },
-];
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+axiosClient.interceptors.response.use(
+  (response) => response.data,
+  (error) => Promise.reject(error)
+);
 const Test = () => {
-  const [opent, setOpent] = useState(data[0].id);
+  const [data, setData] = useState([]);
+  const [opent, setOpent] = useState(null);
   const navigate = useNavigate();
   const [page, setPage] = useState("/check-input-listening");
   const [pageHistory, setPageHistory] = useState(
     "/test-input-history-listeing"
   );
+  useEffect(() => {
+    async function fetchTest() {
+      try {
+        const res = await axiosClient.get("/api/test-practice/thi-dau-vao");
+        setData(res.body);
+        if (res.body && res.body.length > 0) {
+          setOpent(res.body[0].id);
+        }
+      } catch (error) {
+        console.error("Lấy dữ liệu kiểm tra đầu vào thất bại", error);
+      }
+    }
+    fetchTest();
+  }, []);
+
   const handlselection = (id) => {
     setOpent(id);
-    setPage(id === 7 ? "/check-input-reading" : "/check-input-listening");
+    setPage(id === 9 ? "/check-input-reading" : "/check-input-listening");
     setPageHistory(
-      id === 7 ? "/test-input-history-reading" : "/test-input-history-listeing"
+      id === 9 ? "/test-input-history-reading" : "/test-input-history-listeing"
     );
   };
   const handleOnClick = (test) => {
@@ -65,18 +89,25 @@ const Test = () => {
             className="w-5 h-5 "
           ></input>
           <div className="font-sent">
-            <h1 className="text-xl font-bold">{item.name}</h1>
-            <p>{item.time}</p>
-            {opent == item.id && <p>{item.skill}</p>}
+            <h1 className="text-xl font-bold">{item.title}</h1>
+            <p>Thời gian làm bài: 00:30:00</p>
+            {opent === item.id && (
+              <p>
+                Bài thi được sử dụng để đánh giá nhanh trình độ của học sinh cho
+                kĩ năng TOEIC của học viên
+              </p>
+            )}
           </div>
-          <div
-            onClick={() => handleOnClickHistory(opent)}
-            className={`absolute flex gap-2 right-10 font-bold ${
-              opent === item.id ? "text-blue-500" : "text-black"
-            } `}
-          >
-            <Clock /> Xem lịch sử làm bài{" "}
-          </div>
+          {item.submitted === 1 && (
+            <div
+              onClick={() => handleOnClickHistory(item.id)}
+              className={`absolute flex gap-2 right-10 font-bold ${
+                opent === item.id ? "text-blue-500" : "text-black"
+              } `}
+            >
+              <Clock /> Xem lịch sử làm bài{" "}
+            </div>
+          )}
         </div>
       ))}
       <button

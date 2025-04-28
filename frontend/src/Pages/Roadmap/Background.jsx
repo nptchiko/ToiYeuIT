@@ -87,6 +87,7 @@ const Background = () => {
       state: {
         title: course.title,
         price: course.price,
+        id: course.id,
       },
     });
   };
