@@ -1,6 +1,6 @@
 "use client";
 
-import testsData from "../json/tests.json";
+import TestAPI from "../api/testmanagerAPI";
 import {
   X,
   Upload,
@@ -17,6 +17,7 @@ import {
   FolderOpen,
   Trash2,
   AlertTriangle,
+  Loader2,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
@@ -33,6 +34,9 @@ export default function TestManagement() {
   const [selectedTestSet, setSelectedTestSet] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedSets, setExpandedSets] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
   const [newTest, setNewTest] = useState({
     name: "",
     status: "Active",
@@ -43,27 +47,34 @@ export default function TestManagement() {
     fileName: "",
     parsedData: null,
     isNewTestSet: false,
+    course: "",
   });
   const fileInputRef = useRef(null);
   const modalRef = useRef(null);
 
   // Calculate stats from tests data
-  const activeTestsCount = tests.filter(
-    (test) => test.status === "Active"
-  ).length;
-  const totalQuestionsCount = tests.reduce(
-    (total, test) => total + (Number.parseInt(test.questions) || 0),
-    0
-  );
+  const activeTestsCount =
+    tests && tests.length
+      ? tests.filter((test) => test.status === "Active").length
+      : 0;
+
+  const totalQuestionsCount =
+    tests && tests.length
+      ? tests.reduce(
+          (total, test) => total + (Number.parseInt(test.questions) || 0),
+          0
+        )
+      : 0;
 
   // Filter tests based on search term
-  const filteredTests = tests.filter(
-    (test) =>
-      test.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      test.course.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (test.testSet &&
-        test.testSet.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredTests = Array.isArray(tests)
+    ? tests.filter(
+        (test) =>
+          test.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          test.course?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          test.testSet?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   // Group tests by test set
   const groupedTests = filteredTests.reduce((acc, test) => {
@@ -76,167 +87,44 @@ export default function TestManagement() {
   }, {});
 
   useEffect(() => {
-    // Load tests with additional test sets
-    const extendedTestsData = [
-      ...testsData,
-      // Mathematics Test Set
-      {
-        id: 101,
-        name: "Algebra Fundamentals",
-        course: "Mathematics",
-        testSet: "Mathematics",
-        questions: 25,
-        duration: "45 min",
-        status: "Active",
-      },
-      {
-        id: 102,
-        name: "Calculus I",
-        course: "Mathematics",
-        testSet: "Mathematics",
-        questions: 30,
-        duration: "60 min",
-        status: "Active",
-      },
-      {
-        id: 103,
-        name: "Geometry Basics",
-        course: "Mathematics",
-        testSet: "Mathematics",
-        questions: 20,
-        duration: "40 min",
-        status: "Draft",
-      },
-      // Science Test Set
-      {
-        id: 201,
-        name: "Physics Mechanics",
-        course: "Physics",
-        testSet: "Science",
-        questions: 35,
-        duration: "75 min",
-        status: "Active",
-      },
-      {
-        id: 202,
-        name: "Chemistry Fundamentals",
-        course: "Chemistry",
-        testSet: "Science",
-        questions: 40,
-        duration: "90 min",
-        status: "Active",
-      },
-      {
-        id: 203,
-        name: "Biology Cell Structure",
-        course: "Biology",
-        testSet: "Science",
-        questions: 30,
-        duration: "60 min",
-        status: "Inactive",
-      },
-      // Language Test Set
-      {
-        id: 301,
-        name: "English Grammar",
-        course: "English",
-        testSet: "Language",
-        questions: 50,
-        duration: "45 min",
-        status: "Active",
-      },
-      {
-        id: 302,
-        name: "French Vocabulary",
-        course: "French",
-        testSet: "Language",
-        questions: 60,
-        duration: "50 min",
-        status: "Draft",
-      },
-      {
-        id: 303,
-        name: "Spanish Conversation",
-        course: "Spanish",
-        testSet: "Language",
-        questions: 25,
-        duration: "30 min",
-        status: "Active",
-      },
-      // Programming Test Set
-      {
-        id: 401,
-        name: "JavaScript Basics",
-        course: "Web Development",
-        testSet: "Programming",
-        questions: 45,
-        duration: "90 min",
-        status: "Active",
-      },
-      {
-        id: 402,
-        name: "Python Data Structures",
-        course: "Computer Science",
-        testSet: "Programming",
-        questions: 35,
-        duration: "75 min",
-        status: "Active",
-      },
-      {
-        id: 403,
-        name: "Java OOP Concepts",
-        course: "Software Engineering",
-        testSet: "Programming",
-        questions: 30,
-        duration: "60 min",
-        status: "Draft",
-      },
-      // Certification Test Set
-      {
-        id: 501,
-        name: "AWS Solutions Architect",
-        course: "Cloud Computing",
-        testSet: "Certification",
-        questions: 65,
-        duration: "130 min",
-        status: "Active",
-      },
-      {
-        id: 502,
-        name: "CompTIA Security+",
-        course: "Cybersecurity",
-        testSet: "Certification",
-        questions: 90,
-        duration: "180 min",
-        status: "Active",
-      },
-      {
-        id: 503,
-        name: "Cisco CCNA",
-        course: "Networking",
-        testSet: "Certification",
-        questions: 100,
-        duration: "120 min",
-        status: "Active",
-      },
-    ];
+    // Fetch tests from API
+    const fetchTests = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        // Make sure to pass the required page and size parameters
+        const response = await TestAPI.getAllTests();
+        console.log(response.body);
 
-    setTests(extendedTestsData);
+        if (response && response.body) {
+          setTests(response.body);
 
-    // Extract unique test sets
-    const uniqueTestSets = [
-      ...new Set(
-        extendedTestsData.map((test) => test.testSet || "Uncategorized")
-      ),
-    ];
-    setTestSets(uniqueTestSets);
+          // Extract unique test sets safely
+          const uniqueTestSets = [
+            ...new Set(
+              response.body.map((test) => test.testSet || "Uncategorized")
+            ),
+          ];
+          setTestSets(uniqueTestSets);
 
-    // Initialize all test sets as expanded
-    const initialExpandedState = uniqueTestSets.reduce((acc, set) => {
-      acc[set] = true;
-      return acc;
-    }, {});
-    setExpandedSets(initialExpandedState);
+          // Initialize all test sets as expanded
+          const initialExpandedState = uniqueTestSets.reduce((acc, set) => {
+            acc[set] = true;
+            return acc;
+          }, {});
+          setExpandedSets(initialExpandedState);
+        } else {
+          throw new Error("Invalid response format from API");
+        }
+      } catch (err) {
+        console.error("Failed to fetch tests:", err);
+        setError("Failed to load tests. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTests();
   }, []);
 
   useEffect(() => {
@@ -302,6 +190,7 @@ export default function TestManagement() {
       fileName: "",
       parsedData: null,
       isNewTestSet: false,
+      course: "",
     });
   };
 
@@ -315,17 +204,16 @@ export default function TestManagement() {
 
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
-    setSelectedTest({
-      ...selectedTest,
+    setSelectedTest((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
-
   const handleFileClick = () => {
     fileInputRef.current.click();
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
       if (file.type === "application/json" || file.name.endsWith(".json")) {
@@ -335,38 +223,57 @@ export default function TestManagement() {
           fileName: file.name,
         });
 
-        // Read the file to extract test details and parse JSON
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          try {
-            const jsonData = JSON.parse(event.target.result);
+        try {
+          // Read the file to extract test details and parse JSON
+          const reader = new FileReader();
+          reader.onload = async (event) => {
+            try {
+              const jsonData = JSON.parse(event.target.result);
 
-            // Store the parsed data for API submission
-            const parsedData = {
-              testData: jsonData.questions || [],
-              metadata: {
-                totalQuestions: jsonData.questions
-                  ? jsonData.questions.length
-                  : 0,
-                testType: jsonData.testType || "standard",
-                // Add any other metadata you need from the JSON
-              },
-            };
+              // Store the parsed data for API submission
+              const parsedData = {
+                testData: jsonData.questions || [],
+                metadata: {
+                  totalQuestions: jsonData.questions
+                    ? jsonData.questions.length
+                    : 0,
+                  testType: jsonData.testType || "standard",
+                  // Add any other metadata you need from the JSON
+                },
+              };
 
-            // If the JSON has these fields, use them to populate the form
-            setNewTest((prev) => ({
-              ...prev,
-              name: jsonData.name || prev.name,
-              testSet: jsonData.testSet || prev.testSet,
-              questions: jsonData.questions ? jsonData.questions.length : 0,
-              duration: jsonData.duration || prev.duration,
-              parsedData: parsedData,
-            }));
-          } catch (error) {
-            console.error("Error parsing JSON file:", error);
-          }
-        };
-        reader.readAsText(file);
+              // If the JSON has these fields, use them to populate the form
+              setNewTest((prev) => ({
+                ...prev,
+                name: jsonData.name || prev.name,
+                testSet: jsonData.testSet || prev.testSet,
+                questions: jsonData.questions ? jsonData.questions.length : 0,
+                duration: jsonData.duration || prev.duration,
+                course: jsonData.course || prev.course,
+                parsedData: parsedData,
+              }));
+
+              // Upload the file to the server
+              try {
+                const uploadResult = await TestAPI.uploadTestFile(file);
+                console.log("File uploaded successfully:", uploadResult);
+                // You could update the form with any additional data returned from the upload
+              } catch (uploadError) {
+                console.error("Error uploading file:", uploadError);
+                alert("Failed to upload the file. Please try again.");
+              }
+            } catch (error) {
+              console.error("Error parsing JSON file:", error);
+              alert(
+                "Invalid JSON format. Please check your file and try again."
+              );
+            }
+          };
+          reader.readAsText(file);
+        } catch (error) {
+          console.error("Error reading file:", error);
+          alert("Failed to read the file. Please try again.");
+        }
       } else {
         alert("Please upload a JSON file");
         e.target.value = null;
@@ -374,7 +281,7 @@ export default function TestManagement() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validate form
@@ -393,77 +300,161 @@ export default function TestManagement() {
       return;
     }
 
-    // Create new test object
-    const testToAdd = {
-      id: tests.length + 1,
-      name: newTest.name,
-      testSet: newTest.testSet,
-      questions: newTest.questions || 0,
-      duration: newTest.duration,
-      status: newTest.status,
-    };
+    setIsSubmitting(true);
+    setError(null);
 
-    // Here you would typically send the parsedData to your API
-    console.log("Data to send to API:", newTest.parsedData);
+    try {
+      // Create new test object
+      const testToAdd = {
+        name: newTest.name,
+        testSet: newTest.testSet,
+        questions: newTest.questions || 0,
+        duration: newTest.duration,
+        status: newTest.status,
+        course: newTest.course || "",
+        // Include any other fields needed by your API
+        parsedData: newTest.parsedData,
+      };
 
-    // Add to tests array
-    setTests([...tests, testToAdd]);
+      // Send to API
+      const createdTest = await TestAPI.createTest(testToAdd);
 
-    // Update test sets if a new one was added
-    if (newTest.isNewTestSet && !testSets.includes(newTest.testSet)) {
-      setTestSets([...testSets, newTest.testSet]);
-      setExpandedSets((prev) => ({
-        ...prev,
-        [newTest.testSet]: true,
-      }));
+      // Add to tests array with the ID from the API response
+      setTests([...tests, createdTest]);
+
+      // Update test sets if a new one was added
+      if (newTest.isNewTestSet && !testSets.includes(newTest.testSet)) {
+        setTestSets([...testSets, newTest.testSet]);
+        setExpandedSets((prev) => ({
+          ...prev,
+          [newTest.testSet]: true,
+        }));
+      }
+
+      // Close modal and reset form
+      closeModal();
+
+      // Show success message
+      alert("Test added successfully!");
+    } catch (error) {
+      console.error("Error creating test:", error);
+      setError("Failed to create test. Please try again.");
+      alert("Failed to create test. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    // Close modal and reset form
-    closeModal();
-
-    // Show success message
-    alert("Test added successfully!");
   };
 
-  const handleEditSubmit = (e) => {
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate form
-    if (!selectedTest.name.trim()) {
-      alert("Please enter a test name");
+    // Validate form - using title instead of name for API compatibility
+    if (!selectedTest.title?.trim()) {
+      alert("Please enter a test title");
       return;
     }
 
-    // Update the test in the array
-    const updatedTests = tests.map((test) =>
-      test.id === selectedTest.id ? selectedTest : test
-    );
+    setIsSubmitting(true);
+    setError(null);
 
-    setTests(updatedTests);
+    try {
+      // Prepare data for API according to required format
+      const updateData = {
+        testId: selectedTest.id,
+        title: selectedTest.title,
+        status: selectedTest.status,
+      };
 
-    // Update test sets if a new one was added
-    if (selectedTest.testSet && !testSets.includes(selectedTest.testSet)) {
-      setTestSets([...testSets, selectedTest.testSet]);
-      setExpandedSets((prev) => ({
-        ...prev,
-        [selectedTest.testSet]: true,
-      }));
+      // Optional fields - add only if they exist in selectedTest
+      if (selectedTest.testSet) updateData.testSet = selectedTest.testSet;
+      if (selectedTest.course) updateData.course = selectedTest.course;
+      if (selectedTest.questions) updateData.questions = selectedTest.questions;
+      if (selectedTest.duration) updateData.duration = selectedTest.duration;
+
+      // Update the test via API using the formatted data
+      await TestAPI.updateTest(selectedTest.id, updateData);
+
+      // Update the test in the local state
+      const updatedTests = tests.map((test) =>
+        test.id === selectedTest.id ? selectedTest : test
+      );
+
+      setTests(updatedTests);
+
+      // Update test sets if a new one was added
+      if (selectedTest.testSet && !testSets.includes(selectedTest.testSet)) {
+        setTestSets([...testSets, selectedTest.testSet]);
+        setExpandedSets((prev) => ({
+          ...prev,
+          [selectedTest.testSet]: true,
+        }));
+      }
+
+      closeEditModal();
+
+      // Show success message
+      alert("Test updated successfully!");
+    } catch (error) {
+      console.error("Error updating test:", error);
+      setError("Failed to update test. Please try again.");
+      alert("Failed to update test. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    closeEditModal();
-
-    // Show success message
-    alert("Test updated successfully!");
   };
+  const handleViewTest = async (test) => {
+    setIsLoading(true);
+    setError(null);
 
-  const handleViewTest = (test) => {
-    setSelectedTest(test);
-    setIsViewModalOpen(true);
+    try {
+      // Get the full test details from the API
+      const testDetails = await TestAPI.getTestById(test.id);
+      console.log("test details", testDetails);
+      setSelectedTest(testDetails);
+      setIsViewModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching test details:", error);
+      setError("Failed to load test details. Please try again.");
+      alert("Failed to load test details. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
+  const handleEditTest = async (test) => {
+    setIsLoading(true);
+    setError(null);
 
-  const handleEditTest = (test) => {
-    setSelectedTest({ ...test });
-    setIsEditModalOpen(true);
+    try {
+      // Check if we have the ID from the test parameter
+      if (!test || !test.id) {
+        throw new Error("Invalid test selected for editing");
+      }
+
+      // Get the full test details from the API
+      const testDetails = await TestAPI.getTestById(test.id);
+
+      // If API returns title but component uses name, ensure compatibility
+      const preparedTest = {
+        ...testDetails,
+        // Ensure the component has the fields it expects
+        title: testDetails.title || test.title || test.name || "",
+        name:
+          testDetails.name ||
+          testDetails.title ||
+          test.name ||
+          test.title ||
+          "",
+      };
+
+      setSelectedTest(preparedTest);
+      setIsEditModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching test details for editing:", error);
+      setError("Failed to load test details. Please try again.");
+      alert("Failed to load test details for editing. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDeleteTest = (test) => {
@@ -476,44 +467,79 @@ export default function TestManagement() {
     setIsDeleteTestSetModalOpen(true);
   };
 
-  const confirmDeleteTest = () => {
+  const confirmDeleteTest = async () => {
     if (!selectedTest) return;
 
-    // Remove the test from the array
-    const updatedTests = tests.filter((test) => test.id !== selectedTest.id);
-    setTests(updatedTests);
+    setIsSubmitting(true);
+    setError(null);
 
-    // Check if this was the last test in its test set
-    const testSet = selectedTest.testSet || "Uncategorized";
-    const remainingTestsInSet = updatedTests.filter(
-      (test) => (test.testSet || "Uncategorized") === testSet
-    );
+    try {
+      // Delete the test via API
+      await TestAPI.deleteTest(selectedTest.id);
 
-    // If no tests remain in this set, remove the test set
-    if (remainingTestsInSet.length === 0) {
-      const updatedTestSets = testSets.filter((set) => set !== testSet);
-      setTestSets(updatedTestSets);
+      // Remove the test from the local state
+      const updatedTests = tests.filter((test) => test.id !== selectedTest.id);
+      setTests(updatedTests);
+
+      // Check if this was the last test in its test set
+      const testSet = selectedTest.testSet || "Uncategorized";
+      const remainingTestsInSet = updatedTests.filter(
+        (test) => (test.testSet || "Uncategorized") === testSet
+      );
+
+      // If no tests remain in this set, remove the test set
+      if (remainingTestsInSet.length === 0) {
+        const updatedTestSets = testSets.filter((set) => set !== testSet);
+        setTestSets(updatedTestSets);
+      }
+
+      closeAllModals();
+      alert("Test deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting test:", error);
+      setError("Failed to delete test. Please try again.");
+      alert("Failed to delete test. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    closeAllModals();
-    alert("Test deleted successfully!");
   };
 
-  const confirmDeleteTestSet = () => {
+  const confirmDeleteTestSet = async () => {
     if (!selectedTestSet) return;
 
-    // Remove all tests in this test set
-    const updatedTests = tests.filter(
-      (test) => (test.testSet || "Uncategorized") !== selectedTestSet
-    );
-    setTests(updatedTests);
+    setIsSubmitting(true);
+    setError(null);
 
-    // Remove the test set
-    const updatedTestSets = testSets.filter((set) => set !== selectedTestSet);
-    setTestSets(updatedTestSets);
+    try {
+      // Get all tests in this set
+      const testsInSet = tests.filter(
+        (test) => (test.testSet || "Uncategorized") === selectedTestSet
+      );
 
-    closeAllModals();
-    alert("Test set and all its tests deleted successfully!");
+      // Delete each test in the set
+      for (const test of testsInSet) {
+        await TestAPI.deleteTest(test.id);
+      }
+
+      // Update local state
+      const updatedTests = tests.filter(
+        (test) => (test.testSet || "Uncategorized") !== selectedTestSet
+      );
+      setTests(updatedTests);
+
+      // Remove the test set
+      const updatedTestSets = testSets.filter((set) => set !== selectedTestSet);
+      setTestSets(updatedTestSets);
+
+      closeAllModals();
+      alert("Test set and all its tests deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting test set:", error);
+      setError("Failed to delete test set. Please try again.");
+      alert("Failed to delete test set. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const closeViewModal = () => {
@@ -564,6 +590,7 @@ export default function TestManagement() {
             <button
               onClick={handleAddTest}
               className="bg-gradient-to-r from-primary to-blue-700 hover:from-primary/90 hover:to-blue-800 text-white px-4 py-2 rounded-lg flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+              disabled={isLoading}
             >
               <Plus className="h-4 w-4 mr-2" />
               Add new test
@@ -717,157 +744,207 @@ export default function TestManagement() {
               <h2 className="text-2xl font-bold text-foreground">Test list</h2>
             </div>
 
-            {/* Test Sets and Tests */}
-            <div className="overflow-x-auto">
-              {Object.keys(groupedTests).length > 0 ? (
-                Object.keys(groupedTests).map((testSet) => (
-                  <div
-                    key={testSet}
-                    className="mb-4 border border-border rounded-lg overflow-hidden"
-                  >
-                    {/* Test Set Header */}
-                    <div className="flex items-center justify-between p-4 bg-muted">
-                      <div
-                        className="flex items-center flex-1 cursor-pointer"
-                        onClick={() => toggleTestSet(testSet)}
-                      >
-                        <FolderOpen className="h-5 w-5 mr-2 text-primary" />
-                        <h3 className="font-medium text-foreground">
-                          {testSet} ({groupedTests[testSet].length})
-                        </h3>
-                        <div className="ml-2">
-                          {expandedSets[testSet] ? (
-                            <ChevronDown className="h-5 w-5 text-muted-foreground" />
-                          ) : (
-                            <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                          )}
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleDeleteTestSet(testSet)}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/30 transition-colors shadow-sm ml-2"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                        <span>Delete Set</span>
-                      </button>
-                    </div>
+            {/* Loading State */}
+            {isLoading && (
+              <div className="flex justify-center items-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <span className="ml-2 text-lg text-muted-foreground">
+                  Loading tests...
+                </span>
+              </div>
+            )}
 
-                    {/* Tests Table */}
-                    {expandedSets[testSet] && (
-                      <table className="min-w-full">
-                        <thead>
-                          <tr>
-                            <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                              Test Name
-                            </th>
-                            <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                              Course
-                            </th>
-                            <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                              Questions
-                            </th>
-                            <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                              Duration
-                            </th>
-                            <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                              Status
-                            </th>
-                            <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                              Actions
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border">
-                          {groupedTests[testSet].map((test) => (
-                            <tr
-                              key={test.id}
-                              className="bg-card hover:bg-muted/30 transition-colors duration-150"
-                            >
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex items-center">
-                                  <div className="flex-shrink-0 h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
-                                    <FileText className="h-5 w-5 text-primary" />
-                                  </div>
-                                  <div className="ml-4">
-                                    <div className="text-sm font-medium text-foreground">
-                                      {test.name}
-                                    </div>
-                                    <div className="text-xs text-muted-foreground">
-                                      ID: {test.id}
-                                    </div>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                                {test.course}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-foreground">
-                                  {test.questions}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  questions
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex items-center text-sm text-foreground">
-                                  <Clock className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
-                                  {test.duration}
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span
-                                  className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                                    test.status
-                                  )}`}
-                                >
-                                  {test.status}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                <div className="flex space-x-2">
-                                  <button
-                                    onClick={() => handleViewTest(test)}
-                                    className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-primary rounded-lg hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors shadow-sm"
-                                  >
-                                    <Eye className="h-3.5 w-3.5" />
-                                    <span>View</span>
-                                  </button>
-                                  <button
-                                    onClick={() => handleEditTest(test)}
-                                    className="flex items-center gap-1 px-3 py-1.5 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors shadow-sm"
-                                  >
-                                    <Edit className="h-3.5 w-3.5" />
-                                    <span>Edit</span>
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteTest(test)}
-                                    className="flex items-center gap-1 px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/30 transition-colors shadow-sm"
-                                  >
-                                    <Trash2 className="h-3.5 w-3.5" />
-                                    <span>Delete</span>
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="px-6 py-10 text-center">
-                  <div className="flex flex-col items-center justify-center text-muted-foreground">
-                    <AlertCircle className="h-10 w-10 mb-2" />
-                    <p className="text-lg font-medium">No tests found</p>
-                    <p className="text-sm">
-                      Try adjusting your search or add a new test
-                    </p>
-                  </div>
+            {/* Error State */}
+            {error && !isLoading && (
+              <div className="px-6 py-10 text-center">
+                <div className="flex flex-col items-center justify-center text-rose-600 dark:text-rose-400">
+                  <AlertCircle className="h-10 w-10 mb-2" />
+                  <p className="text-lg font-medium">{error}</p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                  >
+                    Retry
+                  </button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+
+            {/* Test Sets and Tests */}
+            {!isLoading && !error && (
+              <div className="overflow-x-auto">
+                {Object.keys(groupedTests).length > 0 ? (
+                  Object.keys(groupedTests).map((testSet) => (
+                    <div
+                      key={testSet}
+                      className="mb-4 border border-border rounded-lg overflow-hidden"
+                    >
+                      {/* Test Set Header */}
+                      <div className="flex items-center justify-between p-4 bg-muted">
+                        <div
+                          className="flex items-center flex-1 cursor-pointer"
+                          onClick={() => toggleTestSet(testSet)}
+                        >
+                          <FolderOpen className="h-5 w-5 mr-2 text-primary" />
+                          <h3 className="font-medium text-foreground">
+                            {testSet} ({groupedTests[testSet].length})
+                          </h3>
+                          <div className="ml-2">
+                            {expandedSets[testSet] ? (
+                              <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                            ) : (
+                              <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleDeleteTestSet(testSet)}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/30 transition-colors shadow-sm ml-2"
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting && selectedTestSet === testSet ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-3.5 w-3.5" />
+                          )}
+                          <span>Delete Set</span>
+                        </button>
+                      </div>
+
+                      {/* Tests Table */}
+                      {expandedSets[testSet] && (
+                        <table className="min-w-full">
+                          <thead>
+                            <tr>
+                              <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                Test Name
+                              </th>
+
+                              <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                Questions
+                              </th>
+                              <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                Duration
+                              </th>
+
+                              <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                Status
+                              </th>
+                              <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                Actions
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border">
+                            {groupedTests[testSet].map((test) => (
+                              <tr
+                                key={test.id}
+                                className="bg-card hover:bg-muted/30 transition-colors duration-150"
+                              >
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <div className="flex items-center">
+                                    <div className="flex-shrink-0 h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
+                                      <FileText className="h-5 w-5 text-primary" />
+                                    </div>
+                                    <div className="ml-4">
+                                      <div className="text-sm font-medium text-foreground">
+                                        {test.name}
+                                      </div>
+                                      <div className="text-xs text-muted-foreground">
+                                        ID: {test.id}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </td>
+
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <div className="text-sm text-foreground">
+                                    {test.questions}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    questions
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <div className="flex items-center text-sm text-foreground">
+                                    <Clock className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
+                                    {test.duration} minute
+                                  </div>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <span
+                                    className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                                      test.status
+                                    )}`}
+                                  >
+                                    {test.status}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                  <div className="flex space-x-2">
+                                    <button
+                                      onClick={() => handleViewTest(test)}
+                                      className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-primary rounded-lg hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors shadow-sm"
+                                      disabled={isSubmitting}
+                                    >
+                                      {isLoading &&
+                                      selectedTest?.id === test.id &&
+                                      isViewModalOpen ? (
+                                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                      ) : (
+                                        <Eye className="h-3.5 w-3.5" />
+                                      )}
+                                      <span>View</span>
+                                    </button>
+                                    <button
+                                      onClick={() => handleEditTest(test)}
+                                      className="flex items-center gap-1 px-3 py-1.5 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors shadow-sm"
+                                      disabled={isSubmitting}
+                                    >
+                                      {isLoading &&
+                                      selectedTest?.id === test.id &&
+                                      isEditModalOpen ? (
+                                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                      ) : (
+                                        <Edit className="h-3.5 w-3.5" />
+                                      )}
+                                      <span>Edit</span>
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteTest(test)}
+                                      className="flex items-center gap-1 px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/30 transition-colors shadow-sm"
+                                      disabled={isSubmitting}
+                                    >
+                                      {isSubmitting &&
+                                      selectedTest?.id === test.id ? (
+                                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                      ) : (
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                      )}
+                                      <span>Delete</span>
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="px-6 py-10 text-center">
+                    <div className="flex flex-col items-center justify-center text-muted-foreground">
+                      <AlertCircle className="h-10 w-10 mb-2" />
+                      <p className="text-lg font-medium">No tests found</p>
+                      <p className="text-sm">
+                        Try adjusting your search or add a new test
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -961,6 +1038,25 @@ export default function TestManagement() {
                     required
                   />
                 </div>
+
+                {/* Course */}
+                {/* <div className="space-y-2">
+                  <label
+                    htmlFor="course"
+                    className="block text-sm font-medium text-foreground"
+                  >
+                    Course
+                  </label>
+                  <input
+                    type="text"
+                    id="course"
+                    name="course"
+                    value={newTest.course}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
+                    placeholder="Enter course name"
+                  />
+                </div> */}
 
                 {/* Test Set Selection */}
                 <div className="space-y-2">
@@ -1112,14 +1208,23 @@ export default function TestManagement() {
                   type="button"
                   onClick={closeModal}
                   className="px-4 py-2.5 border border-border rounded-lg text-foreground hover:bg-muted transition-all duration-200 font-medium"
+                  disabled={isSubmitting}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2.5 bg-gradient-to-r from-primary to-blue-700 text-white rounded-lg hover:from-primary/90 hover:to-blue-800 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
+                  className="px-4 py-2.5 bg-gradient-to-r from-primary to-blue-700 text-white rounded-lg hover:from-primary/90 hover:to-blue-800 transition-all duration-200 font-medium shadow-md hover:shadow-lg flex items-center justify-center"
+                  disabled={isSubmitting}
                 >
-                  Add Test
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Adding...
+                    </>
+                  ) : (
+                    "Add Test"
+                  )}
                 </button>
               </div>
             </form>
@@ -1234,22 +1339,22 @@ export default function TestManagement() {
 
             <form onSubmit={handleEditSubmit} className="p-6">
               <div className="space-y-5">
-                {/* Test Name */}
+                {/* Test Title (was Name) */}
                 <div className="space-y-2">
                   <label
-                    htmlFor="edit-name"
+                    htmlFor="edit-title"
                     className="block text-sm font-medium text-foreground"
                   >
-                    Test Name
+                    Test Title
                   </label>
                   <input
                     type="text"
-                    id="edit-name"
-                    name="name"
-                    value={selectedTest.name}
+                    id="edit-title"
+                    name="title"
+                    value={selectedTest.title}
                     onChange={handleEditInputChange}
                     className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
-                    placeholder="Enter test name"
+                    placeholder="Enter test title"
                     required
                   />
                 </div>
@@ -1336,7 +1441,7 @@ export default function TestManagement() {
                   </div>
                 </div>
 
-                {/* Status */}
+                {/* Status - Matching API requirement */}
                 <div className="space-y-2">
                   <label
                     htmlFor="edit-status"
@@ -1364,6 +1469,13 @@ export default function TestManagement() {
                     <option value="Inactive">Inactive</option>
                   </select>
                 </div>
+
+                {/* Hidden Test ID field */}
+                <input
+                  type="hidden"
+                  name="testId"
+                  value={selectedTest.testId || selectedTest.id || 0}
+                />
               </div>
 
               <div className="mt-8 flex justify-end space-x-3">
@@ -1371,14 +1483,23 @@ export default function TestManagement() {
                   type="button"
                   onClick={closeEditModal}
                   className="px-4 py-2.5 border border-border rounded-lg text-foreground hover:bg-muted transition-all duration-200 font-medium"
+                  disabled={isSubmitting}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2.5 bg-gradient-to-r from-primary to-blue-700 text-white rounded-lg hover:from-primary/90 hover:to-blue-800 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
+                  className="px-4 py-2.5 bg-gradient-to-r from-primary to-blue-700 text-white rounded-lg hover:from-primary/90 hover:to-blue-800 transition-all duration-200 font-medium shadow-md hover:shadow-lg flex items-center justify-center"
+                  disabled={isSubmitting}
                 >
-                  Save Changes
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
                 </button>
               </div>
             </form>
@@ -1425,14 +1546,23 @@ export default function TestManagement() {
                 <button
                   onClick={closeAllModals}
                   className="px-4 py-2.5 border border-border rounded-lg text-foreground hover:bg-muted transition-all duration-200 font-medium"
+                  disabled={isSubmitting}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDeleteTest}
-                  className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition-all duration-200 font-medium shadow-md hover:shadow-lg"
+                  className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition-all duration-200 font-medium shadow-md hover:shadow-lg flex items-center justify-center"
+                  disabled={isSubmitting}
                 >
-                  Delete Test
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    "Delete Test"
+                  )}
                 </button>
               </div>
             </div>
@@ -1485,14 +1615,23 @@ export default function TestManagement() {
                 <button
                   onClick={closeAllModals}
                   className="px-4 py-2.5 border border-border rounded-lg text-foreground hover:bg-muted transition-all duration-200 font-medium"
+                  disabled={isSubmitting}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDeleteTestSet}
-                  className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition-all duration-200 font-medium shadow-md hover:shadow-lg"
+                  className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition-all duration-200 font-medium shadow-md hover:shadow-lg flex items-center justify-center"
+                  disabled={isSubmitting}
                 >
-                  Delete Test Set
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    "Delete Test Set"
+                  )}
                 </button>
               </div>
             </div>
