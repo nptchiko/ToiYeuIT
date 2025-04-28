@@ -14,17 +14,22 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        // Kiểm tra xem có token không
-        if (TokenService.getToken()) {
-          // Lấy thông tin người dùng từ API
+        const token = TokenService.getToken();
+        if (token) {
           const userData = await AuthService.getCurrentUser();
-          setUser(userData);
-          // return userData;
+          if (userData && userData.body) {
+            setUser(userData.body.role);
+          } else {
+            TokenService.clearTokens();
+            setUser(null);
+          }
+        } else {
+          setUser(null);
         }
       } catch (error) {
-        console.error("Failed to get user data:", error);
-        // Nếu có lỗi, xóa token
-        TokenService.clearTokens();
+        console.error("Authentication initialization error:", error);
+        TokenService.clearTokens(); // Clear tokens if fetching user fails
+        setUser(null); // Ensure user is null if error
       } finally {
         setLoading(false);
       }
@@ -32,7 +37,6 @@ export function AuthProvider({ children }) {
 
     checkAuthStatus();
   }, []);
-
   // Đăng nhập
   const login = async (email, password) => {
     setLoading(true);

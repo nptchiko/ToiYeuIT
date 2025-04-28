@@ -13,8 +13,8 @@ axiosClient.interceptors.response.use(
   (response) => response.data,
   (error) => Promise.reject(error)
 );
-export const getCheckInputReading = async () => {
-  return await axiosClient.get("/api/tests/detail?id=3");
+export const getCheckInputReading = async (index) => {
+  return await axiosClient.get(`/api/tests/detail?id=${index}`);
 };
 export const submitTesAnswers = async (testId, score, context) => {
   const payload = {

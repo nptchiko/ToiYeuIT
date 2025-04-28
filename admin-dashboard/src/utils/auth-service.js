@@ -24,7 +24,7 @@ const REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
 // Thời gian hết hạn cookies (7 ngày)
 const TOKEN_EXPIRY = 7;
 
-// Quản lý token trong cookies
+// Improve the TokenService to ensure cookies are properly set
 const TokenService = {
   // Lưu token vào cookies
   setToken: (token) => {
@@ -35,9 +35,9 @@ const TokenService = {
       expires: expiryDate,
       secure: import.meta.env.MODE === "production",
       path: "/",
+      sameSite: "lax", // Add this to ensure cookies work across same-site requests
     });
     console.log("token set :", token);
-    console.log("Cookies:", cookies);
   },
 
   // Lấy token từ cookies
@@ -60,6 +60,7 @@ const TokenService = {
     cookies.set(REFRESH_TOKEN_COOKIE_NAME, token, {
       expires: expiryDate,
       path: "/",
+      sameSite: "strict", // Add this to ensure cookies work across same-site requests
     });
   },
 
@@ -94,7 +95,7 @@ api.interceptors.request.use(
   }
 );
 
-// interceptor để xử lý lỗi 401 (Unauthorized) và tự động refresh token
+// Update the interceptor to better handle token refresh
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -255,6 +256,12 @@ const AuthService = {
       return response.data;
     } catch (error) {
       console.error("Get current user error:", error);
+
+      // Chỉ xóa token nếu lỗi là 401 (Unauthorized)
+      if (error.response && error.response.status === 401) {
+        TokenService.clearTokens();
+      }
+
       throw error;
     }
   },

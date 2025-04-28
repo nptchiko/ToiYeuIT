@@ -1,13 +1,20 @@
 "use client";
 
 import { useAuth } from "../../hooks/auth-context";
-import { Navigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
-  const location = useLocation();
+  const navigate = useNavigate();
 
-  // Hiển thị trạng thái loading nếu đang kiểm tra xác thực
+  // Add useEffect to handle navigation after loading completes
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate("/login", { replace: true });
+    }
+  }, [user, loading, navigate]);
+  // Nếu đang loading, có thể hiển thị spinner
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -16,9 +23,9 @@ export default function ProtectedRoute({ children }) {
     );
   }
 
-  // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập và lưu đường dẫn hiện tại
+  //Nếu không phải admin hoặc chưa đăng nhập, không render gì cả (navigation handled by useEffect)
   if (!user) {
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+    return null;
   }
 
   // Nếu đã đăng nhập, hiển thị nội dung được bảo vệ

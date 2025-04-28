@@ -232,12 +232,11 @@ export default function TestListening() {
   const handleReturnAnswer = async () => {
     try {
       const context = contestApi();
+      console.log(context);
       await TestListeningApi.submitTesAnswers(apiData.testId, score, context);
-      console.log("Nộp bài thành công:", response);
-      return response;
+      console.log("Nộp bài thành công:");
     } catch (error) {
       console.error("Lỗi khi nộp bài:", error.message);
-      console.log(error);
       throw error;
     }
   };
@@ -756,7 +755,7 @@ export default function TestListening() {
             <div className="text-center p-4 bg-gray-100 rounded-lg mb-6">
               <h3 className="text-xl font-bold mb-2">Kết quả bài thi</h3>
               <p className="text-3xl font-bold text-blue-600">
-                {score}/100 điểm
+                {Math.round(score)}/100 điểm
               </p>
               <p className="mt-2">
                 Số câu đúng:{" "}

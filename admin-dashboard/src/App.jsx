@@ -1,6 +1,7 @@
 import Layout from "./components/layout";
 import { AdminProtectedRoute } from "./components/protected-route";
 import { ToastProvider } from "./components/toast-provider";
+import { useAuth } from "./hooks/auth-context";
 import { AuthProvider } from "./hooks/auth-provider";
 import Courses from "./page/Courses";
 import Home from "./page/Home";
@@ -16,6 +17,14 @@ import {
 } from "react-router-dom";
 
 function App() {
+  const { user, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
   return (
     <ToastProvider>
       <AuthProvider>
@@ -25,8 +34,10 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
 
             {/* Route mặc định - chuyển hướng đến trang chủ */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-
+            <Route
+              path="/"
+              element={<Navigate to={user ? "/dashboard" : "/login"} replace />}
+            />
             {/* Các route yêu cầu admin access */}
             <Route
               path="/dashboard"
@@ -78,7 +89,10 @@ function App() {
             />
 
             {/* Trang không tìm thấy */}
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route
+              path="*"
+              element={<Navigate to={user ? "/dashboard" : "/login"} replace />}
+            />
           </Routes>
         </Router>
       </AuthProvider>
