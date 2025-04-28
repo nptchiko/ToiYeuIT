@@ -24,30 +24,129 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate, useLocation } from "react-router-dom";
 import TestListeningApi from "../../../api/TestListeningApi";
-const audioFiles = [
+
+// Define fallback data for when API fails
+const fallbackData = [
   {
-    id: 1,
-    name: "TOEIC Part 1",
-    url: "https://storage.googleapis.com/estudyme/dev/2022/06/27/91254480.mp3",
+    part: 1,
+    questions: [
+      {
+        id: "1",
+        text: "Câu hỏi 1.",
+        audioSource:
+          "https://storage.googleapis.com/estudyme/dev/2022/06/27/30449101.mp3",
+        imageSource:
+          "https://estudyme.hoc102.com/legacy-data/kslearning/images/418922160-1620725865601-pic1.png",
+        correctAnswer: "(D)",
+        options: ["(D)", "(B)", "(A)", "(C)"],
+      },
+    ],
   },
   {
-    id: 2,
-    name: "TOEIC Part 2",
-    url: "https://storage.googleapis.com/estudyme/dev/2022/06/27/48822592.mp3",
+    part: 2,
+    questions: [
+      {
+        id: "7",
+        text: "Câu hỏi 7.",
+        audioSource:
+          "https://storage.googleapis.com/estudyme/dev/2022/06/27/46972225.mp3",
+        correctAnswer: "(B)",
+        options: ["(A)", "(B)", "(C)"],
+      },
+    ],
   },
   {
-    id: 3,
-    name: "TOEIC Part 3",
-    url: "https://storage.googleapis.com/estudyme/dev/2022/06/27/48822592.mp3",
+    part: 3,
+    questions: [
+      {
+        id: "32",
+        text: "What does the woman want to find?",
+        audioSource:
+          "https://storage.googleapis.com/estudyme/dev/2022/06/27/40438651.mp3",
+        correctAnswer: "(B) A file",
+        options: [
+          "(C) An office key",
+          "(A) Some money",
+          "(B) A file",
+          "(D) A check",
+        ],
+      },
+      {
+        id: "33",
+        text: "Where most likely is Patrick?",
+        audioSource:
+          "https://storage.googleapis.com/estudyme/dev/2022/06/27/40438651.mp3",
+        correctAnswer: "(D) On a business trip",
+        options: [
+          "(A) At his home",
+          "(D) On a business trip",
+          "(B) In his office",
+          "(C) At a restaurant",
+        ],
+      },
+      {
+        id: "34",
+        text: "What will John most likely do next?",
+        audioSource:
+          "https://storage.googleapis.com/estudyme/dev/2022/06/27/40438651.mp3",
+        correctAnswer: "(A) Check his office",
+        options: [
+          "(A) Check his office",
+          "(B) Bring Patrick",
+          "(C) Postpone a meeting",
+          "(D) Reply to a letter",
+        ],
+      },
+    ],
   },
   {
-    id: 4,
-    name: "TOEIC Part 4",
-    url: "https://storage.googleapis.com/estudyme/dev/2022/06/27/48822592.mp3",
+    part: 4,
+    questions: [
+      {
+        id: "71",
+        text: "Who most likely is Ted Costello?",
+        audioSource:
+          "https://storage.googleapis.com/estudyme/dev/2022/06/27/32759585.mp3",
+        correctAnswer: "(C) A radio host",
+        options: [
+          "(A) A newspaper reporter",
+          "(C) A radio host",
+          "(B) A computer scientist",
+          "(D) A research assistant",
+        ],
+      },
+      {
+        id: "72",
+        text: "What does Dr. Alfson specialize in?",
+        audioSource:
+          "https://storage.googleapis.com/estudyme/dev/2022/06/27/32759585.mp3",
+        correctAnswer: "(D) The study of language",
+        options: [
+          "(B) Market research",
+          "(A) Music education",
+          "(C) Mergers and acquisitions",
+          "(D) The study of language",
+        ],
+      },
+      {
+        id: "73",
+        text: "What will happen on August 4?",
+        audioSource:
+          "https://storage.googleapis.com/estudyme/dev/2022/06/27/32759585.mp3",
+        correctAnswer: "(A) Dr. Alfson's new book will be available.",
+        options: [
+          "(C) The radio will broadcast an interview.",
+          "(D) The results of a study will be announced.",
+          "(B) A new research project will be launched.",
+          "(A) Dr. Alfson's new book will be available.",
+        ],
+      },
+    ],
   },
 ];
 
 export default function TestListening() {
+  const [audioFiles, setAudioFiles] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -57,193 +156,68 @@ export default function TestListening() {
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
-  const [currentAudioFile, setCurrentAudioFile] = useState(audioFiles[0]);
+  const [currentAudioFile, setCurrentAudioFile] = useState(null);
   const [exitScreen, setExitScreen] = useState(false);
   const [isAnswersSaved, setIsAnswersSaved] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [data, setData] = useState([]);
-  const [apiData, setApiData] = useState([]);
+  const [apiData, setApiData] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+
   const location = useLocation();
-  const { id } = location.state;
+  const { id } = location.state || { id: 0 };
   const audioRef = useRef(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  // Fetch test data from API
   useEffect(() => {
     async function fetchData() {
+      setIsLoading(true);
       try {
         const res = await TestListeningApi.getTestListening(id);
+        console.log("API response:", res);
         setData(res.body.context);
         setApiData(res.body);
+
+        const newAudioFiles = res.body.context.map((part, index) => ({
+          id: index + 1,
+          name: `TOEIC Part ${index + 1}`,
+          url: part.questions[0]?.audioSource || "",
+        }));
+
+        setAudioFiles(newAudioFiles);
+        setCurrentAudioFile(newAudioFiles[0] || null);
+        console.log("Data fetched successfully:", newAudioFiles);
       } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu đề thi index");
-        setData([
-          {
-            part: 1,
-            questions: [
-              {
-                id: "1",
-                text: "Câu hỏi 1.",
-                audioSource:
-                  "https://storage.googleapis.com/estudyme/dev/2022/06/27/30449101.mp3",
-                imageSource:
-                  "https://estudyme.hoc102.com/legacy-data/kslearning/images/418922160-1620725865601-pic1.png",
-                correctAnswer: "(D)",
-                options: ["(D)", "(B)", "(A)", "(C)"],
-              },
-            ],
-          },
-          {
-            part: 2,
-            questions: [
-              {
-                id: "7",
-                text: "Câu hỏi 7.",
-                audioSource:
-                  "https://storage.googleapis.com/estudyme/dev/2022/06/27/46972225.mp3",
-                correctAnswer: "(B)",
-                options: ["(A)", "(B)", "(C)"],
-              },
-            ],
-          },
-          {
-            part: 3,
-            questions: [
-              {
-                id: "32",
-                text: "What does the woman want to find?",
-                audioSource:
-                  "https://storage.googleapis.com/estudyme/dev/2022/06/27/40438651.mp3",
-                correctAnswer: "(B) A file",
-                options: [
-                  "(C) An office key",
-                  "(A) Some money",
-                  "(B) A file",
-                  "(D) A check",
-                ],
-              },
-              {
-                id: "33",
-                text: "Where most likely is Patrick?",
-                audioSource:
-                  "https://storage.googleapis.com/estudyme/dev/2022/06/27/40438651.mp3",
-                correctAnswer: "(D) On a business trip",
-                options: [
-                  "(A) At his home",
-                  "(D) On a business trip",
-                  "(B) In his office",
-                  "(C) At a restaurant",
-                ],
-              },
-              {
-                id: "34",
-                text: "What will John most likely do next?",
-                audioSource:
-                  "https://storage.googleapis.com/estudyme/dev/2022/06/27/40438651.mp3",
-                correctAnswer: "(A) Check his office",
-                options: [
-                  "(A) Check his office",
-                  "(B) Bring Patrick",
-                  "(C) Postpone a meeting",
-                  "(D) Reply to a letter",
-                ],
-              },
-            ],
-          },
-          {
-            part: 4,
-            questions: [
-              {
-                id: "71",
-                text: "Who most likely is Ted Costello?",
-                audioSource:
-                  "https://storage.googleapis.com/estudyme/dev/2022/06/27/32759585.mp3",
-                correctAnswer: "(C) A radio host",
-                options: [
-                  "(A) A newspaper reporter",
-                  "(C) A radio host",
-                  "(B) A computer scientist",
-                  "(D) A research assistant",
-                ],
-              },
-              {
-                id: "72",
-                text: "What does Dr. Alfson specialize in?",
-                audioSource:
-                  "https://storage.googleapis.com/estudyme/dev/2022/06/27/32759585.mp3",
-                correctAnswer: "(D) The study of language",
-                options: [
-                  "(B) Market research",
-                  "(A) Music education",
-                  "(C) Mergers and acquisitions",
-                  "(D) The study of language",
-                ],
-              },
-              {
-                id: "73",
-                text: "What will happen on August 4?",
-                audioSource:
-                  "https://storage.googleapis.com/estudyme/dev/2022/06/27/32759585.mp3",
-                correctAnswer: "(A) Dr. Alfson’s new book will be available.",
-                options: [
-                  "(C) The radio will broadcast an interview.",
-                  "(D) The results of a study will be announced.",
-                  "(B) A new research project will be launched.",
-                  "(A) Dr. Alfson’s new book will be available.",
-                ],
-              },
-            ],
-          },
-        ]);
+        console.error("Error fetching test data:", error.message);
+        toast({
+          title: "Lỗi tải dữ liệu",
+          description: "Sử dụng dữ liệu dự phòng do lỗi API.",
+          variant: "destructive",
+        });
+        setData(fallbackData);
+        const fallbackAudioFiles = fallbackData.map((part, index) => ({
+          id: index + 1,
+          name: `TOEIC Part ${index + 1}`,
+          url: part.questions[0]?.audioSource || "",
+        }));
+        setAudioFiles(fallbackAudioFiles);
+        setCurrentAudioFile(fallbackAudioFiles[0] || null);
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchData();
-  }, []);
-  const contestApi = () => {
-    const context = [
-      { part: 1, answers: [] },
-      { part: 2, answers: [] },
-      { part: 3, answers: [] },
-      { part: 4, answers: [] },
-    ];
-    questions.forEach((partData) => {
-      if (partData.part === 1) {
-        context[0].answers.push({
-          id: partData.id,
-          answer: partData.userAnswer || "",
-        });
-      } else if (partData.part === 2) {
-        context[1].answers.push({
-          id: partData.id,
-          answer: partData.userAnswer || "",
-        });
-      } else if (partData.part === 3) {
-        context[2].answers.push({
-          id: partData.id,
-          answer: partData.userAnswer || "",
-        });
-      } else if (partData.part === 4) {
-        context[3].answers.push({
-          id: partData.id,
-          answer: partData.userAnswer || "",
-        });
-      }
-    });
-    return context;
-  };
-  const handleReturnAnswer = async () => {
-    try {
-      const context = contestApi();
-      console.log(context);
-      await TestListeningApi.submitTesAnswers(apiData.testId, score, context);
-      console.log("Nộp bài thành công:");
-    } catch (error) {
-      console.error("Lỗi khi nộp bài:", error.message);
-      throw error;
-    }
-  };
-  const navigate = useNavigate();
+  }, [id]);
+
+  // Format questions from data
   useEffect(() => {
+    if (data.length === 0) return;
+
     const flattenedQuestions = [];
     let i = 0;
+
     data.forEach((partData) => {
       partData.questions.forEach((question) => {
         i += 1;
@@ -255,14 +229,16 @@ export default function TestListening() {
         });
       });
     });
+
     setQuestions(flattenedQuestions);
   }, [data]);
 
+  // Load saved answers and time from localStorage
   useEffect(() => {
     const savedAnswers = localStorage.getItem("toeicAnswers");
     const savedTime = localStorage.getItem("toeicTimeLeft");
 
-    if (savedAnswers) {
+    if (savedAnswers && questions.length > 0) {
       try {
         const parsedAnswers = JSON.parse(savedAnswers);
         setQuestions((prevQuestions) =>
@@ -279,7 +255,7 @@ export default function TestListening() {
         );
         setIsAnswersSaved(true);
       } catch (error) {
-        console.error("Lỗi khi phân tích câu trả lời đã lưu:", error);
+        console.error("Error parsing saved answers:", error);
       }
     }
 
@@ -288,11 +264,60 @@ export default function TestListening() {
         const parsedTime = JSON.parse(savedTime);
         setTimeLeft(parsedTime);
       } catch (error) {
-        console.error("Lỗi khi phân tích thời gian đã lưu:", error);
+        console.error("Error parsing saved time:", error);
       }
     }
-  }, []);
+  }, [questions.length]);
 
+  // Format API request for submitting answers
+  const formatAnswersForApi = () => {
+    const context = [
+      { part: 1, answers: [] },
+      { part: 2, answers: [] },
+      { part: 3, answers: [] },
+      { part: 4, answers: [] },
+    ];
+
+    questions.forEach((question) => {
+      if (question.part >= 1 && question.part <= 4) {
+        context[question.part - 1].answers.push({
+          id: question.id,
+          answer: question.userAnswer || "",
+        });
+      }
+    });
+
+    return context;
+  };
+
+  // Submit answers to API
+  const handleReturnAnswer = async () => {
+    try {
+      const context = formatAnswersForApi();
+      console.log("Submitting answers:", context);
+
+      if (apiData.testId) {
+        await TestListeningApi.submitTesAnswers(apiData.testId, score, context);
+        console.log("Answers submitted successfully");
+      } else {
+        console.error("No testId available for submission");
+        toast({
+          title: "Lỗi",
+          description: "Không tìm thấy testId để nộp bài.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error submitting answers:", error.message);
+      toast({
+        title: "Lỗi khi nộp bài",
+        description: "Đã xảy ra lỗi khi gửi kết quả bài thi của bạn.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Format time functions
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);
     const seconds = timeInSeconds % 60;
@@ -310,12 +335,20 @@ export default function TestListening() {
       .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
   };
 
+  // Audio controls
   const togglePlay = () => {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
       } else {
-        audioRef.current.play();
+        audioRef.current.play().catch((error) => {
+          console.error("Error playing audio:", error);
+          toast({
+            title: "Lỗi phát âm thanh",
+            description: "Không thể phát âm thanh. Vui lòng thử lại.",
+            variant: "destructive",
+          });
+        });
       }
       setIsPlaying(!isPlaying);
     }
@@ -353,19 +386,24 @@ export default function TestListening() {
   const forward10 = () => {
     if (audioRef.current) {
       audioRef.current.currentTime = Math.min(
-        audioRef.current.duration,
+        audioRef.current.duration || 0,
         audioRef.current.currentTime + 10
       );
     }
   };
 
+  // Handle audio file changes
   useEffect(() => {
-    if (audioRef.current) {
+    if (audioRef.current && currentAudioFile) {
       audioRef.current.load();
-      audioRef.current.playbackRate = playbackRate;
+      if (audioRef.current.readyState >= 2) {
+        audioRef.current.playbackRate = playbackRate;
+      }
+      setIsPlaying(false);
     }
   }, [currentAudioFile, playbackRate]);
 
+  // Handle answer selection
   const handleAnswerSelect = (questionId, answer) => {
     setQuestions(
       questions.map((q) =>
@@ -381,6 +419,7 @@ export default function TestListening() {
     });
   };
 
+  // Save progress to localStorage
   const saveProgress = () => {
     const answersToSave = questions.map((q) => ({
       id: q.id,
@@ -388,6 +427,7 @@ export default function TestListening() {
       que: q.que,
       userAnswer: q.userAnswer,
     }));
+
     localStorage.setItem("toeicAnswers", JSON.stringify(answersToSave));
     localStorage.setItem("toeicTimeLeft", JSON.stringify(timeLeft));
     setIsAnswersSaved(true);
@@ -399,6 +439,8 @@ export default function TestListening() {
       duration: 3000,
     });
   };
+
+  // Reset test
   const resetTest = () => {
     setQuestions(questions.map((q) => ({ ...q, userAnswer: undefined })));
     setShowResults(false);
@@ -409,6 +451,10 @@ export default function TestListening() {
     localStorage.removeItem("toeicAnswers");
     localStorage.removeItem("toeicTimeLeft");
 
+    if (audioFiles.length > 0) {
+      setCurrentAudioFile(audioFiles[0]);
+    }
+
     toast({
       title: "Làm lại bài thi",
       description: "Bài thi đã được thiết lập lại.",
@@ -416,42 +462,50 @@ export default function TestListening() {
     });
   };
 
+  // Complete test and show exit screen
   const completeTest = () => {
     setExitScreen(true);
-
     localStorage.removeItem("toeicAnswers");
     localStorage.removeItem("toeicTimeLeft");
   };
+
+  // Submit test and calculate score
   const submitTest = () => {
     const correctAnswers = questions.filter(
       (q) => q.userAnswer === q.correctAnswer
     ).length;
     const totalQuestions = questions.length;
     const calculatedScore = Math.round((correctAnswers / totalQuestions) * 100);
+
     setScore(calculatedScore);
     setShowResults(true);
     setShowSubmitDialog(false);
     setActivePart(1);
-    setCurrentAudioFile(audioFiles[0]);
-    handleReturnAnswer();
+
+    if (audioFiles.length > 0) {
+      setCurrentAudioFile(audioFiles[0]);
+    }
+
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
       audioRef.current.pause();
       setIsPlaying(false);
     }
 
+    handleReturnAnswer();
     localStorage.removeItem("toeicAnswers");
     localStorage.removeItem("toeicTimeLeft");
   };
 
+  // Countdown timer
   useEffect(() => {
     if (showResults) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 0) {
-          submitTest();
           clearInterval(timer);
+          submitTest();
           return 0;
         }
         return prev - 1;
@@ -461,6 +515,7 @@ export default function TestListening() {
     return () => clearInterval(timer);
   }, [showResults]);
 
+  // Periodic save of time to localStorage
   useEffect(() => {
     if (!isAnswersSaved || showResults) return;
 
@@ -471,8 +526,10 @@ export default function TestListening() {
     return () => clearInterval(saveTimer);
   }, [timeLeft, isAnswersSaved, showResults]);
 
+  // Get current part questions
   const currentPartQuestions = questions.filter((q) => q.part === activePart);
 
+  // Get counts of answered questions
   const getAnsweredCount = (part) => {
     return questions.filter((q) => q.part === part && q.userAnswer).length;
   };
@@ -481,11 +538,85 @@ export default function TestListening() {
     return questions.filter((q) => q.part === part).length;
   };
 
+  // Group questions by part
   const questionsByPart = [1, 2, 3, 4].map((part) => ({
     part,
     questions: questions.filter((q) => q.part === part),
   }));
 
+  // Handle change of part in results view
+  const handleResultsPartChange = (part) => {
+    const newAudioFile =
+      audioFiles.find((file) => file.id === part) || audioFiles[0] || null;
+    if (newAudioFile) {
+      setCurrentAudioFile(newAudioFile);
+      setCurrentTime(0);
+      setIsPlaying(false);
+
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.pause();
+      }
+    }
+  };
+
+  // Set active part and load corresponding audio
+  const setPartAndAudio = (part) => {
+    setActivePart(part);
+
+    const newAudioFile =
+      audioFiles.find((file) => file.id === part) || audioFiles[0] || null;
+    if (newAudioFile) {
+      setCurrentAudioFile(newAudioFile);
+      setCurrentTime(0);
+      setIsPlaying(false);
+
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.pause();
+      }
+    }
+  };
+
+  // Handle audio end
+  const handleAudioEnded = () => {
+    if (audioRef.current) {
+      if (audioRef.current.currentTime >= audioRef.current.duration - 0.1) {
+        audioRef.current.currentTime = 0;
+        setIsPlaying(false);
+      }
+    }
+  };
+
+  // Format option display
+  const formatOptionDisplay = (option) => {
+    if (typeof option === "object" && option.key && option.description) {
+      return option.description;
+    }
+    return option;
+  };
+
+  // Get option value
+  const getOptionValue = (option) => {
+    if (typeof option === "object" && option.key && option.description) {
+      return option.description;
+    }
+    return option;
+  };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Đang tải bài thi...</h2>
+          <p className="text-gray-500">Vui lòng đợi trong giây lát</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Exit screen
   if (exitScreen) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
@@ -499,10 +630,7 @@ export default function TestListening() {
           </p>
           <Button
             className="w-full"
-            onClick={() => {
-              setExitScreen(false);
-              resetTest();
-            }}
+            onClick={() => navigate("/luyen-de/listening")}
           >
             Quay lại trang chủ
           </Button>
@@ -511,67 +639,17 @@ export default function TestListening() {
     );
   }
 
-  const handleResultsPartChange = (part) => {
-    const newAudioFile =
-      audioFiles.find((file) => file.id === part) || audioFiles[0];
-    setCurrentAudioFile(newAudioFile);
-
-    setCurrentTime(0);
-    setIsPlaying(false);
-
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.pause();
-    }
-  };
-
-  const setPartAndAudio = (part) => {
-    setActivePart(part);
-
-    const newAudioFile =
-      audioFiles.find((file) => file.id === part) || audioFiles[0];
-    setCurrentAudioFile(newAudioFile);
-
-    setCurrentTime(0);
-    setIsPlaying(false);
-
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.pause();
-    }
-  };
-  const handleAudioEnded = () => {
-    if (audioRef.current) {
-      if (audioRef.current.currentTime === audioRef.current.duration) {
-        audioRef.current.currentTime = 0;
-        audioRef.current.play();
-      }
-    }
-  };
-
-  const formatOptionDisplay = (option) => {
-    if (typeof option === "object" && option.key && option.description) {
-      return option.description;
-    }
-    return option;
-  };
-
-  const getOptionValue = (option) => {
-    if (typeof option === "object" && option.key && option.description) {
-      return option.description;
-    }
-    return option;
-  };
-
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      <audio
-        ref={audioRef}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
-        onEnded={handleAudioEnded}
-        src={currentAudioFile.url}
-      />
+      {currentAudioFile?.url && (
+        <audio
+          ref={audioRef}
+          onTimeUpdate={handleTimeUpdate}
+          onLoadedMetadata={handleLoadedMetadata}
+          onEnded={handleAudioEnded}
+          src={currentAudioFile.url}
+        />
+      )}
 
       <header className="flex items-center justify-between px-4 py-2 border-b bg-white">
         <div className="flex items-center gap-2">
@@ -599,7 +677,9 @@ export default function TestListening() {
               </span>
             </div>
           )}
-          <h1 className="text-lg font-bold">{apiData.title}</h1>
+          <h1 className="text-lg font-bold">
+            {apiData.title || "TOEIC Listening Test"}
+          </h1>
         </div>
 
         <div className="flex items-center gap-2">
@@ -650,6 +730,7 @@ export default function TestListening() {
             size="icon"
             onClick={rewind10}
             className="rounded-full"
+            disabled={!currentAudioFile}
           >
             <Rewind className="h-5 w-5" />
           </Button>
@@ -658,6 +739,7 @@ export default function TestListening() {
             size="icon"
             onClick={togglePlay}
             className="rounded-full bg-blue-500 text-white hover:bg-blue-600"
+            disabled={!currentAudioFile}
           >
             {isPlaying ? (
               <Pause className="h-5 w-5" />
@@ -670,11 +752,12 @@ export default function TestListening() {
             size="icon"
             onClick={forward10}
             className="rounded-full"
+            disabled={!currentAudioFile}
           >
             <FastForward className="h-5 w-5" />
           </Button>
           <span className="text-sm text-gray-600 ml-2">
-            {currentAudioFile.name}
+            {currentAudioFile?.name || "Không có âm thanh"}
           </span>
         </div>
 
@@ -686,6 +769,7 @@ export default function TestListening() {
             value={currentTime}
             onChange={handleSeek}
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            disabled={!currentAudioFile}
           />
         </div>
 
@@ -702,53 +786,61 @@ export default function TestListening() {
           <Card className="p-6 shadow-sm">
             <h2 className="text-2xl font-bold mb-6">PART {activePart}</h2>
 
-            {currentPartQuestions.map((question) => (
-              <div key={question.id} className="mb-8">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="bg-blue-500 text-white rounded-full w-20 h-7 flex items-center justify-center text-sm">
-                    Câu {question.que}
-                  </div>
-                </div>
-
-                {question.imageSource && (
-                  <div className="border rounded-lg overflow-hidden mb-4">
-                    <img
-                      src={question.imageSource}
-                      alt={`Hình ảnh câu hỏi ${question.que}`}
-                      className="w-full object-cover"
-                    />
-                  </div>
-                )}
-
-                <p className="text-gray-800 mb-4">{question.text}</p>
-
-                <RadioGroup
-                  value={question.userAnswer || ""}
-                  onValueChange={(value) =>
-                    handleAnswerSelect(question.id, value)
-                  }
-                  className="space-y-3"
-                >
-                  {question.options.map((option, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center space-x-2 border p-3 rounded-md hover:bg-gray-50"
-                    >
-                      <RadioGroupItem
-                        value={getOptionValue(option)}
-                        id={`q${question.id}-option${index}`}
-                      />
-                      <Label
-                        htmlFor={`q${question.id}-option${index}`}
-                        className="flex-1 cursor-pointer"
-                      >
-                        {formatOptionDisplay(option)}
-                      </Label>
+            {currentPartQuestions.length > 0 ? (
+              currentPartQuestions.map((question) => (
+                <div key={question.id} className="mb-8">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="bg-blue-500 text-white rounded-full w-20 h-7 flex items-center justify-center text-sm">
+                      Câu {question.que}
                     </div>
-                  ))}
-                </RadioGroup>
-              </div>
-            ))}
+                  </div>
+
+                  {question.imageSource && (
+                    <div className="border rounded-lg overflow-hidden mb-4">
+                      <img
+                        src={question.imageSource}
+                        alt={`Hình ảnh câu hỏi ${question.que}`}
+                        className="w-full object-cover"
+                      />
+                    </div>
+                  )}
+
+                  <p className="text-gray-800 mb-4">
+                    {question.text || "Không có câu hỏi"}
+                  </p>
+
+                  <RadioGroup
+                    value={question.userAnswer || ""}
+                    onValueChange={(value) =>
+                      handleAnswerSelect(question.id, value)
+                    }
+                    className="space-y-3"
+                  >
+                    {question.options.map((option, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center space-x-2 border p-3 rounded-md hover:bg-gray-50"
+                      >
+                        <RadioGroupItem
+                          value={getOptionValue(option)}
+                          id={`q${question.id}-option${index}`}
+                        />
+                        <Label
+                          htmlFor={`q${question.id}-option${index}`}
+                          className="flex-1 cursor-pointer"
+                        >
+                          {formatOptionDisplay(option)}
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-gray-500">
+                Không có câu hỏi nào cho phần này
+              </p>
+            )}
           </Card>
         ) : (
           <Card className="p-6 shadow-sm">
@@ -789,59 +881,75 @@ export default function TestListening() {
                 >
                   <h3 className="text-xl font-bold">PHẦN {part.part}</h3>
 
-                  {part.questions.map((question) => (
-                    <div key={question.id} className="border rounded-lg p-4">
-                      <div className="flex justify-between mb-2">
-                        <span className="font-medium">Câu {question.que}</span>
-                        {question.userAnswer === question.correctAnswer ? (
-                          <span className="text-green-600 font-medium">
-                            Đúng
+                  {part.questions.length > 0 ? (
+                    part.questions.map((question) => (
+                      <div
+                        key={question.id}
+                        className="border rounded-lg p-4 bg-white"
+                      >
+                        <div className="flex justify-between mb-2">
+                          <span className="font-medium">
+                            Câu {question.que}
                           </span>
-                        ) : (
-                          <span className="text-red-600 font-medium">Sai</span>
-                        )}
-                      </div>
-
-                      {question.imageSource && (
-                        <div className="border rounded-lg overflow-hidden mb-4">
-                          <img
-                            src={question.imageSource}
-                            alt={`Hình ảnh câu hỏi ${question.que}`}
-                            className="w-full object-cover"
-                          />
+                          {question.userAnswer === question.correctAnswer ? (
+                            <span className="text-green-600 font-medium">
+                              Đúng
+                            </span>
+                          ) : (
+                            <span className="text-red-600 font-medium">
+                              Sai
+                            </span>
+                          )}
                         </div>
-                      )}
 
-                      <p className="mb-3">{question.text}</p>
-
-                      {question.options.map((option, index) => {
-                        const optionValue = getOptionValue(option);
-                        const isCorrect =
-                          optionValue === question.correctAnswer;
-                        const isSelected = optionValue === question.userAnswer;
-
-                        return (
-                          <div
-                            key={index}
-                            className={`p-2 mb-2 rounded-md ${
-                              isCorrect
-                                ? "bg-green-100 border-green-300 border"
-                                : isSelected && !isCorrect
-                                ? "bg-red-100 border-red-300 border"
-                                : "bg-gray-50 border"
-                            }`}
-                          >
-                            {formatOptionDisplay(option)}
-                            {isCorrect && (
-                              <span className="ml-2 text-green-600 font-medium">
-                                (Đáp án đúng)
-                              </span>
-                            )}
+                        {question.imageSource && (
+                          <div className="border rounded-lg overflow-hidden mb-4">
+                            <img
+                              src={question.imageSource}
+                              alt={`Hình ảnh câu hỏi ${question.que}`}
+                              className="w-full object-cover"
+                            />
                           </div>
-                        );
-                      })}
-                    </div>
-                  ))}
+                        )}
+
+                        <p className="mb-3">
+                          {question.text || "Không có câu hỏi"}
+                        </p>
+
+                        {question.options.map((option, index) => {
+                          const optionValue = getOptionValue(option);
+                          const isCorrect =
+                            optionValue === question.correctAnswer;
+                          const isSelected =
+                            optionValue === question.userAnswer;
+
+                          return (
+                            <div
+                              key={index}
+                              className={`p-2 mb-2 rounded-md ${
+                                isCorrect
+                                  ? "bg-green-100 border-green-300 border"
+                                  : isSelected && !isCorrect
+                                  ? "bg-red-100 border-red-300 border"
+                                  : "bg-gray-50 border"
+                              }`}
+                            >
+                              {formatOptionDisplay(option)}
+                              {isCorrect && (
+                                <span className="ml-2 text-green-600 font-medium">
+                                  (Đáp án đúng)
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-500">
+                      Không có câu hỏi nào cho phần này
+                    </p>
+                  )}
                 </TabsContent>
               ))}
             </Tabs>

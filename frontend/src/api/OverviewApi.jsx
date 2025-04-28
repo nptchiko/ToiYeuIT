@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { TokenService } from "../utils/auth-service";
 const axiosClient = axios.create({
   baseURL: "http://localhost:8081",
   headers: {
@@ -8,8 +8,16 @@ const axiosClient = axios.create({
 });
 
 axiosClient.interceptors.request.use(
-  (config) => config,
-  (error) => Promise.reject(error)
+  (config) => {
+    const token = TokenService.getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
 axiosClient.interceptors.response.use(
