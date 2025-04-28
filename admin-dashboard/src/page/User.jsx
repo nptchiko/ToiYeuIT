@@ -1,14 +1,13 @@
 "use client";
 
+import { userService } from "../api/usersAPI";
 import AddUserModal from "../components/add-user-modal";
 import DeleteUserModal from "../components/delete-user-modal";
 import EditUserModal from "../components/edit-user-modal";
-// Tách các component con để cải thiện khả năng bảo trì
 import StatCard from "../components/stat-card";
 import UserRow from "../components/user-row";
 import UserSkeleton from "../components/user-skeleton";
 import ViewUserModal from "../components/view-user-modal";
-import axios from "axios";
 import {
   Users,
   GraduationCap,
@@ -22,33 +21,6 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 
-const api = axios.create({
-  baseURL: "http://localhost:8081",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  timeout: 10000,
-  withCredentials: true,
-});
-
-// Thêm interceptor để bắt lỗi chung
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response) {
-      // Lỗi server với status code
-      console.error(`API Error: ${error.response.status}`, error.response.data);
-    } else if (error.request) {
-      // Không nhận được phản hồi
-      console.error("Không nhận được phản hồi từ server", error.request);
-    } else {
-      // Lỗi trong quá trình thiết lập request
-      console.error("Error:", error.message);
-    }
-    return Promise.reject(error);
-  }
-);
-
 export default function UsersPage() {
   // State hooks
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,8 +29,8 @@ export default function UsersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({});
   const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false); // cuộn vô cực
-  const [displayCount] = useState(10); // Số lượng hiển thị ban đầu
+  const [loadingMore, setLoadingMore] = useState(false); // infinite scroll
+  const [displayCount] = useState(10); // Initial display count
   const observerRef = useRef(null);
   const lastUserElementRef = useRef(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -81,7 +53,7 @@ export default function UsersPage() {
     gender: "Nam",
   });
 
-  // Xử lý click bên ngoài dropdown
+  // Handle click outside dropdown
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -106,9 +78,9 @@ export default function UsersPage() {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        // Gọi API để lấy danh sách người dùng
-        const response = await api.get("/api/users");
-        // Xử lý dữ liệu trả về
+        // Call API to get user list
+        const response = await userService.getUsers();
+        // Process returned data
         const fetchedUsers = response.data.map((user) => ({
           id: user.id,
           name: user.username,
@@ -123,12 +95,12 @@ export default function UsersPage() {
 
         setUsers(fetchedUsers);
 
-        // Tạo thống kê từ dữ liệu
+        // Create stats from data
         const statsData = {
           totalUsers: fetchedUsers.length,
           totalStudents: fetchedUsers.filter((user) => user.role === "Học viên")
             .length,
-          newRegistrations: Math.floor(fetchedUsers.length * 0.2), // Giả định 20% là đăng ký mới
+          newRegistrations: Math.floor(fetchedUsers.length * 0.2), // Assume 20% are new registrations
           usersTrend: { percentage: 5.2 },
           studentsTrend: { percentage: 2.1 },
           registrationTrend: { percentage: 3.7 },
@@ -136,7 +108,7 @@ export default function UsersPage() {
 
         setStats(statsData);
 
-        // Hiển thị 10 người dùng đầu tiên
+        // Display first 10 users
         setDisplayedUsers(fetchedUsers.slice(0, displayCount));
         setHasMore(fetchedUsers.length > displayCount);
       } catch (error) {
@@ -160,7 +132,7 @@ export default function UsersPage() {
         setDisplayedUsers(mockUsers.slice(0, displayCount));
         setHasMore(mockUsers.length > displayCount);
 
-        // Tạo thống kê từ dữ liệu mẫu
+        // Create stats from sample data
         const statsData = {
           totalUsers: mockUsers.length,
           totalStudents: mockUsers.filter((user) => user.role === "Học viên")
@@ -186,10 +158,9 @@ export default function UsersPage() {
     setLoadingMore(true);
 
     try {
-      // const nextPage = Math.floor(displayedUsers.length / 10) + 1;
-      const response = await api.get("/api/users");
+      const response = await userService.getUsers();
       const newUsers = response.data.data.map((user) => ({
-        id: user.id, // Tạo ID nếu API không trả về
+        id: user.id,
         name: user.username,
         email: user.email,
         role: user.role,
@@ -199,7 +170,7 @@ export default function UsersPage() {
         gender: user.gender,
       }));
       setDisplayedUsers([...displayedUsers, ...newUsers]);
-      setHasMore(newUsers.length === 10); // Giả sử mỗi page có 10 items
+      setHasMore(newUsers.length === 10); // Assume each page has 10 items
     } catch (error) {
       console.error("Error:", error);
     } finally {
@@ -240,14 +211,14 @@ export default function UsersPage() {
   const filteredUsers = useMemo(() => {
     let filtered = displayedUsers;
 
-    // Lọc theo trạng thái
+    // Filter by status
     if (statusFilter !== "all") {
       const statusToFilter =
         statusFilter === "active" ? "Đang hoạt động" : "Không hoạt động";
       filtered = filtered.filter((user) => user.status === statusToFilter);
     }
 
-    // Lọc theo từ khóa tìm kiếm
+    // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(
         (user) =>
@@ -297,21 +268,20 @@ export default function UsersPage() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     // validate email
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(editFormData.email)) {
       alert("Email không hợp lệ");
       return;
     }
 
-    // Validate số điện thoại
+    // Validate phone number
     if (editFormData.phone && !/^\d{10}$/.test(editFormData.phone)) {
       alert("Số điện thoại không hợp lệ");
       return;
     }
 
     try {
-      // Chuấn bị dữ liệu để gửi API
+      // Prepare data for API
       const genderForBackend = editFormData.gender === "Nam" ? "M" : "F";
       const payload = {
         username: editFormData.name,
@@ -322,17 +292,16 @@ export default function UsersPage() {
         status: editFormData.status,
       };
 
-      // Trong thực tế, bạn sẽ gọi API để cập nhật người dùng
+      // Call API to update user
       try {
-        await api.put(`/api/users/${selectedUser.id}`, payload);
-        // Nếu API hoạt động, có thể hiển thị thông báo thành công
-        console.log("Cập nhật người dùng thành công");
+        await userService.updateUser(selectedUser.id, payload);
+        console.log("User updated successfully");
       } catch (apiError) {
         console.error("API error:", apiError);
-        // Vẫn tiếp tục cập nhật UI ngay cả khi API lỗi
+        // Continue updating UI even if API fails
       }
 
-      // Cập nhật state
+      // Update state
       const updatedUsers = users.map((user) =>
         user.id === selectedUser.id
           ? {
@@ -350,7 +319,7 @@ export default function UsersPage() {
 
       setUsers(updatedUsers);
 
-      // Cập nhật displayedUsers
+      // Update displayedUsers
       const updatedDisplayedUsers = displayedUsers.map((user) =>
         user.id === selectedUser.id
           ? {
@@ -394,39 +363,39 @@ export default function UsersPage() {
       return;
     }
 
-    // Validate số điện thoại
+    // Validate phone number
     if (newUserData.phone && !/^\d{10}$/.test(newUserData.phone)) {
       alert("Số điện thoại không hợp lệ");
       return;
     }
 
     try {
-      // Chuyển đổi gender: Nam -> m, Nữ -> f (chữ thường theo yêu cầu của backend)
+      // Convert gender: Nam -> m, Nữ -> f (lowercase per backend requirement)
       const genderForBackend = newUserData.gender === "Nam" ? "m" : "f";
 
-      // Chuẩn bị dữ liệu để gửi API theo đúng schema yêu cầu
+      // Prepare data for API according to required schema
       const payload = {
         username: newUserData.username,
         email: newUserData.email,
-        password: newUserData.password, // Thêm trường password
+        password: newUserData.password, // Add password field
         gender: genderForBackend,
-        phone: newUserData.phone || "", // Nếu phone không có giá trị thì gửi chuỗi rỗng
+        phone: newUserData.phone || "", // If phone has no value, send empty string
       };
 
       try {
-        const response = await api.post("/api/users/create-user", payload);
-        console.log("Thêm người dùng thành công:", response.data);
+        const response = await userService.createUser(payload);
+        console.log("User added successfully:", response.data);
 
-        // Lấy ID từ response nếu có
+        // Get ID from response if available
         let newUserId;
         if (response.data && response.data.id) {
           newUserId = response.data.id;
         } else {
-          // Nếu backend không trả về ID, tạo ID giả ở frontend
-          newUserId = Date.now().toString(); // Sử dụng timestamp làm ID tạm thời
+          // If backend doesn't return ID, create temporary ID in frontend
+          newUserId = Date.now().toString(); // Use timestamp as temporary ID
         }
 
-        // Tạo người dùng mới cho frontend
+        // Create new user for frontend
         const newUser = {
           id: newUserId,
           name: newUserData.username,
@@ -435,20 +404,20 @@ export default function UsersPage() {
           status: "Đang hoạt động",
           registrationDate: new Date().toLocaleDateString("vi-VN"),
           phone: newUserData.phone || "",
-          gender: newUserData.gender, // Giữ nguyên giá trị hiển thị "Nam" hoặc "Nữ"
+          gender: newUserData.gender, // Keep original display value "Nam" or "Nữ"
           avatar: "/placeholder.svg?height=40&width=40",
         };
 
-        // Cập nhật state
+        // Update state
         setUsers((prevUsers) => [newUser, ...prevUsers]);
 
-        // Cập nhật displayedUsers
+        // Update displayedUsers
         setDisplayedUsers((prevDisplayed) => [
           newUser,
           ...prevDisplayed.slice(0, prevDisplayed.length - 1),
         ]);
 
-        // Cập nhật thống kê
+        // Update stats
         setStats((prev) => ({
           ...prev,
           totalUsers: prev.totalUsers + 1,
@@ -459,12 +428,12 @@ export default function UsersPage() {
           newRegistrations: prev.newRegistrations + 1,
         }));
 
-        // Đóng modal và reset form
+        // Close modal and reset form
         closeModal();
         setNewUserData({
           username: "",
           email: "",
-          password: "", // Thêm trường password vào state reset
+          password: "", // Add password field to reset state
           role: "Học viên",
           phone: "",
           gender: "Nam",
@@ -478,28 +447,29 @@ export default function UsersPage() {
       alert("Có lỗi xảy ra khi thêm người dùng mới");
     }
   };
+
   const confirmDeleteUser = async () => {
     try {
-      // Trong thực tế, bạn sẽ gọi API để xóa người dùng
+      // Call API to delete user
       try {
-        await api.delete(`/api/users/${selectedUser.id}`);
-        console.log("Xóa người dùng thành công");
+        await userService.deleteUser(selectedUser.id);
+        console.log("User deleted successfully");
       } catch (apiError) {
         console.error("API error:", apiError);
-        // Vẫn tiếp tục cập nhật UI ngay cả khi API lỗi
+        // Continue updating UI even if API fails
       }
 
-      // Cập nhật state
+      // Update state
       const updatedUsers = users.filter((user) => user.id !== selectedUser.id);
       setUsers(updatedUsers);
 
-      // Cập nhật displayedUsers
+      // Update displayedUsers
       const updatedDisplayedUsers = displayedUsers.filter(
         (user) => user.id !== selectedUser.id
       );
       setDisplayedUsers(updatedDisplayedUsers);
 
-      // Cập nhật thống kê
+      // Update stats
       setStats((prev) => ({
         ...prev,
         totalUsers: prev.totalUsers - 1,
@@ -698,9 +668,6 @@ export default function UsersPage() {
                     <th className="px-6 py-3.5 bg-muted text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Vai trò
                     </th>
-                    {/* <th className="px-6 py-3.5 bg-muted text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Đăng ký
-                    </th> */}
                     <th className="px-6 py-3.5 bg-muted text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Trạng thái
                     </th>

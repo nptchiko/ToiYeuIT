@@ -1,6 +1,6 @@
-import { AuthService } from "@/utils/auth-service";
+import { AuthService, api } from "@/utils/auth-service";
 import { LogOut, User } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FaHome,
   FaProjectDiagram,
@@ -16,8 +16,38 @@ const Header = () => {
   const [selectedOption, setSelectedOption] = useState("TOEIC");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [show, setShow] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const [profileData, setProfileData] = useState({
+    name: "",
+  });
   // const { logout } = useAuth();
   // const navigate = useNavigate();
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get("/users/user-info");
+
+        // Extract the relevant data from the API response
+        const userData = response.data.body;
+
+        setProfileData({
+          name: userData.username || "",
+        });
+
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+        setError("Failed to load user profile. Please try again later.");
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const handleSelected = (option) => {
     setSelectedOption(option);
     setIsOpen(false);
@@ -27,6 +57,21 @@ const Header = () => {
     AuthService.logout();
     // clear session & token hear
   };
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        {error}
+      </div>
+    );
+  }
   return (
     <nav className="flex justify-between items-center p-4 font-semibold bg-slate-50 relative">
       <div className="flex items-center gap-4">
@@ -216,7 +261,7 @@ const Header = () => {
               <div className="flex items-center gap-4">
                 <FaUserCircle className="h-10 w-10" />
                 <div className="text-gray-800 font-semibold">
-                  Nguyễn Văn Hậu
+                  {profileData.name}
                 </div>
               </div>
               <Link
