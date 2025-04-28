@@ -7,39 +7,77 @@ import { Link } from "react-router-dom";
 
 const useProfileData = () => {
   const [data, setData] = useState({
-    name: "Admin User",
-    email: "admin@example.com",
-    phone: "+1 (555) 123-4567",
-    profilePicture: "/placeholder.svg?height=200&width=200",
+    name: "",
+    email: "",
+    phone: "",
+    error: null,
   });
 
   useEffect(() => {
-    // Load data from localStorage on component mount
-    const savedData = localStorage.getItem("profileData");
-    if (savedData) {
-      setData(JSON.parse(savedData));
+    const fetchUserData = async () => {
+      try {
+        // Fetch data from API using AuthService
+        const response = await AuthService.getCurrentUser();
+
+        // Extract the relevant data from the API response
+        const userData = response.body;
+
+        setData({
+          name: userData.username || "",
+          email: userData.email || "",
+          phone: userData.phone || "",
+          isLoading: false,
+          error: null,
+        });
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setData((prevData) => ({
+          ...prevData,
+          isLoading: false,
+          error: "Failed to load profile data",
+        }));
+      }
+    };
+
+    // Only fetch if the user is authenticated
+    if (AuthService.isAuthenticated()) {
+      fetchUserData();
+    } else {
+      setData((prevData) => ({
+        ...prevData,
+        isLoading: false,
+      }));
     }
   }, []);
 
-  const updateProfileData = (newData) => {
-    const updatedData = { ...data, ...newData };
-    setData(updatedData);
-    // Save to localStorage to persist between components
-    localStorage.setItem("profileData", JSON.stringify(updatedData));
-  };
-
-  return { profileData: data, updateProfileData };
+  return { profileData: data };
 };
 
 export default function ProfileMini() {
   const { profileData } = useProfileData();
 
   const handleLogout = () => {
-    // Implement logout functionality here
-    console.log("Logging out...");
     AuthService.logout();
-    // clear session & token hear
+    // You might want to redirect the user or update UI state after logout
   };
+
+  // Show loading state
+  if (profileData.isLoading) {
+    return (
+      <div className="border rounded-xl shadow-lg w-80 overflow-hidden p-8 flex justify-center items-center">
+        <p>Loading profile data...</p>
+      </div>
+    );
+  }
+
+  // Show error state if any
+  if (profileData.error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="border rounded-xl shadow-lg w-80 overflow-hidden">
@@ -47,17 +85,16 @@ export default function ProfileMini() {
       <div className="bg-primary p-6 text-primary-foreground">
         <div className="flex flex-col items-center">
           <div className="relative group">
-            <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-background shadow-md mb-3">
-              <img
-                src={profileData.profilePicture || "/placeholder.svg"}
-                alt="Admin Profile"
-                className="w-full h-full object-cover"
-              />
+            <div
+              className="w-32 h-32 rounded-full flex items-center justify-center bg-cy\
+             border-4 border-blue-400 shadow-md"
+            >
+              <User className="h-16 w-16 text-slate-300" />
             </div>
           </div>
           <h3 className="font-bold text-xl">{profileData.name}</h3>
           <span className="text-sm text-primary-foreground/80 mt-1">
-            Administrator
+            {profileData.role || "Administrator"}
           </span>
         </div>
       </div>
@@ -99,9 +136,7 @@ export default function ProfileMini() {
           className="flex items-center gap-2 text-destructive hover:bg-destructive/10 transition-colors px-3 py-2 rounded-lg"
         >
           <LogOut className="h-4 w-4" />
-          <span onClick={handleLogout} className="text-sm font-medium">
-            Logout
-          </span>
+          <span className="text-sm font-medium">Logout</span>
         </Link>
         <Link
           to="/profile"

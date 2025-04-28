@@ -1,6 +1,6 @@
 import axios from "axios";
 
-// Create API instance with default configuration
+// Create axios instance with default config
 const api = axios.create({
   baseURL: "http://localhost:8081",
   headers: {
@@ -10,7 +10,7 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Add error handling interceptors
+// Add interceptors for error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -21,69 +21,34 @@ api.interceptors.response.use(
       // No response received
       console.error("No response received from server", error.request);
     } else {
-      // Error during request setup
+      // Error in setting up request
       console.error("Error:", error.message);
     }
     return Promise.reject(error);
   }
 );
 
-// User-related API functions
+// User related API calls
 const userService = {
   // Get all users
-  getAllUsers: async () => {
-    try {
-      const response = await api.get("/api/users");
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      // Return mock data as fallback
-      return Array(20)
-        .fill(0)
-        .map((_, index) => ({
-          id: index + 1,
-          username: `Người dùng ${index + 1}`,
-          email: `user${index + 1}@example.com`,
-          role: "Học viên",
-          status: index % 5 === 0 ? "Không hoạt động" : "Đang hoạt động",
-          phone: `098765432${index % 10}`,
-          gender: index % 2 === 0 ? "Nam" : "Nữ",
-        }));
-    }
+  getUsers: async () => {
+    return api.get("/api/users");
   },
 
   // Create a new user
   createUser: async (userData) => {
-    try {
-      const response = await api.post("/api/users/create-user", userData);
-      return response.data;
-    } catch (error) {
-      console.error("Error creating user:", error);
-      throw error;
-    }
+    return api.post("/api/users/create-user", userData);
   },
 
-  // Update an existing user
+  // Update a user
   updateUser: async (userId, userData) => {
-    try {
-      const response = await api.put(`/api/users/${userId}`, userData);
-      return response.data;
-    } catch (error) {
-      console.error("Error updating user:", error);
-      throw error;
-    }
+    return api.put(`/api/users/${userId}`, userData);
   },
 
   // Delete a user
   deleteUser: async (userId) => {
-    try {
-      const response = await api.delete(`/api/users/${userId}`);
-      return response.data;
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      throw error;
-    }
+    return api.delete(`/api/users/${userId}`);
   },
 };
 
-export default userService;
+export { api, userService };

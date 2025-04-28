@@ -1,5 +1,7 @@
 "use client";
 
+import { useToast } from "../components/toast-context";
+import { api, AuthService } from "../utils/auth-service";
 import {
   ArrowLeft,
   Eye,
@@ -8,40 +10,20 @@ import {
   Phone,
   Lock,
   User,
-  Camera,
   Save,
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
-
-const useProfileData = () => {
-  const [data, setData] = useState({
-    name: "Admin User",
-    email: "admin@example.com",
-    phone: "+1 (555) 123-4567",
-    profilePicture: "/placeholder.svg?height=200&width=200",
-  });
-
-  useEffect(() => {
-    // Load data from localStorage on component mount
-    const savedData = localStorage.getItem("profileData");
-    if (savedData) {
-      setData(JSON.parse(savedData));
-    }
-  }, []);
-
-  const updateProfileData = (newData) => {
-    const updatedData = { ...data, ...newData };
-    setData(updatedData);
-    // Save to localStorage to persist between components
-    localStorage.setItem("profileData", JSON.stringify(updatedData));
-  };
-
-  return { profileData: data, updateProfileData };
-};
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function ProfilePage() {
-  const { profileData, updateProfileData } = useProfileData();
+  const navigate = useNavigate();
+
+  const [profileData, setProfileData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -49,23 +31,48 @@ export default function ProfilePage() {
     password: "",
     confirmPassword: "",
   });
-  const [previewImage, setPreviewImage] = useState(null);
-  const fileInputRef = useRef(null);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  // using esc to escape page
+  const addToast = useToast();
 
-  // Initialize form data from profile data
+  // Fetch user data from API
   useEffect(() => {
-    setFormData({
-      name: profileData.name,
-      email: profileData.email,
-      phone: profileData.phone,
-      password: "",
-      confirmPassword: "",
-    });
-  }, [profileData]);
+    const fetchUserData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get("/users/user-info");
+
+        // Extract the relevant data from the API response
+        const userData = response.data.body;
+
+        setProfileData({
+          name: userData.username || "",
+          email: userData.email || "",
+          phone: userData.phone || "",
+        });
+
+        setFormData({
+          name: userData.username || "",
+          email: userData.email || "",
+          phone: userData.phone || "",
+          password: "",
+          confirmPassword: "",
+        });
+
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+        setError("Failed to load user profile. Please try again later.");
+        setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -75,48 +82,64 @@ export default function ProfilePage() {
     });
   };
 
-  // Handle profile picture change
-  const handleProfilePictureClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validate passwords match if changing password
     if (formData.password && formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      addToast("Passwords do not match!");
       return;
     }
 
-    // Update profile data (excluding password fields)
-    updateProfileData({
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      ...(previewImage && { profilePicture: previewImage }),
-    });
+    try {
+      // If password is being changed, make the API call to reset password
+      if (formData.password) {
+        await api.put("/auth/reset-password", {
+          email: formData.email,
+          newPassword: formData.password,
+          confirmPassword: formData.confirmPassword,
+        });
+      }
 
-    alert("Profile updated successfully!");
+      // Update local state with new values
+      setProfileData({
+        ...profileData,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+      });
+
+      // Show success message and redirect
+      alert("Profile updated successfully!");
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      addToast("Failed to update profile. Please try again.", error);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-6">
         <div className="mb-6">
           <Link
-            to="/"
+            to="/dashboard"
             className="flex items-center text-sm text-blue-600 hover:text-blue-800 font-medium"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
@@ -135,44 +158,17 @@ export default function ProfilePage() {
 
           <div className="p-8">
             <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Profile Picture */}
+              {/* User Icon */}
               <div className="flex flex-col items-center sm:flex-row sm:items-start gap-6">
-                <div className="relative group">
-                  <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-md">
-                    <img
-                      src={previewImage || profileData.profilePicture}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleProfilePictureClick}
-                    className="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full shadow-md hover:bg-blue-700 transition-colors"
-                  >
-                    <Camera className="h-5 w-5" />
-                  </button>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept="image/*"
-                  />
+                <div className="w-32 h-32 rounded-full flex items-center justify-center bg-gray-100 border-4 border-blue-400 shadow-md">
+                  <User className="h-16 w-16 text-blue-600" />
                 </div>
 
                 <div className="flex-1 space-y-2">
-                  <h3 className="text-lg font-medium">Profile Picture</h3>
+                  <h3 className="text-lg font-medium">YOUR PROFILE</h3>
                   <p className="text-sm text-gray-500">
-                    Upload a new profile picture. JPG, PNG or GIF with maximum
-                    size of 1MB.
+                    Manage your personal information and account settings
                   </p>
-                  {previewImage && (
-                    <p className="text-sm text-green-600">
-                      New image selected. Save changes to update your profile
-                      picture.
-                    </p>
-                  )}
                 </div>
               </div>
 
