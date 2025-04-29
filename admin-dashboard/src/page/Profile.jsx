@@ -2,6 +2,7 @@
 
 import { useToast } from "../components/toast-context";
 import { api, AuthService } from "../utils/auth-service";
+import { TokenService } from "../utils/auth-service";
 import {
   ArrowLeft,
   Eye,
@@ -38,7 +39,18 @@ export default function ProfilePage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const addToast = useToast();
-
+  api.interceptors.request.use(
+    (config) => {
+      const token = TokenService.getToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
   // Fetch user data from API
   useEffect(() => {
     const fetchUserData = async () => {

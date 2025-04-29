@@ -12,7 +12,7 @@ export function ToastProvider({ children }) {
   }, []);
 
   const addToast = useCallback(
-    (message, type = "success", duration = 5000) => {
+    (message, type = "success", duration = 4000) => {
       const id = Date.now();
 
       setToasts((prev) => [...prev, { id, message, type, duration }]);
