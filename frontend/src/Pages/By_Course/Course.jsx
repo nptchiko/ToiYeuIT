@@ -4,7 +4,7 @@ import arrow from "../../assets/By_Course/arrow.png";
 import volume from "../../assets/By_Course/Lovepik.png";
 import { useState } from "react";
 import { AiFillWarning } from "react-icons/ai";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 const Course = () => {
   const [hasText, setHasText] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -19,12 +19,16 @@ const Course = () => {
     address: "",
   });
   const location = useLocation();
-  const { title, price } = location.state || {};
+  localStorage.setItem("phone_course", phone);
+  localStorage.setItem("full_course", fullName);
+  const { title, price, id } = location.state || {};
   const [coupon, setCoupon] = useState(price);
   const [errorCoupon, setErrorCoupon] = useState("");
   const [couponInput, setCouponInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const navigate = useNavigate();
+  localStorage.setItem("course_id", id);
+  localStorage.setItem("course_price", price);
   // Validate phone number
   const handlePhoneChange = (e) => {
     const value = e.target.value;
@@ -111,35 +115,10 @@ const Course = () => {
     if (Object.values(newErrors).some((error) => error !== "")) {
       return;
     }
-
-    // Set submitting state
     setIsSubmitting(true);
-
-    // Create object to send
-    const orderData = {
-      personalInfo: {
-        phone: "+84" + phone,
-        fullName,
-        address,
-        email,
-      },
-      orderInfo: {
-        product: "TOEIC mất gốc đến LR 300 & SW 100",
-        originalPrice: 1000000,
-        discountedPrice: coupon,
-        appliedCoupon: couponInput === "hau" ? "hau" : "",
-      },
-      timestamp: new Date().toISOString(),
-    };
-
-    // Log the object (in production, would send to server)
-    console.log("Order Data:", orderData);
-
-    // Simulate API call
     setTimeout(() => {
-      alert("Đã gửi thông tin đặt hàng thành công!");
       setIsSubmitting(false);
-      // Here you would typically redirect to the next step
+      navigate("/vnpay");
     }, 1000);
   };
 
@@ -356,8 +335,8 @@ const Course = () => {
 
           <div className="text-sm flex flex-wrap">
             Bằng việc nhấn{" "}
-            <div className="font-bold px-1">"Tiếp tục thanh toán"</div> bạn xác
-            nhận đã đọc và đồng ý thanh toán
+            <button className="font-bold px-1">"Tiếp tục thanh toán"</button>{" "}
+            bạn xác nhận đã đọc và đồng ý thanh toán
           </div>
 
           <button
