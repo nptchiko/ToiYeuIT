@@ -140,7 +140,6 @@ const AuthService = {
           withCredentials: true,
         }
       );
-
       const { token, role } = response.data.body;
       console.log("Received token:", token);
 
