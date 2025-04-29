@@ -1,3 +1,4 @@
+import { TokenService } from "../utils/auth-service";
 import axios from "axios";
 
 // Create axios instance with default config
@@ -9,6 +10,20 @@ const api = axios.create({
   timeout: 10000,
   withCredentials: true,
 });
+
+//  interceptor để tự động thêm token vào header của mỗi request
+api.interceptors.request.use(
+  (config) => {
+    const token = TokenService.getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 // Add interceptors for error handling
 api.interceptors.response.use(

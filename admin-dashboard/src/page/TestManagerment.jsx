@@ -1,6 +1,7 @@
 "use client";
 
 import TestAPI from "../api/testmanagerAPI";
+import { useToast } from "@/components/toast-context";
 import {
   X,
   Upload,
@@ -51,6 +52,7 @@ export default function TestManagement() {
   });
   const fileInputRef = useRef(null);
   const modalRef = useRef(null);
+  const addToast = useToast();
 
   // Calculate stats from tests data
   const activeTestsCount =
@@ -247,9 +249,9 @@ export default function TestManagement() {
                 ...prev,
                 name: jsonData.name || prev.name,
                 testSet: jsonData.testSet || prev.testSet,
-                questions: jsonData.questions ? jsonData.questions.length : 0,
+                // questions: jsonData.questions ? jsonData.questions.length : 0,
                 duration: jsonData.duration || prev.duration,
-                course: jsonData.course || prev.course,
+                // course: jsonData.course || prev.course,
                 parsedData: parsedData,
               }));
 
@@ -308,10 +310,10 @@ export default function TestManagement() {
       const testToAdd = {
         name: newTest.name,
         testSet: newTest.testSet,
-        questions: newTest.questions || 0,
+        // questions: newTest.questions || 0,
         duration: newTest.duration,
         status: newTest.status,
-        course: newTest.course || "",
+        // course: newTest.course || "",
         // Include any other fields needed by your API
         parsedData: newTest.parsedData,
       };
@@ -348,7 +350,7 @@ export default function TestManagement() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate form - using title instead of name for API compatibility
+    // Validate form
     if (!selectedTest.title?.trim()) {
       alert("Please enter a test title");
       return;
@@ -358,21 +360,13 @@ export default function TestManagement() {
     setError(null);
 
     try {
-      // Prepare data for API according to required format
-      const updateData = {
-        testId: selectedTest.id,
-        title: selectedTest.title,
-        status: selectedTest.status,
-      };
-
-      // Optional fields - add only if they exist in selectedTest
-      if (selectedTest.testSet) updateData.testSet = selectedTest.testSet;
-      if (selectedTest.course) updateData.course = selectedTest.course;
-      if (selectedTest.questions) updateData.questions = selectedTest.questions;
-      if (selectedTest.duration) updateData.duration = selectedTest.duration;
-
-      // Update the test via API using the formatted data
-      await TestAPI.updateTest(selectedTest.id, updateData);
+      // call api
+      const response = await TestAPI.updateTest(
+        selectedTest.status,
+        selectedTest.id,
+        selectedTest.name
+      );
+      console.log("response submit edit :", response);
 
       // Update the test in the local state
       const updatedTests = tests.map((test) =>
@@ -393,33 +387,33 @@ export default function TestManagement() {
       closeEditModal();
 
       // Show success message
-      alert("Test updated successfully!");
+      addToast("Test updated successfully!", "error");
     } catch (error) {
       console.error("Error updating test:", error);
       setError("Failed to update test. Please try again.");
-      alert("Failed to update test. Please try again.");
+      addToast("Failed to update test. Please try again.", "error");
     } finally {
       setIsSubmitting(false);
     }
   };
-  const handleViewTest = async (test) => {
-    setIsLoading(true);
-    setError(null);
+  // const handleViewTest = async (test) => {
+  //   setIsLoading(true);
+  //   setError(null);
 
-    try {
-      // Get the full test details from the API
-      const testDetails = await TestAPI.getTestById(test.id);
-      console.log("test details", testDetails);
-      setSelectedTest(testDetails);
-      setIsViewModalOpen(true);
-    } catch (error) {
-      console.error("Error fetching test details:", error);
-      setError("Failed to load test details. Please try again.");
-      alert("Failed to load test details. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //   try {
+  //     // Get the full test details from the API
+  //     const testDetails = await TestAPI.getTestById(test.id);
+  //     console.log("test details", testDetails);
+  //     setSelectedTest(testDetails);
+  //     setIsViewModalOpen(true);
+  //   } catch (error) {
+  //     console.error("Error fetching test details:", error);
+  //     setError("Failed to load test details. Please try again.");
+  //     alert("Failed to load test details. Please try again.");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
   const handleEditTest = async (test) => {
     setIsLoading(true);
     setError(null);
@@ -438,12 +432,6 @@ export default function TestManagement() {
         ...testDetails,
         // Ensure the component has the fields it expects
         title: testDetails.title || test.title || test.name || "",
-        name:
-          testDetails.name ||
-          testDetails.title ||
-          test.name ||
-          test.title ||
-          "",
       };
 
       setSelectedTest(preparedTest);
@@ -451,7 +439,10 @@ export default function TestManagement() {
     } catch (error) {
       console.error("Error fetching test details for editing:", error);
       setError("Failed to load test details. Please try again.");
-      alert("Failed to load test details for editing. Please try again.");
+      addToast(
+        "Failed to load test details for editing. Please try again.",
+        "error"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -542,10 +533,10 @@ export default function TestManagement() {
     }
   };
 
-  const closeViewModal = () => {
-    setIsViewModalOpen(false);
-    setSelectedTest(null);
-  };
+  // const closeViewModal = () => {
+  //   setIsViewModalOpen(false);
+  //   setSelectedTest(null);
+  // };
 
   const closeEditModal = () => {
     setIsEditModalOpen(false);
@@ -882,7 +873,7 @@ export default function TestManagement() {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                                   <div className="flex space-x-2">
-                                    <button
+                                    {/* <button
                                       onClick={() => handleViewTest(test)}
                                       className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-primary rounded-lg hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors shadow-sm"
                                       disabled={isSubmitting}
@@ -895,7 +886,7 @@ export default function TestManagement() {
                                         <Eye className="h-3.5 w-3.5" />
                                       )}
                                       <span>View</span>
-                                    </button>
+                                    </button> */}
                                     <button
                                       onClick={() => handleEditTest(test)}
                                       className="flex items-center gap-1 px-3 py-1.5 bg-amber-50 text-amber-600 rounded-lg hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:hover:bg-amber-900/30 transition-colors shadow-sm"
@@ -1131,7 +1122,7 @@ export default function TestManagement() {
 
                 <div className="grid grid-cols-2 gap-4">
                   {/* Questions Count */}
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <label
                       htmlFor="questions"
                       className="block text-sm font-medium text-foreground"
@@ -1148,7 +1139,7 @@ export default function TestManagement() {
                       placeholder="Enter number"
                       min="0"
                     />
-                  </div>
+                  </div> */}
 
                   {/* Completion Time */}
                   <div className="space-y-2">
@@ -1197,7 +1188,6 @@ export default function TestManagement() {
                     }}
                   >
                     <option value="Active">Active</option>
-                    <option value="Draft">Draft</option>
                     <option value="Inactive">Inactive</option>
                   </select>
                 </div>
@@ -1233,7 +1223,7 @@ export default function TestManagement() {
       )}
 
       {/* View Test Modal */}
-      {isViewModalOpen && selectedTest && (
+      {/* {isViewModalOpen && selectedTest && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
           <div
             ref={modalRef}
@@ -1318,7 +1308,7 @@ export default function TestManagement() {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Edit Test Modal */}
       {isEditModalOpen && selectedTest && (

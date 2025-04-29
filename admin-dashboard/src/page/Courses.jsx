@@ -190,7 +190,7 @@ export default function CourseDashboard() {
       <div className="container mx-auto p-6 max-w-7xl">
         <h1 className="text-3xl font-bold mb-8  ">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
-            Test Managerment
+            Course Managerment
           </span>
         </h1>
 

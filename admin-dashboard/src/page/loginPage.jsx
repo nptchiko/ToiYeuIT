@@ -322,16 +322,30 @@ export default function LoginPage() {
 
     try {
       // Gọi API để xác minh mã code
-      await verifyResetCode(resetEmail, verificationCode);
-      openNewPasswordModal();
+      const response = await verifyResetCode(resetEmail, verificationCode);
+      console.log("hehehe", response);
+      // Nếu xác minh thành công, mở modal newPassword
+      if (response === true) {
+        openNewPasswordModal();
+      } else {
+        closeModals();
+      }
     } catch (error) {
       console.error("Verification failed:", error);
+
+      // Thêm state để hiển thị lỗi khi mã xác minh không đúng
+      // setVerificationCodeErrors({
+      //   code: "Mã xác nhận không chính xác hoặc đã hết hạn",
+      // });
+
+      // Không chuyển hướng đến trang login khi mã sai
+      // navigate("/login"); // Bỏ dòng này
+
       // Toast thông báo đã được xử lý trong auth-provider
     } finally {
       setIsVerificationSubmitting(false);
     }
   };
-
   // Cập nhật phần xử lý đặt mật khẩu mới
   const handleNewPasswordSubmit = async (e) => {
     e.preventDefault();
