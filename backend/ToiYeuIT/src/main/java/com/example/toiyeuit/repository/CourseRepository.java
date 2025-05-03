@@ -3,7 +3,9 @@ package com.example.toiyeuit.repository;
 import com.example.toiyeuit.entity.course.Course;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -45,4 +47,13 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
                     "AND MONTH(e.enrolled_at) = MONTH(CURRENT_DATE())"
     )
     long retrieveMonthlyRevenue();
+
+    @Modifying
+    @Query(
+            nativeQuery = true,
+            value = "UPDATE ToiYeuIT.course c " +
+                    "SET c.enabled = :isEnabled " +
+                    "WHERE  c.course_id = :id"
+    )
+    int toggleVisiable(int id, int isEnabled);
 }

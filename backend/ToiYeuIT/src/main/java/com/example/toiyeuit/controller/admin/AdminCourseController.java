@@ -12,6 +12,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/admin/courses")
 @RequiredArgsConstructor
@@ -21,12 +23,17 @@ public class AdminCourseController {
     AdminCourseService courseService;
 
     @GetMapping
-    public ApiResponse<Page<Course>> getAllCourses(
+    public ApiResponse<List<Course>> getAllCourses(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size){
+            @RequestParam(defaultValue = "3") int size){
         Pageable pageable = PageRequest.of(page-1, size);
-    //    Page<Course> course = courseService.
-        return null;
+        Page<Course> course = courseService.getAll(pageable);
+
+        return ApiResponse.<List<Course>>builder()
+                .code(200)
+                .message("All available course")
+                .body(course.getContent())
+                .build();
     }
 
     @GetMapping("/revenue")
@@ -39,8 +46,12 @@ public class AdminCourseController {
     }
 
     @PatchMapping("/{id}/visibility")
-    public ApiResponse<?> toggleCourseVisibility(@PathVariable("id") int id, @RequestParam boolean isEnabled){
-
+    public ApiResponse<?> toggleCourseVisibility(@PathVariable("id") int id, boolean isEnabled){
+        courseService.toggleVisiable(id, isEnabled);
+        return ApiResponse.builder()
+                .code(200)
+                .message("Toggle course okay!")
+                .build();
     }
 
 }

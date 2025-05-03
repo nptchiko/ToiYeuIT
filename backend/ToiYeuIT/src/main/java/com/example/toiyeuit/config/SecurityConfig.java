@@ -52,6 +52,7 @@ public class SecurityConfig {
 
 
     public static final String[] PUBLIC_ENDPOINT = {
+            "**",
         "/api/auth/**",
         "/api/users/create-user",
         "/api/courses/**",
