@@ -98,7 +98,7 @@ export default function UsersPage() {
         // Create stats from data
         const statsData = {
           totalUsers: fetchedUsers.length,
-          totalStudents: fetchedUsers.filter((user) => user.role === "Học viên")
+          totalStudents: fetchedUsers.filter((user) => user.role === "USER")
             .length,
           newRegistrations: Math.floor(fetchedUsers.length * 0.2), // Assume 20% are new registrations
           usersTrend: { percentage: 5.2 },
