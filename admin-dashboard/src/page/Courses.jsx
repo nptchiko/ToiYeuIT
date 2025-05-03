@@ -918,7 +918,7 @@ function CourseCard({ course, onEdit, onToggleVisibility, onDelete }) {
   );
 }
 
-// Helper function to get color classes
+// get color class
 function getColorClass(color, type) {
   const classes = {
     blue: {

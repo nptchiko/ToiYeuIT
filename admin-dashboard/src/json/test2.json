@@ -1,0 +1,106 @@
+{
+  "testId": 3,
+  "title": "Test 1: Đề thi thử TOEIC Listening mục tiêu 700+",
+  "questionsByPart": [
+    {
+      "part": 5,
+      "questions": [
+        {
+          "id": 101,
+          "part": 5,
+          "text": "Relative housing values have dropped more than 10 percent from ____ peak in the first half of the year.",
+          "correctAnswer": "(B)their",
+          "options": ["(A) they", "(D) theirs", "(C) them", "(B) their"]
+        }
+      ]
+    },
+    {
+      "part": 6,
+      "questions": [
+        {
+          "id": 185,
+          "part": 6,
+          "text": "Câu hỏi 131.",
+          "paragraph": "refer to the following notice.NOTICE TO EMPLOYEES The IT department maintains the proper working order of all on-site comput…nWe will (134) ____ contact you to set up a time for a visit from one of our technicians.\\nThank you for your cooperation.",
+          "correctAnswer": "(D) is functioning",
+          "options": [
+            "(B) functional",
+            "(C) to function",
+            "(A) functionally",
+            "(D) is functioning"
+          ]
+        },
+        {
+          "id": 186,
+          "part": 6,
+          "text": "Câu hỏi 132.",
+          "paragraph": "refer to the following notice.NOTICE TO EMPLOYEES The IT department maintains the proper working order of all on-site comput…nWe will (134) ____ contact you to set up a time for a visit from one of our technicians.\\nThank you for your cooperation.",
+          "correctAnswer": "(A) problem",
+          "options": [
+            "(B) charge",
+            "(C) meeting",
+            "(D) decision",
+            "(A) problem"
+          ]
+        },
+        {
+          "id": 187,
+          "part": 6,
+          "text": "Câu hỏi 133.",
+          "paragraph": "refer to the following notice.NOTICE TO EMPLOYEES The IT department maintains the proper working order of all on-site comput…nWe will (134) ____ contact you to set up a time for a visit from one of our technicians.\\nThank you for your cooperation.",
+          "correctAnswer": "(B) Also tell us what you were doing immediately prior to it.",
+          "options": [
+            "(C) Moreover, improper connections could be responsible for the error.",
+            "(A) Turning your computer off and back on won’t address the issue.",
+            "(D) We will try to answer any questions you have about your device.",
+            "(B) Also tell us what you were doing immediately prior to it."
+          ]
+        },
+        {
+          "id": 188,
+          "part": 6,
+          "text": "Câu hỏi 134.",
+          "paragraph": "refer to the following notice.NOTICE TO EMPLOYEES The IT department maintains the proper working order of all on-site comput…nWe will (134) ____ contact you to set up a time for a visit from one of our technicians.\\nThank you for your cooperation.",
+          "correctAnswer": "(D) promptly",
+          "options": [
+            "(B) collectively",
+            "(C) frequently",
+            "(D) promptly",
+            "(A) casually"
+          ]
+        }
+      ]
+    },
+    {
+      "part": 7,
+      "questions": [
+        {
+          "id": 189,
+          "part": 7,
+          "text": "Where would this information most likely be found?",
+          "paragraph": "refer to the following information.   Thank you for purchasing the TechRight 1400 Scanner. In this publication, you will find everything you need to know to start scanning documents and images into a computer running any common operating system. You can learn about the various parts of your scanner, its advanced features, and review our start-up guide. For more detailed instructions on how to use your TechRight scanner, visit us at www.techright.com.",
+          "correctAnswer": "(A) In a user manual",
+          "options": [
+            "(A) In a user manual",
+            "(B) On a receipt",
+            "(D) In an advertisement",
+            "(C) On a product’s packaging"
+          ]
+        },
+        {
+          "id": 190,
+          "part": 7,
+          "text": "According to the information, what is provided on the Web site?.",
+          "paragraph": "refer to the following information.   Thank you for purchasing the TechRight 1400 Scanner. In this publication, you will find everything you need to know to start scanning documents and images into a computer running any common operating system. You can learn about the various parts of your scanner, its advanced features, and review our start-up guide. For more detailed instructions on how to use your TechRight scanner, visit us at www.techright.com.",
+          "correctAnswer": "(C) Operating instructions",
+          "options": [
+            "(C) Operating instructions",
+            "(D) Detailed images",
+            "(B) A copy of a publication",
+            "(A) Antivirus software"
+          ]
+        }
+      ]
+    }
+  ]
+}

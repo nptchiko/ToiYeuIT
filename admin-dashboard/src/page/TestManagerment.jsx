@@ -1,6 +1,7 @@
 "use client";
 
 import TestAPI from "../api/testmanagerAPI";
+import { userService } from "../api/usersAPI";
 import { useToast } from "@/components/toast-context";
 import {
   X,
@@ -19,6 +20,7 @@ import {
   Trash2,
   AlertTriangle,
   Loader2,
+  Torus,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
@@ -53,6 +55,9 @@ export default function TestManagement() {
   const fileInputRef = useRef(null);
   const modalRef = useRef(null);
   const addToast = useToast();
+  const [userCount, setUserCount] = useState(0);
+
+  // const [percentChange, setPercentChange] = useState(11.01);
 
   // Calculate stats from tests data
   const activeTestsCount =
@@ -87,6 +92,27 @@ export default function TestManagement() {
     acc[testSet].push(test);
     return acc;
   }, {});
+
+  // get all users
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await userService.getUsers();
+        if (response && response.data) {
+          const users = Array.isArray(response.data)
+            ? response.data
+            : response.data.data;
+          setUserCount(users.length);
+        }
+        setIsLoading(false);
+      } catch (error) {
+        console.error("error featching user count ", error);
+        setError(true);
+        setIsLoading(false);
+      }
+    };
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     // Fetch tests from API
@@ -206,6 +232,7 @@ export default function TestManagement() {
 
   const handleEditInputChange = (e) => {
     const { name, value } = e.target;
+
     setSelectedTest((prev) => ({
       ...prev,
       [name]: value,
@@ -320,7 +347,7 @@ export default function TestManagement() {
 
       // Send to API
       const createdTest = await TestAPI.createTest(testToAdd);
-
+      console.log("testset ", testToAdd.testSet);
       // Add to tests array with the ID from the API response
       setTests([...tests, createdTest]);
 
@@ -349,49 +376,42 @@ export default function TestManagement() {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-
     // Validate form
-    if (!selectedTest.title?.trim()) {
-      alert("Please enter a test title");
+    if (!selectedTest.name?.trim()) {
+      addToast("Please enter a test name", "error");
       return;
     }
-
     setIsSubmitting(true);
     setError(null);
-
     try {
-      // call api
+      // Call API with the correct parameters: status, testId, name
       const response = await TestAPI.updateTest(
         selectedTest.status,
         selectedTest.id,
         selectedTest.name
       );
-      console.log("response submit edit :", response);
-
-      // Update the test in the local state
-      const updatedTests = tests.map((test) =>
-        test.id === selectedTest.id ? selectedTest : test
-      );
-
-      setTests(updatedTests);
-
-      // Update test sets if a new one was added
-      if (selectedTest.testSet && !testSets.includes(selectedTest.testSet)) {
-        setTestSets([...testSets, selectedTest.testSet]);
-        setExpandedSets((prev) => ({
-          ...prev,
-          [selectedTest.testSet]: true,
-        }));
+      // Check if the response indicates success
+      if (response && response.code === 200) {
+        // Update the test in the local state
+        const updatedTests = tests.map((test) =>
+          test.testId === selectedTest.id
+            ? {
+                ...test,
+                name: selectedTest.name,
+                status: selectedTest.status,
+              }
+            : test
+        );
+        setTests(updatedTests);
+        closeEditModal();
+        // Show success message
+        addToast("Test updated successfully!", "success");
+      } else {
+        setError("Failed to update test. Please try again.");
       }
-
-      closeEditModal();
-
-      // Show success message
-      addToast("Test updated successfully!", "error");
     } catch (error) {
       console.error("Error updating test:", error);
-      setError("Failed to update test. Please try again.");
-      addToast("Failed to update test. Please try again.", "error");
+      // setError("Failed to update test. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -414,40 +434,28 @@ export default function TestManagement() {
   //     setIsLoading(false);
   //   }
   // };
-  const handleEditTest = async (test) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // Check if we have the ID from the test parameter
-      if (!test || !test.id) {
-        throw new Error("Invalid test selected for editing");
-      }
-
-      // Get the full test details from the API
-      const testDetails = await TestAPI.getTestById(test.id);
-
-      // If API returns title but component uses name, ensure compatibility
-      const preparedTest = {
-        ...testDetails,
-        // Ensure the component has the fields it expects
-        title: testDetails.title || test.title || test.name || "",
-      };
-
-      setSelectedTest(preparedTest);
-      setIsEditModalOpen(true);
-    } catch (error) {
-      console.error("Error fetching test details for editing:", error);
-      setError("Failed to load test details. Please try again.");
-      addToast(
-        "Failed to load test details for editing. Please try again.",
-        "error"
-      );
-    } finally {
-      setIsLoading(false);
+  const handleEditTest = (test) => {
+    // Check if we have the test data with necessary fields
+    if (!test || !test.testId) {
+      addToast("Invalid test selected for editing", "error");
+      return;
     }
-  };
 
+    // Use the test data directly from getAllTests result
+    // Make sure we're using a consistent structure for editing
+    const testForEditing = {
+      id: test.testId,
+      name: test.name,
+      status: test.status,
+      duration: test.duration,
+      testSet: test.testSet,
+      testSetId: test.testSetId,
+      questions: test.questions,
+    };
+
+    setSelectedTest(testForEditing);
+    setIsEditModalOpen(true);
+  };
   const handleDeleteTest = (test) => {
     setSelectedTest(test);
     setIsDeleteTestModalOpen(true);
@@ -465,11 +473,13 @@ export default function TestManagement() {
     setError(null);
 
     try {
-      // Delete the test via API
+      // Delete the test via API - using the correct testId
       await TestAPI.deleteTest(selectedTest.id);
 
       // Remove the test from the local state
-      const updatedTests = tests.filter((test) => test.id !== selectedTest.id);
+      const updatedTests = tests.filter(
+        (test) => test.testId !== selectedTest.id
+      );
       setTests(updatedTests);
 
       // Check if this was the last test in its test set
@@ -485,16 +495,15 @@ export default function TestManagement() {
       }
 
       closeAllModals();
-      alert("Test deleted successfully!");
+      addToast("Test deleted successfully!", "success");
     } catch (error) {
       console.error("Error deleting test:", error);
       setError("Failed to delete test. Please try again.");
-      alert("Failed to delete test. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
-
+  //cai any chu co API
   const confirmDeleteTestSet = async () => {
     if (!selectedTestSet) return;
 
@@ -616,7 +625,13 @@ export default function TestManagement() {
                 <p className="text-muted-foreground font-medium">Total Users</p>
                 <div className="flex items-center mt-1">
                   <h3 className="text-3xl font-bold mr-2 text-foreground">
-                    3,782
+                    {isLoading ? (
+                      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                    ) : error ? (
+                      "Error"
+                    ) : (
+                      userCount.toLocaleString()
+                    )}
                   </h3>
                   <div className="flex items-center text-sm text-emerald-600 dark:text-emerald-500 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
                     <svg
@@ -1309,7 +1324,6 @@ export default function TestManagement() {
           </div>
         </div>
       )} */}
-
       {/* Edit Test Modal */}
       {isEditModalOpen && selectedTest && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
@@ -1329,27 +1343,27 @@ export default function TestManagement() {
 
             <form onSubmit={handleEditSubmit} className="p-6">
               <div className="space-y-5">
-                {/* Test Title (was Name) */}
+                {/* Test Name (changed from Title) */}
                 <div className="space-y-2">
                   <label
-                    htmlFor="edit-title"
+                    htmlFor="edit-name"
                     className="block text-sm font-medium text-foreground"
                   >
-                    Test Title
+                    Test Name
                   </label>
                   <input
                     type="text"
-                    id="edit-title"
-                    name="title"
-                    value={selectedTest.title}
+                    id="edit-name"
+                    name="name"
+                    value={selectedTest.name || selectedTest.title || ""}
                     onChange={handleEditInputChange}
                     className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
-                    placeholder="Enter test title"
+                    placeholder="Enter test name"
                     required
                   />
                 </div>
 
-                {/* Test Set */}
+                {/* Test Set - Kept as is */}
                 <div className="space-y-2">
                   <label
                     htmlFor="edit-testSet"
@@ -1365,69 +1379,38 @@ export default function TestManagement() {
                     onChange={handleEditInputChange}
                     className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
                     placeholder="Enter test set name (e.g. Math, Science, etc.)"
+                    readOnly
                   />
                 </div>
 
-                {/* Course */}
+                {/* Completion Time - Limited to 45 or 60 minutes */}
                 <div className="space-y-2">
                   <label
-                    htmlFor="edit-course"
+                    htmlFor="edit-duration"
                     className="block text-sm font-medium text-foreground"
                   >
-                    Course
+                    Completion Time
                   </label>
-                  <input
-                    type="text"
-                    id="edit-course"
-                    name="course"
-                    value={selectedTest.course}
-                    onChange={handleEditInputChange}
-                    className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
-                    placeholder="Enter course name"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Questions Count */}
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="edit-questions"
-                      className="block text-sm font-medium text-foreground"
-                    >
-                      Number of Questions
-                    </label>
-                    <input
-                      type="number"
-                      id="edit-questions"
-                      name="questions"
-                      value={selectedTest.questions}
+                  <div className="relative">
+                    <select
+                      id="edit-duration"
+                      name="duration"
+                      value={selectedTest.duration || "45"}
                       onChange={handleEditInputChange}
-                      className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
-                      placeholder="Enter number"
-                      min="0"
-                    />
-                  </div>
-
-                  {/* Completion Time */}
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="edit-duration"
-                      className="block text-sm font-medium text-foreground"
+                      className="w-full px-4 py-2.5 pl-10 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all appearance-none"
+                      style={{
+                        backgroundImage:
+                          "url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' strokeLinecap='round' strokeLinejoin='round' strokeWidth='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\")",
+                        backgroundPosition: "right 0.5rem center",
+                        backgroundRepeat: "no-repeat",
+                        backgroundSize: "1.5em 1.5em",
+                        paddingRight: "2.5rem",
+                      }}
                     >
-                      Completion Time
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        id="edit-duration"
-                        name="duration"
-                        value={selectedTest.duration}
-                        onChange={handleEditInputChange}
-                        className="w-full px-4 py-2.5 pl-10 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
-                        placeholder="60 min"
-                      />
-                      <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    </div>
+                      <option value="45">45 minutes</option>
+                      <option value="60">60 minutes</option>
+                    </select>
+                    <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   </div>
                 </div>
 
@@ -1442,7 +1425,7 @@ export default function TestManagement() {
                   <select
                     id="edit-status"
                     name="status"
-                    value={selectedTest.status}
+                    value={selectedTest.status || "Active"}
                     onChange={handleEditInputChange}
                     className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all appearance-none"
                     style={{

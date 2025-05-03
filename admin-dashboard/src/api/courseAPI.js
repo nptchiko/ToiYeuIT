@@ -68,7 +68,6 @@ export const courseService = {
     }
   },
 
-  // Toggle course visibility
   toggleCourseVisibility: async (id, isEnabled) => {
     try {
       const response = await api.patch(`/api/admin/courses/${id}/visibility?isEnabled=${isEnabled}`);
