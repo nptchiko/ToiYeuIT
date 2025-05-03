@@ -1,0 +1,94 @@
+{
+  "testSetId": 2,
+  "title": "Test 2: Đề thi Listening đầu vào",
+  "parts": [
+    {
+      "part": 1,
+      "questions": [
+        {
+          "audioSource": "https://storage.googleapis.com/estudyme/dev/2022/06/27/9574740.mp3",
+          "imageSource": "https://estudyme.hoc102.com/legacy-data/kslearning/images/960073773-1621582820918-part1-6.png",
+          "correctAnswer": "(A)",
+          "options": ["(A)", "(C)", "(D)", "(B)"]
+        }
+      ]
+    },
+    {
+      "part": 2,
+      "questions": [
+        {
+          "audioSource": "https://storage.googleapis.com/estudyme/dev/2022/06/27/97067174.mp3",
+          "correctAnswer": "(C)",
+          "options": ["(C)", "(A)", "(B)"]
+        }
+      ]
+    },
+    {
+      "part": 3,
+      "questions": [
+        {
+          "text": "Who most likely is the woman?",
+          "audioSource": "https://storage.googleapis.com/estudyme/dev/2022/06/27/90524118.mp3",
+          "correctAnswer": "(D)A product developer",
+          "options": [
+            "(B)A department manager",
+            "(D)A product developer",
+            "(C)A senior engineer",
+            "(A)A business consultant"
+          ]
+        },
+        {
+          "text": "What problem does the woman mention?",
+          "correctAnswer": "(A)The machine isn’t working properly.",
+          "options": [
+            "(A)The machine isn’t working properly.",
+            "(C)She requires new batteries.",
+            "(B)A piece has broken off.",
+            "(D)She wasn’t given enough time."
+          ]
+        },
+        {
+          "text": "What does the man suggest doing?",
+          "correctAnswer": "(B)Consulting with more knowledgeable staff",
+          "options": [
+            "(B)Consulting with more knowledgeable staff",
+            "(A)Starting the project over from the beginning",
+            "(C)Begin working on another project",
+            "(D)Getting feedback from customers"
+          ]
+        }
+      ]
+    },
+    {
+      "part": 4,
+      "questions": [
+        {
+          "text": "What is Success Makers mainly about?",
+          "audioSource": "https://storage.googleapis.com/estudyme/dev/2022/06/27/45885048.mp3",
+          "correctAnswer": "(A)Advice for business people",
+          "options": [
+            "(A)Advice for business people",
+            "(B)Finding jobs",
+            "(D)Managing restaurants",
+            "(C)Communication strategies"
+          ]
+        },
+        {
+          "text": "What day is the program broadcast?",
+          "correctAnswer": "(D)Thursday",
+          "options": ["(D)Thursday", "(A)Monday", "(C)Wednesday", "(B)Tuesday"]
+        },
+        {
+          "text": "Who is Lauri Hampner?",
+          "correctAnswer": "(B)A restaurant manager",
+          "options": [
+            "(D)A writer",
+            "(A)A radio host",
+            "(C)A business magazine columnist",
+            "(B)A restaurant manager"
+          ]
+        }
+      ]
+    }
+  ]
+}
