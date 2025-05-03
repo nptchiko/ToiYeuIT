@@ -7,13 +7,19 @@ import com.example.toiyeuit.dto.response.VNPayResponse;
 import com.example.toiyeuit.entity.User;
 import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.entity.course.CourseOrder;
+import com.example.toiyeuit.entity.course.Enrollment;
 import com.example.toiyeuit.entity.key.OrderKey;
+import com.example.toiyeuit.enums.CourseStatus;
 import com.example.toiyeuit.enums.PaymentMethod;
 import com.example.toiyeuit.enums.PaymentStatus;
+import com.example.toiyeuit.enums.PredefinedRole;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
 import com.example.toiyeuit.repository.CourseRepository;
+import com.example.toiyeuit.repository.EnrollmentRepository;
 import com.example.toiyeuit.repository.OrderCourseRepository;
 import com.example.toiyeuit.repository.UserRepository;
+import com.example.toiyeuit.service.UserService;
+import com.example.toiyeuit.utils.SecurityUtils;
 import com.example.toiyeuit.utils.VNPayUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +34,8 @@ public class PaymentService {
     private final VNPAYConfig vnPayConfig;
     private final OrderCourseRepository orderCourseRepository;
     private final CourseRepository courseRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
+    private final EnrollmentRepository enrollmentRepository;
 
     public VNPayResponse createVnPayPayment(HttpServletRequest request) {
         long amount = Integer.parseInt(request.getParameter("amount")) * 100L;
@@ -51,10 +58,13 @@ public class PaymentService {
 
     @Transactional
     public OrderCourseResponse saveOrder(OrderCourseRequest orderCourseRequest) throws ResourceNotFoundException {
-       Course course = courseRepository.findById(orderCourseRequest.getCourseId()).orElseThrow(() -> new ResourceNotFoundException("Course not found"));
-       User user = userRepository.findById(orderCourseRequest.getUserId()).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-       orderCourseRepository.save(CourseOrder.builder()
+        Course course = courseRepository.findById(orderCourseRequest.getCourseId()).orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+        var user = userService.getUserByEmail(
+                SecurityUtils.getCurrentUserLogin()
+        );
+
+       var result = orderCourseRepository.save(CourseOrder.builder()
                        .id(OrderKey.builder().user_id(user.getId()).course_id(course.getId()).build())
                .course(course)
                .user(user)
@@ -62,9 +72,20 @@ public class PaymentService {
                .paymentStatus(PaymentStatus.fromString(orderCourseRequest.getPaymentMethod()))
                .build());
 
+       if (result.getPaymentStatus() == PaymentStatus.PAID){
+           enrollmentRepository.save(
+                   Enrollment.builder()
+                           .course(course)
+                           .status(CourseStatus.PENDING)
+                           .user(user)
+                           .build());
+
+           userService.updateRole(user, PredefinedRole.STUDENT);
+       }
+
        return OrderCourseResponse.builder()
                .courseId(orderCourseRequest.getCourseId())
-               .userId(orderCourseRequest.getUserId())
+               .userId(user.getId())
                .paymentMethod(orderCourseRequest.getPaymentMethod())
                .status(orderCourseRequest.getStatus())
                .build();

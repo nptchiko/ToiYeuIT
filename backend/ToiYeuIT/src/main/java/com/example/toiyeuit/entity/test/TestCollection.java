@@ -2,9 +2,7 @@ package com.example.toiyeuit.entity.test;
 
 import com.example.toiyeuit.entity.Skill;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Set;
@@ -13,6 +11,9 @@ import java.util.Set;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "test_collection")
 public class TestCollection {
     @Id
@@ -31,4 +32,5 @@ public class TestCollection {
 
     @OneToMany(mappedBy = "testCollection", cascade = CascadeType.ALL)
     Set<Test> tests;
+
 }

@@ -3,16 +3,16 @@ package com.example.toiyeuit.controller.admin;
 
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.entity.course.Course;
+import com.example.toiyeuit.service.admin.AdminCourseService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/courses")
@@ -20,14 +20,38 @@ import org.springframework.web.bind.annotation.RestController;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class AdminCourseController {
 
-   // AdminCourseService courseService;
+    AdminCourseService courseService;
 
     @GetMapping
-    public ApiResponse<Page<Course>> getAllCourses(
+    public ApiResponse<List<Course>> getAllCourses(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size){
+            @RequestParam(defaultValue = "3") int size){
         Pageable pageable = PageRequest.of(page-1, size);
-    //    Page<Course> course = courseService.
-        return null;
+        Page<Course> course = courseService.getAll(pageable);
+
+        return ApiResponse.<List<Course>>builder()
+                .code(200)
+                .message("All available course")
+                .body(course.getContent())
+                .build();
     }
+
+    @GetMapping("/revenue")
+    public ApiResponse<Long> getRevenue(){
+        return ApiResponse.<Long>builder()
+                .code(200)
+                .message("Monthly revenue")
+                .body(courseService.getRevenue())
+                .build();
+    }
+
+    @PatchMapping("/{id}/visibility")
+    public ApiResponse<?> toggleCourseVisibility(@PathVariable("id") int id, boolean isEnabled){
+        courseService.toggleVisiable(id, isEnabled);
+        return ApiResponse.builder()
+                .code(200)
+                .message("Toggle course okay!")
+                .build();
+    }
+
 }

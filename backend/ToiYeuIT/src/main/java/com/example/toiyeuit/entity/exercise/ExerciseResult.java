@@ -24,7 +24,7 @@ public class ExerciseResult {
     ExerciseSubmission exerciseSubmission;
 
     @MapsId(value = "ques_id")
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "ques_id")
     Question question;
 

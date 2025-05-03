@@ -36,4 +36,16 @@ public interface TestRepository extends JpaRepository<Test, Long> {
                     "where ts.user.id = :userId"
     )
     List<TestResponse> retrieveBySubmission(long userId);
+
+    long countAllByTestCollection_Id(Integer testCollectionId);
+
+    @Query(
+            "SELECT new com.example.toiyeuit.dto.response.TestResponse(t.id, t.title, t.index, " +
+                    "case when exists (select 1 from TestSubmission ts where ts.test.id = t.id and ts.user.id = :userId ) " +
+                    "then 1 " +
+                    "else 0 end)" +
+                    "FROM Test t " +
+                    "where t.title like '%đầu vào%'"
+    )
+    List<TestResponse> retrieveInputTest(long userId);
 }

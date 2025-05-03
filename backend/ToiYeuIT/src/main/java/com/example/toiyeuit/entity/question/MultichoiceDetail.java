@@ -21,7 +21,7 @@ public class MultichoiceDetail {
     @JsonIgnore
     Key id;
 
-    @ManyToOne()
+    @ManyToOne
     @JsonIgnore
     @MapsId("question_id")
     @JoinColumn(name = "ques_id")

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PaymentController {
     private final PaymentService paymentService;
+
     @GetMapping("/vn-pay")
     public ApiResponse<VNPayResponse> pay(HttpServletRequest request) {
         return ApiResponse.<VNPayResponse>builder()
@@ -40,7 +41,6 @@ public class PaymentController {
             return ApiResponse.<VNPayResponse>builder()
                     .code(HttpStatus.BAD_REQUEST.value())
                     .message("Failed")
-                    .body(null)
                     .build();
         }
     }

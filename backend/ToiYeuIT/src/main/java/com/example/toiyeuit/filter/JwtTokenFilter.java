@@ -1,5 +1,6 @@
 package com.example.toiyeuit.filter;
 
+import com.example.toiyeuit.config.SecurityConfig;
 import com.example.toiyeuit.repository.UserRepository;
 import com.example.toiyeuit.service.AuthService;
 import com.example.toiyeuit.service.JwtService;
@@ -23,6 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.text.ParseException;
 
+import static com.example.toiyeuit.config.SecurityConfig.*;
 import static io.micrometer.common.util.StringUtils.isEmpty;
 
 @Slf4j
@@ -52,6 +54,8 @@ public class JwtTokenFilter extends OncePerRequestFilter{
 
                 UserDetails userDetail = userDetails.loadUserByUsername(email);
 
+                log.info("[JwtTokenFilter] PredefinedRole: ");
+
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
                                 userDetail, null, userDetail.getAuthorities()
@@ -69,10 +73,18 @@ public class JwtTokenFilter extends OncePerRequestFilter{
     }
     private String getJwtFromRequest(HttpServletRequest request){
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-        log.info("token: " + token);
+        log.info("[JwtTokenFilter] token: " + token);
         if (token != null && token.startsWith("Bearer ")) {
             return token.substring(7);
         }
         return null;
     }
+    /* @Override
+     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+         String path = request.getRequestURI();
+         for (String s : PUBLIC_ENDPOINT)
+             if (path.matches(s))
+                 return true;
+         return false;
+     }*/
 }

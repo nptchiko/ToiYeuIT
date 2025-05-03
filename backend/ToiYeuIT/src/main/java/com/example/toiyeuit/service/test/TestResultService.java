@@ -30,10 +30,10 @@ public class TestResultService {
     TestResultRepository testResultRepository;
 
     private Long getSubmissionId(long testId) {
-       /* var user = userService.getUserByEmail(
+        var user = userService.getUserByEmail(
                 SecurityUtils.getCurrentUserLogin()
-        );*/
-        var user = userService.getUserByEmail("mikudeptrai@gmail.com");
+        );
+        //var user = userService.getUserByEmail("mikudeptrai@gmail.com");
         return submitRepository.findByWhoMadeIt(testId, user.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.TEST_NOT_DONE))
                 .getId();

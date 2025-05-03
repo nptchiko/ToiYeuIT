@@ -143,8 +143,8 @@ public class AuthService {
         }
         return "User has been logged out!";
     }
-    public void forgetPassword(String email) {
-        verificationService.createNewPassword(email);
+    public String forgetPassword(String email) {
+        return verificationService.createNewPassword(email);
     }
 
     // reuse if permission present

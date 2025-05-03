@@ -71,9 +71,17 @@ public class InitApplication implements ApplicationRunner{
                 );
             }
 
+            Optional<Role> studentRole = roleRepository.findByName("STUDENT");
+            if (studentRole.isEmpty()) {
+                roleRepository.save(Role.builder()
+                        .name("STUDENT")
+                        .build()
+                );
+            }
+
             if (userRepository.findByEmail(ADMIN_EMAIL).isEmpty()) {
                 Role role = roleRepository.findByName("ADMIN")
-                        .orElseThrow(() -> new RuntimeException("Role not found"));
+                        .orElseThrow(() -> new RuntimeException("PredefinedRole not found"));
 
                 log.info("admin: " + ADMIN_EMAIL);
 
