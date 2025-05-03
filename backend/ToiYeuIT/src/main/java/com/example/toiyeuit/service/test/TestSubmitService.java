@@ -4,11 +4,14 @@ package com.example.toiyeuit.service.test;
 import com.example.toiyeuit.dto.request.testSubmit.TestSubmitRequest;
 import com.example.toiyeuit.entity.test.TestResult;
 import com.example.toiyeuit.entity.test.TestSubmission;
+import com.example.toiyeuit.exception.AppException;
+import com.example.toiyeuit.exception.ErrorCode;
 import com.example.toiyeuit.repository.QuestionRepository;
 import com.example.toiyeuit.repository.TestResultRepository;
 import com.example.toiyeuit.repository.TestSubmissionRepository;
 import com.example.toiyeuit.service.QuestionService;
 import com.example.toiyeuit.service.UserService;
+import com.example.toiyeuit.utils.SecurityUtils;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -37,11 +40,9 @@ public class TestSubmitService {
 
         var test = testService.getByID(request.getTestId());
 
-    //    var email = SecurityUtils.getCurrentUserLogin().orElseThrow(
-    //            () -> new AppException(ErrorCode.UNAUTHENTICATED)
-    //    );
+        var email = SecurityUtils.getCurrentUserLogin();
         // temp
-        var user = userService.getUserByEmail("mikudeptrai@gmail.com");
+        var user = userService.getUserByEmail(email);
 
         var submit = testSubmissionRepository.findByWhoMadeIt(test.getId(), user.getId());
         if  (submit.isPresent()) {

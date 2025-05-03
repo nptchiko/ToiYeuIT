@@ -1,6 +1,7 @@
 package com.example.toiyeuit.controller;
 
 
+import com.example.toiyeuit.dto.request.ChangePasswordRequest;
 import com.example.toiyeuit.dto.request.LoginRequest;
 import com.example.toiyeuit.dto.request.LogoutRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
@@ -8,20 +9,26 @@ import com.example.toiyeuit.dto.response.AuthTokenResponse;
 import com.example.toiyeuit.dto.response.UserResponse;
 import com.example.toiyeuit.entity.User;
 import com.example.toiyeuit.service.AuthService;
+import com.example.toiyeuit.service.ChangePasswordService;
 import com.example.toiyeuit.service.EmailService;
 import com.example.toiyeuit.service.UserService;
 import com.nimbusds.jose.JOSEException;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.mapping.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.Collections;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,12 +36,10 @@ import java.text.ParseException;
 @RequestMapping("api/auth/")
 public class AuthController {
 
-    @Autowired
     AuthService authService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private EmailService emailService;
+    UserService userService;
+    EmailService emailService;
+    ChangePasswordService changePasswordService;
 
     @PostMapping("/login")
     public ApiResponse<AuthTokenResponse> login(@RequestBody LoginRequest request, HttpServletResponse response){
@@ -58,10 +63,22 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     public ApiResponse<?> forgotPassword(@RequestParam("email") String email){
-        authService.forgetPassword(email);
+        var token = authService.forgetPassword(email);
         return ApiResponse.builder()
                 .code(200)
+                .body(Collections.singletonMap("verify-token", token))
                 .message("A confirmation code is sent to email: " + email)
+                .build();
+    }
+    @Operation(
+            description = "set oldPassword to null if requesting forget-password"
+    )
+    @PutMapping("/reset-password")
+    ApiResponse<?> changePassword(@RequestBody @Valid ChangePasswordRequest request){
+        changePasswordService.changePassword(request);
+        return ApiResponse.builder()
+                .code(200)
+                .message("Password changed successfully")
                 .build();
     }
 }

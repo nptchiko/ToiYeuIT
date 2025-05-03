@@ -12,8 +12,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AdminTestCreationRequest {
-    long testSetId;
-    String title;
-    int index;
+public class TestSetCreationRequest {
+    String name;
+    String skill;
+    String description;
 }

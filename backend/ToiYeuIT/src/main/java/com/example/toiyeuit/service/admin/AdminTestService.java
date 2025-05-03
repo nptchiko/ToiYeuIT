@@ -2,10 +2,20 @@ package com.example.toiyeuit.service.admin;
 
 
 import com.example.toiyeuit.dto.admin.AdminTestResponse;
-import com.example.toiyeuit.dto.admin.AdminUpdateTestRequest;
+import com.example.toiyeuit.dto.admin.TestCreationRequest;
+import com.example.toiyeuit.dto.admin.TestSetCreationRequest;
+import com.example.toiyeuit.dto.admin.UpdateTestRequest;
+import com.example.toiyeuit.dto.response.TestResponse;
+import com.example.toiyeuit.dto.response.TestSetResponse;
+import com.example.toiyeuit.entity.test.Test;
 import com.example.toiyeuit.entity.test.TestCollection;
+import com.example.toiyeuit.mapper.TestSetMapper;
+import com.example.toiyeuit.repository.SkillRepository;
+import com.example.toiyeuit.repository.TestCollectionRepository;
 import com.example.toiyeuit.repository.TestDetailRepository;
 import com.example.toiyeuit.repository.TestRepository;
+import com.example.toiyeuit.service.SkillService;
+import com.example.toiyeuit.service.test.TestCollectionService;
 import com.example.toiyeuit.service.test.TestService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,7 +33,35 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminTestService {
     TestRepository testRepository;
     TestDetailRepository testDetailRepository;
-    private final TestService testService;
+    TestService testService;
+    TestCollectionService testCollectionService;
+    TestSetMapper testSetMapper;
+    TestCollectionRepository testCollectionRepository;
+    SkillService skillService;
+
+    public TestSetResponse saveTestSet(TestSetCreationRequest request){
+        return testSetMapper.toTestSet(
+                testCollectionRepository.save(
+                        TestCollection.builder()
+                                .description(request.getDescription())
+                                .skill(skillService.findBySkillName(request.getName()))
+                                .tests(null)
+                                .title(request.getName())
+                                .build()
+                )
+        );
+    }
+
+    public TestResponse saveTest(TestCreationRequest request){
+       return testSetMapper.toTestResponse(testRepository.save(
+                Test.builder()
+                        .enabled(true)
+                        .index(testService.numberOfTestInSet(request.getTestSetId()))
+                        .title(request.getTitle())
+                        .testCollection(testCollectionService.getById((int) request.getTestSetId()))
+                        .build()
+        ));
+    }
 
     public Page<AdminTestResponse> getAllTests(Pageable pageable){
         return testRepository.findAll(pageable)
@@ -35,12 +73,13 @@ public class AdminTestService {
                             .testSetId(testCollection.getId())
                             .questions(testDetailRepository.countNumberOfQuesOfTest(test.getId()))
                             .testId(test.getId())
+                            .name(test.getTitle())
                             .status(test.isEnabled() ? "Active" : "Not active")
                             .build();
                 });
     }
     @Transactional
-    public void updateTest(AdminUpdateTestRequest request){
+    public void updateTest(UpdateTestRequest request){
         var test = testService.getByID((long) request.getTestId());
 
         boolean status = true;
@@ -51,7 +90,7 @@ public class AdminTestService {
             status = !"Not active".equalsIgnoreCase(request.getStatus());
         }
 
-        String title = request.getTitle() !=  null ? request.getTitle() : test.getTitle();
+        String title = request.getName() !=  null ? request.getName() : test.getTitle();
 
         testRepository.update(status, title, test.getId());
     }
@@ -59,5 +98,10 @@ public class AdminTestService {
     @Transactional
     public void deleteTest(long id){
         testRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteTestSet(long id){
+        testCollectionRepository.deleteTestCollectionById(id);
     }
 }

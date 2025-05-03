@@ -1,13 +1,11 @@
 package com.example.toiyeuit.service;
 
 
-import com.example.toiyeuit.dto.response.UserResponse;
 import com.example.toiyeuit.entity.VerificationToken;
 import com.example.toiyeuit.exception.AppException;
 import com.example.toiyeuit.exception.ErrorCode;
 import com.example.toiyeuit.repository.UserRepository;
 import com.example.toiyeuit.repository.VerificationRepository;
-import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -16,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @AllArgsConstructor
@@ -27,7 +26,7 @@ public class VerificationService {
     VerificationRepository verifyingRepo;
     private final UserRepository userRepository;
 
-    public void createNewPassword(String email) {
+    public String createNewPassword(String email) {
 
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -41,13 +40,16 @@ public class VerificationService {
 
         emailService.sendEmail(email, buildEmail(user.getUsername(), token), "Confirm your email to reset new password");
 
+        return token;
     }
 
     @Transactional
-    public String confirmToken(String token){
+    public Boolean confirmToken(String token){
 
         var confirmToken = verifyingRepo.findByToken(token).orElseThrow(
-                () -> new AppException(ErrorCode.VERIFYING_TOKEN_NOT_FOUND));
+                () -> {
+                    throw new AppException(ErrorCode.VERIFYING_TOKEN_NOT_FOUND);
+                });
 
         if (confirmToken.getConfirmAt() != null)
             throw new RuntimeException("Email is already confirmed");
@@ -59,7 +61,7 @@ public class VerificationService {
 
         setConfirmedAt(token);
 
-        return "Your email is confirmed!";
+        return true;
 
     }
     public VerificationToken saveToken(VerificationToken token){

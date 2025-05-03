@@ -34,8 +34,8 @@ public class TestCollectionService {
 
     public List<TestSetResponse> getAll(){
         var tests = testsRepositoty.findAll();
-        //var user = userService.getUserByEmail(SecurityUtils.getCurrentUserLogin());
-        var user = userService.getUserByEmail("mikudeptrai@gmail.com");
+        var user = userService.getUserByEmail(SecurityUtils.getCurrentUserLogin());
+        //var user = userService.getUserByEmail("mikudeptrai@gmail.com");
         var result = tests.stream().map(
             testsMapper::toTestSet
         ).toList();

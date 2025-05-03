@@ -33,4 +33,16 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 
     @Override
     Page<Course> findAll(Pageable pageable);
+
+
+    @Query(
+            nativeQuery = true,
+            value = "SELECT sum(c.price) " +
+                    "FROM enrollment e " +
+                    "JOIN course c " +
+                    "on c.course_id = e.course_id " +
+                    "where YEAR(e.enrolled_at) = YEAR(CURRENT_DATE()) " +
+                    "AND MONTH(e.enrolled_at) = MONTH(CURRENT_DATE())"
+    )
+    long retrieveMonthlyRevenue();
 }

@@ -7,6 +7,7 @@ import com.example.toiyeuit.dto.response.TestResponse;
 import com.example.toiyeuit.dto.response.TestSetResponse;
 import com.example.toiyeuit.service.test.TestCollectionService;
 import com.example.toiyeuit.service.test.TestResultService;
+import com.example.toiyeuit.service.test.TestService;
 import com.example.toiyeuit.service.test.TestSubmitService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,7 @@ public class TestPracticeController {
     private final TestCollectionService testsService;
     private final TestSubmitService service;
     private final TestResultService resultService;
+    private final TestService testService;
     @GetMapping
     public ApiResponse<List<TestSetResponse>> tests(){
         var result = testsService.getAll();
@@ -65,7 +67,11 @@ public class TestPracticeController {
 
     @GetMapping("/thi-dau-vao")
     public ApiResponse<List<TestResponse>> testDauVao(){
-      //  var body =
-        return null;
+        var body = testService.retrieveInputTest();
+        return ApiResponse.<List<TestResponse>>builder()
+                .message("Retrieved successfully")
+                .code(200)
+                .body(body)
+                .build();
     }
 }

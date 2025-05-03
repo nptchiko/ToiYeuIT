@@ -7,6 +7,9 @@ import com.example.toiyeuit.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter // auto get
@@ -39,5 +42,8 @@ public class CourseOrder {
     @Column(nullable = false, columnDefinition = "varchar(32) default 'VNPAY'")
     PaymentMethod paymentMethod = PaymentMethod.VNPAY;
 
+    @CreationTimestamp
+    @Column(name = "created_at")
+    LocalDateTime createdAt;
 }
 

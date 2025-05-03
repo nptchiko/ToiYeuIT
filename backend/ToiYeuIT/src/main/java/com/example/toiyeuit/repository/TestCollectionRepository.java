@@ -12,15 +12,9 @@ import java.util.Optional;
 @Repository
 public interface TestCollectionRepository extends JpaRepository<TestCollection, Integer> {
 
-//    @Query(//nativeQuery = true,
-//   value =
-//           "SELECT tc.title, tc.skill, tc.tests, tc.description, tc.id FROM TestCollection tc " +
-//                   "JOIN FETCH tc.tests tct " +
-//                   "JOIN FETCH tc.skill tcs "
-//    )
     List<TestCollection> findAll();
 
-    Optional<TestCollection> findById(Integer id);
+    Optional<TestCollection> findById(long id);
 
     @Query(
             nativeQuery = true,
@@ -30,4 +24,5 @@ public interface TestCollectionRepository extends JpaRepository<TestCollection, 
     )
     List<TestCollection> findAllBySkillId(@Param("id") Integer id);
 
+    void deleteTestCollectionById(long id);
 }

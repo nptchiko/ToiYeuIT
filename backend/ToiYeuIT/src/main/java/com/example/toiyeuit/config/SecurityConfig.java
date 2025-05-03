@@ -11,6 +11,8 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -27,6 +29,7 @@ import org.springframework.security.oauth2.server.resource.web.authentication.Be
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 // basic spring security config
 @Configuration
@@ -48,27 +51,20 @@ public class SecurityConfig {
     }
 
 
-    private static final String[] PUBLIC_ENDPOINT = {
- //           "/api/auth/login",
- //           "/api/auth/signup",
- //           "/api/auth/refresh",
- //           "/api/auth/logout",
-////            "/api/courses/**",
- //           "/api/users/**",
- ////           "/api/users/create-user",
- //           "/api/payment/**",
- //           "/api/lessons/**",
- //           "/api/decks/**",
-            "/**",
-            "/swagger-ui/**",
-            "/v3/api-docs/**"
+    public static final String[] PUBLIC_ENDPOINT = {
+        "/api/auth/**",
+        "/api/users/create-user",
+        "/api/courses/**",
+        "/api/deck/**",
+        "/api/verify/confirm",
+        "/swagger-ui/**",
+        "/v3/api-docs/**"
     };
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 
 
     @Bean
@@ -78,7 +74,7 @@ public class SecurityConfig {
                 .cors(c -> c.configurationSource(corsConfiguration.corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINT).permitAll()
-                        .requestMatchers("api/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session
@@ -89,7 +85,7 @@ public class SecurityConfig {
                     //  CustomAuthenticationEntryPoint
                     //  CustomAccessHandler
                 })
-                .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(tokenFilter, BasicAuthenticationFilter.class)
         .build();
     }
 
