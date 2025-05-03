@@ -29,10 +29,10 @@ public enum ErrorCode {
     //not found - 404
     RESOURCE_NOT_FOUND(4040, "No static resource found, check your path carefully!", HttpStatus.NOT_FOUND),
     USER_NOT_FOUND(4041, "User not found", HttpStatus.NOT_FOUND),
-    ROLE_NOT_FOUND(4042, "Role not found", HttpStatus.NOT_FOUND),
+    ROLE_NOT_FOUND(4042, "PredefinedRole not found", HttpStatus.NOT_FOUND),
     SKILL_NOT_FOUND(4043, "Skill not found", HttpStatus.NOT_FOUND),
     TEST_NOT_FOUND(4044, "Test not found", HttpStatus.NOT_FOUND),
-    VERIFYING_TOKEN_NOT_FOUND(4045, "Verification token is not found", HttpStatus.NOT_FOUND),
+    VERIFYING_TOKEN_NOT_FOUND(4045, "Verification token is wrong", HttpStatus.NOT_FOUND),
     QUESTION_NOT_FOUND(4046, "Question not found", HttpStatus.NOT_FOUND)
     ;
 

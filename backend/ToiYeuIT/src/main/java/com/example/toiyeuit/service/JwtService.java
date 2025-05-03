@@ -52,7 +52,7 @@ public class JwtService {
 
         String scope = String.valueOf(
                 Optional.of(user.getRole()).orElseThrow(()->
-                        new ResourceNotFoundException("Role not found")
+                        new ResourceNotFoundException("PredefinedRole not found")
                 )
         );
 

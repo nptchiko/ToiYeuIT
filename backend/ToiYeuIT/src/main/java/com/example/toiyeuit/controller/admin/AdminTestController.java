@@ -2,11 +2,14 @@ package com.example.toiyeuit.controller.admin;
 
 
 import com.example.toiyeuit.dto.admin.AdminTestResponse;
-import com.example.toiyeuit.dto.admin.AdminUpdateTestRequest;
+import com.example.toiyeuit.dto.admin.TestCreationRequest;
+import com.example.toiyeuit.dto.admin.TestSetCreationRequest;
+import com.example.toiyeuit.dto.admin.UpdateTestRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.dto.response.TestResponse;
+import com.example.toiyeuit.dto.response.TestSetResponse;
 import com.example.toiyeuit.service.admin.AdminTestService;
-import jakarta.validation.Valid;
+import com.example.toiyeuit.service.test.TestCollectionService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,6 +27,7 @@ import java.util.List;
 public class AdminTestController {
 
     AdminTestService adminTestService;
+    private final TestCollectionService testCollectionService;
 
     @GetMapping
     public ApiResponse<java.util.List<AdminTestResponse>> getAllTest(
@@ -39,14 +43,18 @@ public class AdminTestController {
                 .body(tests.getContent())
                 .build();
     }
-    @PostMapping
-    public ApiResponse<TestResponse> saveTest(){
-        return null;
+    @PostMapping("/test")
+    public ApiResponse<TestResponse> addTest(@RequestBody TestCreationRequest request){
+        return ApiResponse.<TestResponse>builder()
+                .code(200)
+                .message("Successfully")
+                .body(adminTestService.saveTest(request))
+                .build();
 
     }
 
-    @PutMapping
-    public ApiResponse<Void> updateTest(@RequestBody AdminUpdateTestRequest request){
+    @PutMapping("/test")
+    public ApiResponse<Void> updateTest(@RequestBody UpdateTestRequest request){
         adminTestService.updateTest(request);
 
         return ApiResponse.<Void>builder()
@@ -54,7 +62,7 @@ public class AdminTestController {
                 .message("Update done")
                 .build();
     }
-    @DeleteMapping
+    @DeleteMapping("/test/{id}")
     public ApiResponse<Void> deleteTest(@PathVariable("id") long id){
 
         adminTestService.deleteTest(id);
@@ -62,6 +70,22 @@ public class AdminTestController {
         return ApiResponse.<Void>builder()
                 .code(200)
                 .message("Update done")
+                .build();
+    }
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> deleteTestSet(@PathVariable("id") long id){
+        adminTestService.deleteTestSet(id);
+        return ApiResponse.<Void>builder()
+                .code(200)
+                .message("Delete test set okay!")
+                .build();
+    }
+    @PostMapping
+    public ApiResponse<TestSetResponse> addNewTestSet(@RequestBody TestSetCreationRequest request){
+        return ApiResponse.<TestSetResponse>builder()
+                .message("Add new test set okay!")
+                .code(200)
+                .body(adminTestService.saveTestSet(request))
                 .build();
     }
 }

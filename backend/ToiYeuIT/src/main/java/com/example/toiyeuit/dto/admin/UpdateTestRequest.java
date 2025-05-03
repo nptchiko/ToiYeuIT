@@ -12,8 +12,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AdminUpdateTestRequest {
+public class UpdateTestRequest {
     String status;
     int testId;
-    String title;
+    String name;
 }

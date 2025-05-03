@@ -24,11 +24,11 @@ public class TestResult {
     TestSubmission testSubmission;
 
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "question_id")
     Question question;
 
-    @Column(length = 30, nullable = false)
+    @Column(length = 150, nullable = false)
     String answer;
 
     int part;

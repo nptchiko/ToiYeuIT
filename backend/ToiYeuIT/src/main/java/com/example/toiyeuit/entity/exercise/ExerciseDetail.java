@@ -24,7 +24,7 @@ public class ExerciseDetail {
     @MapsId(value = "exercise_id")
     Exercise excerise;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "question_id")
     @MapsId(value = "question_id")
     Question question;

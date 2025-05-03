@@ -23,15 +23,8 @@ public interface QuestionMapper {
         var result = new LinkedList<String>();
 
         for (var option : options){
-            if (option.getDescription().matches("\\([ABCD]\\)")) {
-                result.add(option.getDescription());
-                continue;
-            }
-            result.add(String.format("(%s) %s",
-                    option.getId().getKey().toString(),
-                    option.getDescription()
-            ));
 
+                result.add(option.getDescription());
         }
 
         return result;

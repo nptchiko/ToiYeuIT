@@ -37,9 +37,6 @@ public class CourseController {
                 .build();
     }
 
-//    @GetMapping("/my-course")
- //   public ApiResponse<>
-
     @GetMapping("/{id}")
     public ResponseEntity<Course> getCourseById(@PathVariable Integer id) throws ResourceNotFoundException {
         Course course = courseService.findById(id);
@@ -76,4 +73,5 @@ public class CourseController {
         courseRepository.deleteById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
 }

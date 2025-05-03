@@ -2,6 +2,7 @@ package com.example.toiyeuit.service.test;
 
 import com.example.toiyeuit.dto.response.QuestionResponse;
 import com.example.toiyeuit.dto.response.TestDetailsResponse;
+import com.example.toiyeuit.dto.response.TestResponse;
 import com.example.toiyeuit.entity.test.Test;
 import com.example.toiyeuit.exception.AppException;
 import com.example.toiyeuit.exception.ErrorCode;
@@ -9,6 +10,8 @@ import com.example.toiyeuit.mapper.QuestionMapper;
 import com.example.toiyeuit.repository.QuestionClusterRepository;
 import com.example.toiyeuit.repository.QuestionRepository;
 import com.example.toiyeuit.repository.TestRepository;
+import com.example.toiyeuit.service.UserService;
+import com.example.toiyeuit.utils.SecurityUtils;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,6 +30,11 @@ public class TestService {
     QuestionClusterRepository questionClusterRepository;
     QuestionRepository questionRepository;
     QuestionMapper questionMapper;
+    private final UserService userService;
+
+    public int numberOfTestInSet(long testSetId){
+        return (int)testRepository.countAllByTestCollection_Id((int)testSetId);
+    }
 
     public Test getByID(Long id){
         return testRepository.findById(id).orElseThrow(
@@ -95,4 +103,14 @@ public class TestService {
         }
         return context;
     }
+    public List<TestResponse> retrieveInputTest(){
+        var user = userService.getUserByEmail(
+                SecurityUtils.getCurrentUserLogin()
+        //        "mikudeptrai@gmail.com"
+        );
+        return testRepository.retrieveInputTest(user.getId());
+
+    }
+
+
 }

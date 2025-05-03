@@ -19,7 +19,6 @@ spring:
     open-in-view: true
     properties:
       hibernate:
-        format_sql: true
 
   mail:
     host: smtp.gmail.com
@@ -70,4 +69,4 @@ payment:
     command: pay
     orderType: other
 #    change this to frontend port later
-    returnUrl: http://localhost:8081/api/payment/vn-pay-callback
+    returnUrl: http://localhost:3001/vnpay

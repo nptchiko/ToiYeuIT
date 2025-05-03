@@ -33,8 +33,9 @@ public class ChangePasswordService {
         String email = request.getEmail();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        log.info("New password: " + request.getNewPassword());
-        log.info("Confirm password: " + request.getConfirmPassword());
+        if (request.getOldPassword() != null
+                && !passwordEncoder.matches(request.getOldPassword(), user.getPassword()))
+            throw new RuntimeException("Old password was wrong");
         if ( passwordEncoder.matches(request.getNewPassword(), user.getPassword()))
             throw new AppException(ErrorCode.PASS_EXISTED);
 

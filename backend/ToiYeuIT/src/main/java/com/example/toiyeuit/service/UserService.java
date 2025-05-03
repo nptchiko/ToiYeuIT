@@ -7,6 +7,7 @@ import com.example.toiyeuit.dto.response.UserResponse;
 import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.entity.Role;
 import com.example.toiyeuit.entity.User;
+import com.example.toiyeuit.enums.PredefinedRole;
 import com.example.toiyeuit.exception.AppException;
 import com.example.toiyeuit.exception.ErrorCode;
 import com.example.toiyeuit.exception.UserAlreadyExistsException;
@@ -18,6 +19,10 @@ import com.example.toiyeuit.repository.TestRepository;
 import com.example.toiyeuit.repository.UserRepository;
 import com.example.toiyeuit.service.test.TestService;
 import com.example.toiyeuit.utils.SecurityUtils;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,32 +34,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@AllArgsConstructor
 @Service
+@Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private UserMapper userMapper;
-
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    @Autowired
-    private CourseRepository courseRepository;
-    @Autowired
-    private TestService testService;
-    @Autowired
-    private TestRepository testRepository;
-
-    public UserService(UserRepository userRepository,
-                       RoleRepository roleRepository,
-                       PasswordEncoder passwordEncoder){
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-
-    }
+    UserRepository userRepository;
+    RoleService roleService;
+    PasswordEncoder passwordEncoder;
+    UserMapper userMapper;
+    TestRepository testRepository;
+    CourseRepository courseRepository;
 
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
@@ -82,6 +73,21 @@ public class UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
+    public void updateRole(User _user, PredefinedRole _role){
+        var user = _user;
+        if (user == null)
+            user = getUserByEmail(
+                    SecurityUtils.getCurrentUserLogin()
+            );
+
+        var role = roleService.findRoleByName(_role);
+
+        if (user.getRole().getName().equalsIgnoreCase(role.getName()))
+            return;
+        user.setRole(role);
+        userRepository.save(user);
+    }
+
     public UserResponse getUserResponseByEmail(String email){
         return userMapper.toUserResponse(getUserByEmail(email));
     }
@@ -103,17 +109,16 @@ public class UserService {
 //            throw new AppException(ErrorCode.USER_PHONE_EXISTED);
 
         // get role from roleName, default to USER if not found
-      //  Role userRole = roleRepository.findByName(userCreationRequest.getRoleName())
+      //  PredefinedRole userRole = roleRepository.findByName(userCreationRequest.getRoleName())
         //        .orElseGet(() -> roleRepository.findByName("USER")
         //                .orElseThrow(() -> new ResourceNotFoundException("Default role not found")));
-        Role userRole = roleRepository.findByName("USER")
-                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+        Role userRole = roleService.findRoleByName(PredefinedRole.USER);
 
         User user = userMapper.toUser(userCreationRequest);
         user.setRole(userRole);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         //user.setEmail(user.getEmail().toLowerCase());
-        logger.info("[service.UserService]: email: " + user.getEmail());
+        log.info("[service.UserService]: email: " + user.getEmail());
 
         return userMapper.toUserResponse(userRepository.save(user));
     }

@@ -25,7 +25,7 @@ public class TestDetail {
     @MapsId(value = "test_id")
     Test test;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "question_id")
     @MapsId(value = "ques_id")
     Question question;
