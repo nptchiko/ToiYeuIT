@@ -1,38 +1,48 @@
 package com.example.toiyeuit.service;
 
 import com.example.toiyeuit.dto.request.FlashcardDeckRequestDTO;
-import com.example.toiyeuit.entity.Flashcard;
+import com.example.toiyeuit.dto.response.FlashcardDeckResponse;
 import com.example.toiyeuit.entity.FlashcardDeck;
 import com.example.toiyeuit.exception.FlashcardServiceLogicException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
+import com.example.toiyeuit.mapper.FlashcardDeckMapper;
 import com.example.toiyeuit.repository.FlashcardDeckRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FlashcardDeckService {
 
     private final FlashcardDeckRepository flashcardDeckRepository;
+    private final FlashcardDeckMapper flashcardDeckMapper;
 
-    public FlashcardDeckService(FlashcardDeckRepository flashcardDeckRepository) {
+    public FlashcardDeckService(FlashcardDeckRepository flashcardDeckRepository, FlashcardDeckMapper flashcardDeckMapper) {
         this.flashcardDeckRepository = flashcardDeckRepository;
+        this.flashcardDeckMapper = flashcardDeckMapper;
     }
 
-    public List<FlashcardDeck> findAll() {
-        return flashcardDeckRepository.findAll();
+    public List<FlashcardDeckResponse> findAll() {
+        return flashcardDeckRepository.findAll()
+                .stream()
+                .map(flashcardDeckMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
-    public FlashcardDeck findById(Integer id) throws ResourceNotFoundException {
-        return flashcardDeckRepository.findById(id).orElseThrow(
+
+    public FlashcardDeckResponse findById(Integer id) throws ResourceNotFoundException {
+        FlashcardDeck deck = flashcardDeckRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Could not find flashcard with id " + id)
         );
+
+        return flashcardDeckMapper.toResponse(deck);
     }
 
     @Transactional
-    public FlashcardDeck createNewDeck(FlashcardDeckRequestDTO flashcardDeck) {
+    public FlashcardDeckResponse createNewDeck(FlashcardDeckRequestDTO flashcardDeck) {
         if (flashcardDeck.getName() == null || flashcardDeck.getName().isEmpty()) {
             throw new FlashcardServiceLogicException("Flashcard deck name cannot be empty");
         }
@@ -46,7 +56,7 @@ public class FlashcardDeckService {
                 .build();
 
         try {
-            return flashcardDeckRepository.save(deck);
+            return flashcardDeckMapper.toResponse(flashcardDeckRepository.save(deck));
         } catch (Exception e) {
             throw new FlashcardServiceLogicException(e.getMessage());
         }
@@ -59,7 +69,7 @@ public class FlashcardDeckService {
     }
 
     @Transactional
-    public FlashcardDeck updateDeck(Integer deckId, FlashcardDeckRequestDTO flashcardDeckRequestDTO)
+    public FlashcardDeckResponse updateDeck(Integer deckId, FlashcardDeckRequestDTO flashcardDeckRequestDTO)
             throws ResourceNotFoundException, FlashcardServiceLogicException {
 
         if (flashcardDeckRequestDTO.getName() == null || flashcardDeckRequestDTO.getName().isEmpty()) {
@@ -74,7 +84,7 @@ public class FlashcardDeckService {
         deck.setDescription(flashcardDeckRequestDTO.getDescription());
 
         try {
-            return flashcardDeckRepository.save(deck);
+            return flashcardDeckMapper.toResponse(flashcardDeckRepository.save(deck));
         } catch (Exception e) {
             throw new FlashcardServiceLogicException(e.getMessage());
         }

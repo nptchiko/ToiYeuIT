@@ -1,7 +1,7 @@
 package com.example.toiyeuit.controller;
 
 import com.example.toiyeuit.dto.request.FlashcardRequestDTO;
-import com.example.toiyeuit.entity.Flashcard;
+import com.example.toiyeuit.dto.response.FlashcardResponse;
 import com.example.toiyeuit.exception.FlashcardServiceLogicException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
 import com.example.toiyeuit.service.FlashcardService;
@@ -22,19 +22,19 @@ public class FlashcardController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Flashcard>> getFlashcardsByDeckId(@PathVariable Integer deckId){
+    public ResponseEntity<List<FlashcardResponse>> getFlashcardsByDeckId(@PathVariable Integer deckId){
         return new ResponseEntity<>(flashcardService.findAllByDeckId(deckId), HttpStatus.OK);
     }
 
     @GetMapping("/{flashcardId}")
-    public ResponseEntity<Flashcard> getFlashcardById(@PathVariable Integer deckId, @PathVariable Long flashcardId)
+    public ResponseEntity<FlashcardResponse> getFlashcardById(@PathVariable Integer deckId, @PathVariable Long flashcardId)
         throws ResourceNotFoundException, FlashcardServiceLogicException {
 
         return new ResponseEntity<>(flashcardService.findById(deckId, flashcardId), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Flashcard> createFlashcard(@PathVariable Integer deckId,
+    public ResponseEntity<FlashcardResponse> createFlashcard(@PathVariable Integer deckId,
                                                      @RequestBody FlashcardRequestDTO flashcard)
             throws ResourceNotFoundException, FlashcardServiceLogicException {
 
@@ -42,7 +42,7 @@ public class FlashcardController {
     }
 
     @PutMapping("/{flashcardId}")
-    public ResponseEntity<Flashcard> updateFlashcard(@PathVariable Integer deckId, @PathVariable Long flashcardId,
+    public ResponseEntity<FlashcardResponse> updateFlashcard(@PathVariable Integer deckId, @PathVariable Long flashcardId,
                                                      @RequestBody FlashcardRequestDTO flashcard)
             throws ResourceNotFoundException, FlashcardServiceLogicException {
 
