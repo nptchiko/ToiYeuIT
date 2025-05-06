@@ -62,12 +62,10 @@ public class FlashcardDeckService {
         }
 
         FlashcardDeck deck = FlashcardDeck.builder()
-                // TODO: use Spring Security context to get username@deckName since decks may have the same name
                 .name(flashcardDeck.getName())
                 .description(flashcardDeck.getDescription())
                 .created_at(LocalDateTime.now())
                 .creator(userRepository.findByEmail(SecurityUtils.getCurrentUserLogin()).orElse(null))
-                // TODO: use spring security context to get user for creator attribute here too.
                 .build();
 
         try {
@@ -80,7 +78,10 @@ public class FlashcardDeckService {
 
     @Transactional
     public void deleteDeck(Integer deckId) {
-        flashcardDeckRepository.deleteById(deckId);
+        FlashcardDeck deck = flashcardDeckRepository.findById(deckId)
+                .orElseThrow(() -> new ResourceNotFoundException("Deck with id " + deckId + " doesn't exist"));
+
+        flashcardDeckRepository.delete(deck);
     }
 
     @Transactional

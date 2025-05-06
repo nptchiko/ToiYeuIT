@@ -149,6 +149,7 @@ public class FlashcardService {
 
         flashcard.setFrontContent(flashcardRequestDTO.getFrontContent());
         flashcard.setBackContent(flashcardRequestDTO.getBackContent());
+        flashcard.setIsFavorite(flashcardRequestDTO.getIsFavorite());
 
         try {
             return flashcardMapper.toResponse(flashcardRepository.save(flashcard));

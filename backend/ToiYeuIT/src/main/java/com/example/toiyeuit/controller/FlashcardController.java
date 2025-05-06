@@ -1,6 +1,7 @@
 package com.example.toiyeuit.controller;
 
 import com.example.toiyeuit.dto.request.FlashcardRequestDTO;
+import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.dto.response.FlashcardResponse;
 import com.example.toiyeuit.exception.FlashcardServiceLogicException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
@@ -22,38 +23,61 @@ public class FlashcardController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FlashcardResponse>> getFlashcardsByDeckId(@PathVariable Integer deckId){
-        return new ResponseEntity<>(flashcardService.findAllByDeckId(deckId), HttpStatus.OK);
+    public ApiResponse<List<FlashcardResponse>> getFlashcardsByDeckId(@PathVariable Integer deckId){
+
+        return ApiResponse.<List<FlashcardResponse>>builder()
+                .code(HttpStatus.OK.value())
+                .body(flashcardService.findAllByDeckId(deckId))
+                .message("Retrieved all cards of deck " + deckId + " successfully")
+                .build();
     }
 
     @GetMapping("/{flashcardId}")
-    public ResponseEntity<FlashcardResponse> getFlashcardById(@PathVariable Integer deckId, @PathVariable Long flashcardId)
+    public ApiResponse<FlashcardResponse> getFlashcardById(@PathVariable Integer deckId, @PathVariable Long flashcardId)
         throws ResourceNotFoundException, FlashcardServiceLogicException {
 
-        return new ResponseEntity<>(flashcardService.findById(deckId, flashcardId), HttpStatus.OK);
+        return ApiResponse.<FlashcardResponse>builder()
+                .code(HttpStatus.OK.value())
+                .body(flashcardService.findById(deckId, flashcardId))
+                .message("Retrieved card successfully")
+                .build();
+//        return new ResponseEntity<>(flashcardService.findById(deckId, flashcardId), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<FlashcardResponse> createFlashcard(@PathVariable Integer deckId,
+    public ApiResponse<FlashcardResponse> createFlashcard(@PathVariable Integer deckId,
                                                      @RequestBody FlashcardRequestDTO flashcard)
             throws ResourceNotFoundException, FlashcardServiceLogicException {
 
-        return new ResponseEntity<>(flashcardService.addNewFlashcard(deckId, flashcard), HttpStatus.CREATED);
+        return ApiResponse.<FlashcardResponse>builder()
+                .code(HttpStatus.CREATED.value())
+                .body(flashcardService.addNewFlashcard(deckId, flashcard))
+                .message("Created a new flashcard")
+                .build();
+//        return new ResponseEntity<>(flashcardService.addNewFlashcard(deckId, flashcard), HttpStatus.CREATED);
     }
 
     @PutMapping("/{flashcardId}")
-    public ResponseEntity<FlashcardResponse> updateFlashcard(@PathVariable Integer deckId, @PathVariable Long flashcardId,
-                                                     @RequestBody FlashcardRequestDTO flashcard)
+    public ApiResponse<FlashcardResponse> updateFlashcard(@PathVariable Integer deckId, @PathVariable Long flashcardId,
+                                                          @RequestBody FlashcardRequestDTO flashcard)
             throws ResourceNotFoundException, FlashcardServiceLogicException {
-
-        return new ResponseEntity<>(flashcardService.updateFlashcard(deckId, flashcardId, flashcard), HttpStatus.OK);
+        return ApiResponse.<FlashcardResponse>builder()
+                .code(HttpStatus.OK.value())
+                .body(flashcardService.updateFlashcard(deckId, flashcardId, flashcard))
+                .message("Success")
+                .build();
     }
 
     @DeleteMapping("/{flashcardId}")
-    public ResponseEntity<?> deleteFlashcard(@PathVariable Integer deckId, @PathVariable Long flashcardId) throws
+    public ApiResponse<String> deleteFlashcard(@PathVariable Integer deckId, @PathVariable Long flashcardId) throws
             ResourceNotFoundException, FlashcardServiceLogicException {
 
         flashcardService.deleteFlashcard(deckId, flashcardId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+       return ApiResponse.<String>builder()
+               .code(HttpStatus.NO_CONTENT.value())
+               .body(null)
+               .message("No problem calling delete endpoint")
+               .build();
     }
 }

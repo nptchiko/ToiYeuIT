@@ -165,6 +165,18 @@ export default function Flashcard() {
     );
     if (cardInDeck) {
       cardInDeck.starred = !cardInDeck.starred;
+
+      const newCard = {
+        frontContent: cardInDeck.english,
+        backContent: cardInDeck.vietnamese,
+        isFavorite: cardInDeck.starred,
+      };
+
+      flashcardService.updateFlashcard(
+        decks[deckIndex].id,
+        decks[deckIndex].cards[cardIndex].id,
+        newCard,
+      );
       setDecks(newDecks);
     }
   };
@@ -172,18 +184,21 @@ export default function Flashcard() {
   const addNewDeck = () => {
     if (newDeckName.trim()) {
       setDecks([...decks, { name: newDeckName, cards: [] }]);
+      const newDeckObject = { name: newDeckName };
+      flashcardService.createNewDeck(newDeckObject);
       setNewDeckName("");
       setShowAddDeck(false);
     }
   };
 
-  const deleteDeck = () => {
+  const deleteDeck = async () => {
     if (decks.length <= 1) {
       alert("Không thể xóa bộ thẻ duy nhất!");
       return;
     }
     const newDecks = [...decks];
     newDecks.splice(deckIndex, 1);
+    await flashcardService.deleteDeckById(decks[deckIndex].id);
     setDecks(newDecks);
     setDeckIndex(0);
     setCardIndex(0);
@@ -198,6 +213,16 @@ export default function Flashcard() {
         english: newCardEng,
         starred: false,
       });
+      const newCardObject = {
+        frontContent: newCardEng,
+        backContent: newCardVie,
+        isFavorite: false,
+      };
+
+      flashcardService
+        .createNewFlashcard(decks[deckIndex].id, newCardObject)
+        .then((response) => console.log(response));
+
       setDecks(newDecks);
       setNewCardVie("");
       setNewCardEng("");
@@ -223,6 +248,17 @@ export default function Flashcard() {
       if (cardInDeck) {
         cardInDeck.vietnamese = newCardVie;
         cardInDeck.english = newCardEng;
+        const newCard = {
+          frontContent: cardInDeck.english,
+          backContent: cardInDeck.vietnamese,
+          isFavorite: cardInDeck.starred,
+        };
+
+        flashcardService.updateFlashcard(
+          decks[deckIndex].id,
+          decks[deckIndex].cards[cardIndex].id,
+          newCard,
+        );
         setDecks(newDecks);
         setNewCardVie("");
         setNewCardEng("");
@@ -233,6 +269,7 @@ export default function Flashcard() {
 
   const deleteCard = () => {
     if (!currentCard) return;
+
     const newDecks = [...decks];
     const cardIndexInDeck = newDecks[deckIndex].cards.findIndex(
       (c) =>
@@ -241,6 +278,9 @@ export default function Flashcard() {
     );
     if (cardIndexInDeck !== -1) {
       newDecks[deckIndex].cards.splice(cardIndexInDeck, 1);
+
+      flashcardService.deleteFlashcardById(decks[deckIndex].id, currentCard.id);
+
       setDecks(newDecks);
       if (cardIndex >= filteredCards.length - 1) {
         setCardIndex(Math.max(0, filteredCards.length - 2));
