@@ -1,19 +1,23 @@
 package com.example.toiyeuit.service;
 
 import com.example.toiyeuit.dto.request.FlashcardRequestDTO;
+import com.example.toiyeuit.dto.response.FlashcardResponse;
 import com.example.toiyeuit.entity.Flashcard;
 import com.example.toiyeuit.entity.FlashcardDeck;
 import com.example.toiyeuit.entity.User;
 import com.example.toiyeuit.exception.FlashcardServiceLogicException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
+import com.example.toiyeuit.mapper.FlashcardMapper;
 import com.example.toiyeuit.repository.FlashcardDeckRepository;
 import com.example.toiyeuit.repository.FlashcardRepository;
 import com.example.toiyeuit.repository.UserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FlashcardService {
@@ -21,16 +25,20 @@ public class FlashcardService {
     private final FlashcardRepository flashcardRepository;
     private final FlashcardDeckRepository flashcardDeckRepository;
     private final UserRepository userRepository;
+    private final FlashcardMapper flashcardMapper;
 
     public FlashcardService(FlashcardRepository flashcardRepository,
                             FlashcardDeckRepository flashcardDeckRepository,
-                            UserRepository userRepository) {
+                            UserRepository userRepository,
+                            FlashcardMapper flashcardMapper) {
         this.flashcardRepository = flashcardRepository;
         this.flashcardDeckRepository = flashcardDeckRepository;
         this.userRepository = userRepository;
+        this.flashcardMapper = flashcardMapper;
     }
 
     // TODO: implement UserFlashcardService to find flashcards by userId (move this code along)
+    // Deprecated
     public List<List<Flashcard>> findAllByUserId(Long userId) throws UsernameNotFoundException,
             ResourceNotFoundException,
             FlashcardServiceLogicException {
@@ -57,27 +65,27 @@ public class FlashcardService {
         }
     }
 
-    public Flashcard findById(Integer deckId, Long id) throws ResourceNotFoundException, FlashcardServiceLogicException {
+    public FlashcardResponse findById(Integer deckId, Long id) throws ResourceNotFoundException, FlashcardServiceLogicException {
         Flashcard flashcard = flashcardRepository.findById(id).orElseThrow(()
                 -> new ResourceNotFoundException("Flashcard with id " + id + " doesn't exist"));
 
         if (flashcard.getDeck().getId().equals(deckId)) {
-            return flashcard;
+            return flashcardMapper.toResponse(flashcard);
         } else {
             throw new FlashcardServiceLogicException("Flashcard with id " + id + " is not in the deck");
         }
     }
 
-    public List<Flashcard> findAllByDeckId(Integer deckId) {
+    public List<FlashcardResponse> findAllByDeckId(Integer deckId) {
         FlashcardDeck deck = flashcardDeckRepository.findById(deckId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cannot find this deck"));
 
-        return flashcardRepository.findAllByDeck(deck);
+        return flashcardRepository.findAllByDeck(deck).stream().map(flashcardMapper::toResponse).collect(Collectors.toList());
     }
 
 
     @Transactional
-    public Flashcard addNewFlashcard(Integer deckId, FlashcardRequestDTO flashcardRequestDTO) {
+    public FlashcardResponse addNewFlashcard(Integer deckId, FlashcardRequestDTO flashcardRequestDTO) {
         FlashcardDeck deck = flashcardDeckRepository.findById(deckId)
                 .orElseThrow(() -> new ResourceNotFoundException("Deck with id " +
                         deckId + " doesn't exist"));
@@ -98,7 +106,7 @@ public class FlashcardService {
                 .build();
 
         try {
-           return flashcardRepository.save(flashcard);
+            return flashcardMapper.toResponse(flashcardRepository.save(flashcard));
         } catch (Exception e) {
             throw new FlashcardServiceLogicException(e.getMessage());
         }
@@ -120,8 +128,8 @@ public class FlashcardService {
     }
 
     @Transactional
-    public Flashcard updateFlashcard(Integer deckId, Long id, FlashcardRequestDTO flashcardRequestDTO)
-        throws ResourceNotFoundException, FlashcardServiceLogicException {
+    public FlashcardResponse updateFlashcard(Integer deckId, Long id, FlashcardRequestDTO flashcardRequestDTO)
+            throws ResourceNotFoundException, FlashcardServiceLogicException {
 
         Flashcard flashcard = flashcardRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Flashcard with id " + id + " doesn't exist")
@@ -141,9 +149,10 @@ public class FlashcardService {
 
         flashcard.setFrontContent(flashcardRequestDTO.getFrontContent());
         flashcard.setBackContent(flashcardRequestDTO.getBackContent());
+        flashcard.setIsFavorite(flashcardRequestDTO.getIsFavorite());
 
         try {
-            return flashcardRepository.save(flashcard);
+            return flashcardMapper.toResponse(flashcardRepository.save(flashcard));
         } catch (Exception e) {
             throw new FlashcardServiceLogicException(e.getMessage());
         }

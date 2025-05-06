@@ -11,5 +11,5 @@ import java.util.List;
 @Repository
 public interface FlashcardDeckRepository extends JpaRepository<FlashcardDeck, Integer> {
 
-    List<FlashcardDeck> findAllByCreator(User user);
+List<FlashcardDeck> findAllByCreator(User user);
 }

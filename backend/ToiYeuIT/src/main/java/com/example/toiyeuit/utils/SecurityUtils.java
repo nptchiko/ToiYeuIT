@@ -23,7 +23,7 @@ public class SecurityUtils {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         else if (authentication.getPrincipal() instanceof UserDetails userDetails){
             return userDetails.getUsername();
-        } else if (authentication.getPrincipal() instanceof  String s){
+        } else if (authentication.getPrincipal() instanceof String s){
             return s;
         }
         throw new AppException(ErrorCode.UNAUTHENTICATED);
