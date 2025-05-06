@@ -4,6 +4,7 @@ import com.example.toiyeuit.dto.request.FlashcardDeckRequestDTO;
 import com.example.toiyeuit.dto.response.FlashcardDeckResponse;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
 import com.example.toiyeuit.service.FlashcardDeckService;
+import com.example.toiyeuit.utils.SecurityUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +26,10 @@ public class FlashcardDeckController {
         return new ResponseEntity<>(flashcardDeckService.createNewDeck(flashcardDeckRequestDTO), HttpStatus.CREATED);
     }
 
+
     @GetMapping
-    public ResponseEntity<List<FlashcardDeckResponse>> findAllDecks() {
-        return new ResponseEntity<>(flashcardDeckService.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<FlashcardDeckResponse>> findAllDecksOfCurrentUser() {
+        return new ResponseEntity<>(flashcardDeckService.findAllByUserEmail(), HttpStatus.OK);
     }
 
     @GetMapping("/{deckId}")
