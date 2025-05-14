@@ -1,6 +1,7 @@
 package com.example.toiyeuit.controller.admin;
 
 
+import com.example.toiyeuit.dto.admin.UpdateCourseRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.service.admin.AdminCourseService;
@@ -33,6 +34,16 @@ public class AdminCourseController {
                 .code(200)
                 .message("All available course")
                 .body(course.getContent())
+                .build();
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<Course> updateCourse(@PathVariable("id") int id, @RequestBody UpdateCourseRequest request){
+        var body = courseService.updateCourse(id, request);
+        return ApiResponse.<Course>builder()
+                .code(200)
+                .message("Update course okay!")
+                .body(body)
                 .build();
     }
 

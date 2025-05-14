@@ -1,4 +1,4 @@
-package com.example.toiyeuit.repository;
+package com.example.toiyeuit.repository.test;
 
 import com.example.toiyeuit.entity.test.TestCollection;
 import org.springframework.data.jpa.repository.JpaRepository;

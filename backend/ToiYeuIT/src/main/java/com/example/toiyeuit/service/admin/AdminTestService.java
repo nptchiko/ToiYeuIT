@@ -10,8 +10,7 @@ import com.example.toiyeuit.dto.response.TestSetResponse;
 import com.example.toiyeuit.entity.test.Test;
 import com.example.toiyeuit.entity.test.TestCollection;
 import com.example.toiyeuit.mapper.TestSetMapper;
-import com.example.toiyeuit.repository.SkillRepository;
-import com.example.toiyeuit.repository.TestCollectionRepository;
+import com.example.toiyeuit.repository.test.TestCollectionRepository;
 import com.example.toiyeuit.repository.TestDetailRepository;
 import com.example.toiyeuit.repository.TestRepository;
 import com.example.toiyeuit.service.SkillService;
@@ -55,7 +54,7 @@ public class AdminTestService {
        return testSetMapper.toTestResponse(testRepository.save(
                 Test.builder()
                         .enabled(true)
-                        .index(testService.numberOfTestInSet(request.getTestSetId()))
+                        .index(testService.numberOfTestInSet(request.getTestSetId())+1)
                         .title(request.getTitle())
                         .testCollection(testCollectionService.getById((int) request.getTestSetId()))
                         .build()

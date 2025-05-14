@@ -1,7 +1,7 @@
 package com.example.toiyeuit.entity.course;
 
+import com.example.toiyeuit.enums.CourseLevel;
 import com.example.toiyeuit.enums.CourseType;
-import com.example.toiyeuit.enums.Level;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.experimental.FieldDefaults;
@@ -28,14 +28,14 @@ public class Course {
     private String description;
 
     @Enumerated(value = EnumType.STRING)
-    private Level level = Level.BASIC;
+    private CourseLevel level;
 
     @Column
     private Double price;
 
     private Boolean enabled;
 
-    private Integer duration;
+    private int duration;
 
     @Column(name = "tag")
     private String tag;
