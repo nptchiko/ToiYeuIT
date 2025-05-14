@@ -7,7 +7,7 @@ import com.example.toiyeuit.exception.AppException;
 import com.example.toiyeuit.exception.ErrorCode;
 import com.example.toiyeuit.mapper.TestSetMapper;
 import com.example.toiyeuit.repository.SkillRepository;
-import com.example.toiyeuit.repository.TestCollectionRepository;
+import com.example.toiyeuit.repository.test.TestCollectionRepository;
 import com.example.toiyeuit.repository.TestSubmissionRepository;
 import com.example.toiyeuit.service.UserService;
 import com.example.toiyeuit.utils.SecurityUtils;
