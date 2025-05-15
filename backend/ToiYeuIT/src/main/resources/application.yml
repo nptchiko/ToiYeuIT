@@ -35,6 +35,16 @@ spring:
      #     connectiontimeout: 5000
           timeout: 3000
       #    writetimeout: 5000
+  security:
+    oauth2:
+      client:
+        registration:
+              google:
+                client-id: 621389070737-fg51k2vn7mhnu3v9frfbhbbuk2iv242v.apps.googleusercontent.com
+                client-secret: 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
+                scope:
+                  - email
+                  - profile
 
 server:
   port: 8081

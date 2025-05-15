@@ -1,26 +1,25 @@
 package com.example.toiyeuit.service;
 
 import com.example.toiyeuit.entity.course.Course;
-import com.example.toiyeuit.exception.AlreadyExistsException;
-import com.example.toiyeuit.exception.CourseServiceLogicException;
-import com.example.toiyeuit.exception.ResourceNotFoundException;
+import com.example.toiyeuit.exception.*;
+import com.example.toiyeuit.mapper.CourseMapper;
 import com.example.toiyeuit.repository.CourseRepository;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CourseService {
 
     private final CourseRepository courseRepository;
     private final Logger logger = LoggerFactory.getLogger(CourseService.class);
+    private final CourseMapper courseMapper;
 
-    public CourseService(CourseRepository courseRepository) {
+    public CourseService(CourseRepository courseRepository, CourseMapper courseMapper) {
         this.courseRepository = courseRepository;
+        this.courseMapper = courseMapper;
     }
 
     public List<Course> findAll() {
@@ -43,33 +42,22 @@ public class CourseService {
         );
     }
 
-    @Transactional
-    public Course create(Course course) throws AlreadyExistsException,
-            CourseServiceLogicException {
-        if (courseRepository.existsById(course.getId())) {
-            throw new AlreadyExistsException("Course already exists with id " + course.getId());
-        }
+    public Course addCourse(Course course){
+        assert course.getTitle() != null;
 
-        try {
-            return courseRepository.save(course);
-        } catch (Exception e) {
-            logger.error("Failed to create course " + course.getTitle());
-            throw new CourseServiceLogicException("Failed to create course " + course.getTitle());
-        }
-    }
+        if (existByTiltle(course.getTitle()))
+            throw new AppException(ErrorCode.COURSE_NOT_FOUND);
 
-    @Transactional
-    public Course update(Course course) throws ResourceNotFoundException {
-        Optional<Course> courseOptional = courseRepository.findById(course.getId());
-        if (!courseOptional.isPresent()) {
-            throw new ResourceNotFoundException("Course not found with id " + course.getId());
-        }
         return courseRepository.save(course);
     }
 
-    public void delete(Integer id) {
+    public boolean existByTiltle(String title){
+        return courseRepository.findByTitle(title).isPresent();
+    }
+
+    public void delete(int id) {
         Course course = courseRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Course not found with id " + id));
+                new RuntimeException("Course not found with id " + id));
 
         courseRepository.deleteById(id);
     }

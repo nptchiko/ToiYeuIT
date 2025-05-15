@@ -2,7 +2,7 @@ package com.example.toiyeuit.controller.admin;
 
 
 import com.example.toiyeuit.dto.admin.AdminTestResponse;
-import com.example.toiyeuit.dto.admin.TestCreationRequest;
+import com.example.toiyeuit.dto.admin.test.TestCreationRequest;
 import com.example.toiyeuit.dto.admin.TestSetCreationRequest;
 import com.example.toiyeuit.dto.admin.UpdateTestRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;

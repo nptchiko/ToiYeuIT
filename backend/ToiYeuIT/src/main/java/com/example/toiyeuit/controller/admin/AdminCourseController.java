@@ -1,7 +1,7 @@
 package com.example.toiyeuit.controller.admin;
 
 
-import com.example.toiyeuit.dto.admin.UpdateCourseRequest;
+import com.example.toiyeuit.dto.admin.CrudCourseRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.service.admin.AdminCourseService;
@@ -36,9 +36,16 @@ public class AdminCourseController {
                 .body(course.getContent())
                 .build();
     }
-
+   @PostMapping
+    public ApiResponse<Course> addCourse(@RequestBody CrudCourseRequest request){
+        return ApiResponse.<Course>builder()
+                .code(200)
+                .body(courseService.saveCourse(request))
+                .message("Course created successfully")
+                .build();
+    }
     @PutMapping("/{id}")
-    public ApiResponse<Course> updateCourse(@PathVariable("id") int id, @RequestBody UpdateCourseRequest request){
+    public ApiResponse<Course> updateCourse(@PathVariable("id") int id, @RequestBody CrudCourseRequest request){
         var body = courseService.updateCourse(id, request);
         return ApiResponse.<Course>builder()
                 .code(200)
@@ -57,11 +64,20 @@ public class AdminCourseController {
     }
 
     @PatchMapping("/{id}/visibility")
-    public ApiResponse<?> toggleCourseVisibility(@PathVariable("id") int id, boolean isEnabled){
+    public ApiResponse<?> toggleCourseVisibility(@PathVariable("id") int id,@RequestParam("isEnabled") boolean isEnabled){
         courseService.toggleVisiable(id, isEnabled);
         return ApiResponse.builder()
                 .code(200)
                 .message("Toggle course okay!")
+                .build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> deleteCourse(@PathVariable("id") int id){
+        courseService.deleteCourse(id);
+        return ApiResponse.<Void>builder()
+                .code(200)
+                .message(String.format("Deleted course with id=%d", id))
                 .build();
     }
 
