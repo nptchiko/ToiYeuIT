@@ -1,88 +1,95 @@
 CREATE DATABASE IF NOT EXISTS ToiYeuIT;
 USE ToiYeuIT;
+
 CREATE TABLE `role` (
   `role_id` int PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(255)
 );
 
-CREATE TABLE `user` (
-  `user_id` bigint PRIMARY KEY AUTO_INCREMENT,
-  `username` varchar(255) UNIQUE NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `email` varchar(255) UNIQUE NOT NULL,
-  `gender` enum('f', 'm'),
-  `phone` varchar(255),
-  `role_id` int,
-  FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`)
+create table user
+(
+    user_id  bigint auto_increment
+        primary key,
+    username varchar(255)               not null,
+    password varchar(255)               not null,
+    email    varchar(255)               not null,
+    gender   varchar(32) default 'MALE' null,
+    phone    varchar(255)               null,
+    role_id  int                        null,
+    enabled  bit                        null,
+    constraint email
+        unique (email),
+    constraint user_ibfk_1
+        foreign key (role_id) references role (role_id)
 );
 
-CREATE TABLE `course` (
-  `course_id` int PRIMARY KEY AUTO_INCREMENT,
-  `title` varchar(255) NOT NULL,
-  `description` text NOT NULL ,
-  `level`       enum ('Cơ bản', 'Trung cấp', 'Nâng cao') not null,
-  `price` decimal(10,2) NOT NULL,
-  `enabled` boolean,
-  `duration` int,
-  'tag' varchar(50)
-);
+create index role_id
+    on user (role_id);
+
 
 CREATE TABLE `skill` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
   `name` varchar(255)
 );
 
+CREATE TABLE `course` (
+                          `course_id` int PRIMARY KEY AUTO_INCREMENT,
+                          `title` varchar(255) NOT NULL,
+                          `description` text NOT NULL ,
+                          `level`       enum ('BASIC', 'INTERMEDIATE', 'ADVANCED') not null,
+                          `price` decimal(10,2) NOT NULL,
+                          `enabled` boolean,
+                          `duration` int,
+                          `tag` varchar(50)
+);
 CREATE TABLE `lessons` (
-  `lesson_id` int PRIMARY KEY AUTO_INCREMENT,
-  `course_id` int,
-  `title` varchar(255),
-  `video_url` varchar(255),
-  `image_url` varchar(255),
-  `description` text,
-  `skill_id` int,
-  FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`),
-  FOREIGN KEY (`skill_id`) REFERENCES `skill` (`id`)
+                           `lesson_id` int PRIMARY KEY AUTO_INCREMENT,
+                           `course_id` int,
+                           `title` varchar(255),
+                           `video_url` varchar(255),
+                           `image_url` varchar(255),
+                           `description` text,
+                           `skill_id` int,
+                           FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`),
+                           FOREIGN KEY (`skill_id`) REFERENCES `skill` (`id`)
 );
 
+
+
+create table test_collection
+(
+    id          int auto_increment
+        primary key,
+    skill_id    int          null,
+    description varchar(255) null,
+    title       varchar(255) null,
+    constraint test_collection_ibfk_2
+        foreign key (skill_id) references skill (id)
+);
+
+create index skill_id
+    on test_collection (skill_id);
+
+create table test
+(
+    id                 int auto_increment
+        primary key,
+    test_collection_id int              not null,
+    `index`            int              not null,
+    title              varchar(255)     null,
+    enabled            bit default b'1' null,
+    constraint FK34np1jcju9km4vaswfl1oy9cp
+        foreign key (test_collection_id) references test_collection (id)
+);
 CREATE TABLE `exercise` (
-  `id` int AUTO_INCREMENT,
-  `lesson_id` int,
-  `instruction` varchar(255),
-  `content` text,
-  `media_url` varchar(255),
-  `type` varchar(255),
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`lesson_id`)
-);
-
-CREATE TABLE `exercise_detail` (
-                                   `ex_id` int,
-                                   `question_id` bigint,
-                                   `index` int NOT NULL,
-                                   PRIMARY KEY (`ex_id`, `question_id`),
-                                   FOREIGN KEY (`ex_id`) REFERENCES `exercise` (`id`),
-                                   FOREIGN KEY (`question_id`) REFERENCES `question` (`ques_id`)
-);
-
-CREATE TABLE `exercise_submission` (
-                                       `submission_id` bigint COMMENT 'tsid',
-                                       `ex_id` int,
-                                       `last_answered_by` bigint,
-                                       `last_answered_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-                                       `score` decimal,
-                                       PRIMARY KEY (`submission_id`),
-                                       FOREIGN KEY (`ex_id`) REFERENCES `exercise` (`id`),
-                                       FOREIGN KEY (`last_answered_by`) REFERENCES `user` (`user_id`)
-);
-
-CREATE TABLE `exercise_result` (
-                                   `id` bigint,
-                                   `ques_id` bigint,
-                                   `answer` varchar(255) NOT NULL,
-                                   `correct_ans` varchar(255) NOT NULL,
-                                   PRIMARY KEY (`id`, `ques_id`),
-                                   FOREIGN KEY (`id`) REFERENCES `exercise_submission` (`submission_id`),
-                                   FOREIGN KEY (`ques_id`) REFERENCES `question` (`ques_id`)
+                            `id` int AUTO_INCREMENT,
+                            `lesson_id` int,
+                            `instruction` varchar(255),
+                            `content` text,
+                            `media_url` varchar(255),
+                            `type` varchar(255),
+                            PRIMARY KEY (`id`),
+                            FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`lesson_id`)
 );
 create table question_cluster
 (
@@ -120,32 +127,57 @@ create table multichoice_detail
         foreign key (ques_id) references question (ques_id)
             on update cascade
 );
-
-create table test_collection
+create table exercise_detail
 (
-    id          int auto_increment
-        primary key,
-    skill_id    int          null,
-    description varchar(255) null,
-    title       varchar(255) null,
-    constraint test_collection_ibfk_2
-        foreign key (skill_id) references skill (id)
+    ex_id       int    not null,
+    question_id bigint not null,
+    `index`     int    not null,
+    primary key (ex_id, question_id),
+    constraint FK16w4ykpke2ttr3mej89qfgjim
+        foreign key (ex_id) references exercise (id)
+            on update cascade on delete cascade,
+    constraint exercise_detail___fk
+        foreign key (question_id) references question (ques_id)
+
+            on update cascade on delete cascade
 );
 
-create index skill_id
-    on test_collection (skill_id);
-
-create table test
+create table exercise_submission
 (
-    id                 int auto_increment
+    submission_id    bigint                              not null comment 'tsid'
         primary key,
-    test_collection_id int              not null,
-    `index`            int              not null,
-    title              varchar(255)     null,
-    enabled            bit default b'1' null,
-    constraint FK34np1jcju9km4vaswfl1oy9cp
-        foreign key (test_collection_id) references test_collection (id)
+    ex_id            int                                 null,
+    last_answered_by bigint                              null,
+    last_answered_at timestamp default CURRENT_TIMESTAMP null,
+    score            float                               null,
+    constraint exercise_submission_ibfk_1
+        foreign key (ex_id) references exercise (id),
+    constraint exercise_submission_ibfk_2
+        foreign key (last_answered_by) references user (user_id)
 );
+
+create index ex_id
+    on exercise_submission (ex_id);
+
+create index last_answered_by
+    on exercise_submission (last_answered_by);
+
+
+
+create table exercise_result
+(
+    id          bigint      not null,
+    ques_id     bigint      not null,
+    answer      varchar(30) not null,
+    correct_ans varchar(30) not null,
+    primary key (id, ques_id),
+    constraint exercise_result_ibfk_1
+        foreign key (id) references exercise_submission (submission_id),
+    constraint exercise_result_ibfk_2
+        foreign key (ques_id) references question (ques_id)
+            on update cascade on delete cascade
+);
+
 
 create table test_detail
 (
@@ -214,17 +246,17 @@ CREATE TABLE `flashcards` (
   FOREIGN KEY (`deck_id`) REFERENCES `flashcard_decks` (`deck_id`)
 );
 
-CREATE TABLE `enrollment` (
-  `user_id` bigint,
-  `course_id` int,
-  `status` enum('COMPLETED', 'PENDING', 'EXPIRED'),
-  `enrolled_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  `expired_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`user_id`, `course_id`),
-  FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
-  FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`)
-);
-
+# CREATE TABLE `enrollment` (
+#   `user_id` bigint,
+#   `course_id` int,
+#   `status` enum('COMPLETED', 'PENDING', 'EXPIRED'),
+#   `enrolled_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+#   `expired_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+#   PRIMARY KEY (`user_id`, `course_id`),
+#   FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
+#   FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`)
+# );
+#
 CREATE TABLE `order_course` (
   `user_id` bigint,
   `course_id` int,

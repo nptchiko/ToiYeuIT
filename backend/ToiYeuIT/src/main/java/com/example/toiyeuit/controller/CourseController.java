@@ -61,13 +61,6 @@ public class CourseController {
         return new ResponseEntity<>(createdCourse, HttpStatus.CREATED);
     }
 
-    @PutMapping
-    public ResponseEntity<Course> updateCourse(@RequestBody Course course) throws CourseServiceLogicException,
-            ResourceNotFoundException {
-
-        return new ResponseEntity<>(courseService.update(course), HttpStatus.OK);
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteById(@PathVariable Integer id) throws ResourceNotFoundException {
         courseRepository.deleteById(id);

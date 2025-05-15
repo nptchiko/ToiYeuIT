@@ -44,6 +44,7 @@ public class Course {
     private CourseType type;
 
     // temporary
+    @Transient
     @JsonProperty("rating")
     double getRating(){
         return 5.0;

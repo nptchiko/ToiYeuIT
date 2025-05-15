@@ -1,6 +1,6 @@
 package com.example.toiyeuit.mapper;
 
-import com.example.toiyeuit.dto.admin.UpdateCourseRequest;
+import com.example.toiyeuit.dto.admin.CrudCourseRequest;
 import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.enums.CourseLevel;
 import org.mapstruct.Mapper;
@@ -11,8 +11,7 @@ import org.mapstruct.Named;
 public interface CourseMapper {
 
     @Mapping(target = "level", source = "level", qualifiedByName = "convertLevel")
-    @Mapping(target = "type", source = "type")
-    Course toCourse(UpdateCourseRequest request);
+    Course toCourse(CrudCourseRequest request);
 
     @Named("convertLevel")
     default CourseLevel convertLevel(String _level){
