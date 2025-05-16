@@ -1,0 +1,21 @@
+### Login to the app -- replace the token after Authorization: Beaer with the token receive by this request
+POST http://localhost:8081/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "mikudeptrai@gmail.com",
+    "password": "12345"
+}
+### Post a new course order
+POST http://localhost:8081/api/payment/save-order
+Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJtaWt1ZGVwdHJhaUBnbWFpbC5jb20iLCJzY29wZSI6ImNvbS5leGFtcGxlLnRvaXlldWl0LmVudGl0eS5Sb2xlQDZlODZmM2EzIiwiaXMtcmVmcmVzaC10b2tlbiI6ZmFsc2UsImlzcyI6Im1pa3VkZXB0cmFpIiwiZXhwIjoxNzQ3OTgyMjU1LCJpYXQiOjE3NDczNzc0NTUsImp0aSI6IjZkMDRhODJkLTAwN2UtNDA4OC1hOGIyLTUxY2UyN2UyOWFkZiJ9.n9Dqn1EjR9WN2lAbd9Vl4FB5_AdpqH_3gYLveydEwGY7N5cqKoNa8oYGf91Hzqr338ptMruaQvLNlzHlo-Anu9GJCvFVR0Zg0hxa6O2B0W5s8bSz5OPnVo4S1BDbX_9usdmjpcJ4IJZAhZdhqULoGo7vctrTpmoz4inzSL_LKWxe4_Tp6JHOl7bKBkNSnMqGkDqa0OUuWnmHB0kCoBR4d_8LxNe5yRs_oITGGxhxwGwoODUbz7f1jsOyGmm_xTaPVf4PrZyxTB-x0tR7F1iKQwMzLdZbM3efTDYbp-MnOYtEmhEHUQlS-OW-uxLAjTY9PREcN-oxoSJF0Fz9zTA7WA
+Content-Type: application/json
+
+{
+  "courseId": 7,
+  "paymentMethod": "VNPAY",
+  "status": "PAID"
+}
+### Get mapping to course orders history
+GET http://localhost:8081/api/payment/order-history
+Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJtaWt1ZGVwdHJhaUBnbWFpbC5jb20iLCJzY29wZSI6ImNvbS5leGFtcGxlLnRvaXlldWl0LmVudGl0eS5Sb2xlQDdjZDdiNTg0IiwiaXMtcmVmcmVzaC10b2tlbiI6ZmFsc2UsImlzcyI6Im1pa3VkZXB0cmFpIiwiZXhwIjoxNzQ3OTc5ODgxLCJpYXQiOjE3NDczNzUwODEsImp0aSI6ImU0MWQ4YTI5LTlmNDktNDkwNC05Mzk1LTVlMjVmYjMyZGI1NCJ9.jApySGlx3QZLJXSZHsxLHH4Te8fvRjWZDQtgIpnSx5A5p0OM9qP11r9eqBNzMkF9XYku68WyKkpkp2gtM3rF-MfJ6oSmc8MJyZDfwCwGOyoTTfxiFSTY7t6blgF2k53T5c-LD9VUbJJiBjlAUYq2g7lOPgq6llQa6V9WfkQxqstmQ4H3Brxg05ObOGrlWkg8I3KqDADurUmDtVa9fXF2YvZLwRHBftoteBSB2u65Vc0R5bGVAO-3S0XRkMBhRPLzvsEn2Qyh6GzYbZBCH7vFcZLdWPy3dYsZ2UoPLqs6iIQEmxGYmblRBPEJFyWwSKztKUJAd_heN5sCIc9Q-Z-KTQ
