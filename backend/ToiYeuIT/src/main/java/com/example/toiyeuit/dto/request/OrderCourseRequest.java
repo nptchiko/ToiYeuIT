@@ -9,7 +9,6 @@ import lombok.*;
 @ToString
 public class OrderCourseRequest {
    private Integer courseId;
-//   private Long userId;
    private String status;
    private String paymentMethod;
 }
