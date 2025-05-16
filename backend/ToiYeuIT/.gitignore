@@ -36,4 +36,4 @@ build/
 src/main/resources/local.env.properties
 .settings/
 
-local.env.properties
+**/local.env.properties

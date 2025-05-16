@@ -87,12 +87,6 @@ public class PaymentService {
         }
 
         return courseOrderMapper.toResponse(result);
-        /*return OrderCourseResponse.builder()
-                .courseId(orderCourseRequest.getCourseId())
-                .userId(user.getId())
-                .paymentMethod(orderCourseRequest.getPaymentMethod())
-                .status(orderCourseRequest.getStatus())
-                .build();*/
     }
 
     public List<OrderCourseResponse> getOrderHistoryOfCurrentUser() throws ResourceNotFoundException {
