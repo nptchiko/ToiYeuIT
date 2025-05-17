@@ -1,0 +1,25 @@
+GET http://localhost:8081/api/lessons/1
+
+Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJtaWt1ZGVwdHJhaUBnbWFpbC5jb20iLCJzY29wZSI6ImNvbS5leGFtcGxlLnRvaXlldWl0LmVudGl0eS5Sb2xlQDZlODZmM2EzIiwiaXMtcmVmcmVzaC10b2tlbiI6ZmFsc2UsImlzcyI6Im1pa3VkZXB0cmFpIiwiZXhwIjoxNzQ3OTgyMjU1LCJpYXQiOjE3NDczNzc0NTUsImp0aSI6IjZkMDRhODJkLTAwN2UtNDA4OC1hOGIyLTUxY2UyN2UyOWFkZiJ9.n9Dqn1EjR9WN2lAbd9Vl4FB5_AdpqH_3gYLveydEwGY7N5cqKoNa8oYGf91Hzqr338ptMruaQvLNlzHlo-Anu9GJCvFVR0Zg0hxa6O2B0W5s8bSz5OPnVo4S1BDbX_9usdmjpcJ4IJZAhZdhqULoGo7vctrTpmoz4inzSL_LKWxe4_Tp6JHOl7bKBkNSnMqGkDqa0OUuWnmHB0kCoBR4d_8LxNe5yRs_oITGGxhxwGwoODUbz7f1jsOyGmm_xTaPVf4PrZyxTB-x0tR7F1iKQwMzLdZbM3efTDYbp-MnOYtEmhEHUQlS-OW-uxLAjTY9PREcN-oxoSJF0Fz9zTA7WA
+
+###
+GET http://localhost:8081/api/lessons/1/2
+
+Content-Type: application/json,
+Origin: http://localhost:3001
+Authorization: Bearer eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJtaWt1ZGVwdHJhaUBnbWFpbC5jb20iLCJzY29wZSI6ImNvbS5leGFtcGxlLnRvaXlldWl0LmVudGl0eS5Sb2xlQDJmOWI5MzgyIiwiaXMtcmVmcmVzaC10b2tlbiI6ZmFsc2UsImlzcyI6Im1pa3VkZXB0cmFpIiwiZXhwIjoxNzQ4MDc0Mzk0LCJpYXQiOjE3NDc0Njk1OTQsImp0aSI6IjczNmNhZTI5LTkzOWYtNGYxNy05MmVlLWRkNjQ3N2ZlNTc3MSJ9.ykqItbXzYQb8ywb0QogtmUQHIBXWtkrHs7_SNWZvgDqr0fUeWUtTdwg0v1PkVbFUr4JJqibLgbC4J4hboln0AFM9M-qoOvIzwJvXYz5OEZwLQp1cqV83PAjDd7QGH7NBJFM70aKS0TorP8vffrMvjekGlOkRFp7KDU6YeSC8Z1TBV7b-3BtrTmKCdTp5ZNQXGbi-FcQ8AmOsLxeVXcG4sjV1fSR1uBkwnYHUW8be27SkINuPVfNsJkogFEo1OGAQo2o0NU55JoHPLyCgE8aHUJxJdTAdjleGwlUIxnTYnqiz3V8Yiwc5V7c3VjZHExHw3WCV8fHpqHkV8ojfSL1Jug
+
+### Get token first
+POST http://localhost:8081/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "mikudeptrai@gmail.com",
+  "password": "12345"
+}
+
+> {% client.global.set("access_token", response.body.token); %}
+
+### Use token
+GET http://localhost:8081/api/lessons/1/2
+Authorization: Bearer {{access_token}}

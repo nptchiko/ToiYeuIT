@@ -32,6 +32,144 @@ INSERT INTO ToiYeuIT.course (title, description, level, price, enabled, duration
 INSERT INTO ToiYeuIT.course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6', 'INTERMEDIATE', 1800000, 1, 8, 'Bestseller', 'LR');
 INSERT INTO ToiYeuIT.course (title, description, level, price, enabled, duration, tag, type) VALUES ('string', 'string', 'BASIC', 0, 0, 0, 'string', 'LR');
 
+INSERT INTO lesson (lesson_id, course_id, title, description, is_submitted, order_index, video_url, materials_url) VALUES
+(1, 1, 'Introduction to Nouns', 'Understanding common and proper nouns.', FALSE, 1, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://hocmai.vn/kho-tai-lieu/documents/1590396216/page-1.png'),
+(2, 1, 'Verbs: The Action Words', 'Basics of verbs and their types.', FALSE, 2, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://hocmai.vn/kho-tai-lieu/documents/1590396216/page-1.png'),
+(3, 1, 'Present Simple Tense', 'Forming and using the present simple tense.', FALSE, 3, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://hocmai.vn/kho-tai-lieu/documents/1590396216/page-1.png'),
+(4, 2, 'Past Simple vs. Present Perfect', 'Distinguishing between past simple and present perfect usage.', FALSE, 1, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://hocmai.vn/kho-tai-lieu/documents/1590396216/page-1.png'),
+(5, 2, 'Future Tenses Overview', 'Will, Be Going To, and Present Continuous for future.', FALSE, 2, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'https://hocmai.vn/kho-tai-lieu/documents/1590396216/page-1.png');
+
+
+-- Grammar content for lessons
+INSERT INTO grammar (grammar_id, lesson_id, title, content) VALUES
+(1, 1, 'Nouns Explained', 'A noun is a word that names a person (e.g., teacher, Mary), a place (e.g., city, school), a thing (e.g., book, car), or an idea (e.g., freedom, happiness). Common nouns refer to general categories (e.g., dog, country). Proper nouns refer to specific names and are capitalized (e.g., Fido, France).'),
+(2, 2, 'Understanding Verbs', 'Verbs are words that express action (e.g., run, eat, think) or a state of being (e.g., is, am, are, seem, feel). They are essential for forming sentences. Main verbs carry the primary meaning, while auxiliary verbs (helping verbs) like "be," "do," and "have" help form tenses, moods, and voices.'),
+(3, 3, 'The Present Simple Tense', 'The present simple tense is used to describe habits, unchanging situations, general truths, and fixed arrangements. For most verbs, the base form is used. For third-person singular (he, she, it), an "-s" or "-es" is added. Example: I walk. She walks. They study. He studies.'),
+(4, 4, 'Past Simple vs. Present Perfect Deep Dive', 'Past Simple (e.g., I visited Paris last year) is used for completed actions at a specific time in the past. Present Perfect (e.g., I have visited Paris) is used for actions completed at an unspecified time in the past, actions that started in the past and continue to the present, or past actions with present results. Key signal words for Past Simple: yesterday, last week, in 2010. Key signal words for Present Perfect: ever, never, already, yet, since, for.'),
+(5, 5, 'Expressing the Future', '"Will" is often used for spontaneous decisions, predictions, and promises (e.g., I will help you). "Be going to" is used for plans and intentions (e.g., I am going to visit my aunt). Present Continuous (e.g., I am meeting John tomorrow) can be used for fixed future arrangements.');
+
+-- Quiz questions for grammar sections
+
+-- For Grammar ID 1 (Nouns Explained, Lesson ID 1)
+INSERT INTO grammar_quiz (grammar_quiz_id, grammar_id, question_text, order_index) VALUES
+(1, 1, 'Which of the following is a proper noun?', 1),
+(2, 1, 'Identify the common noun in the sentence: "The cat sat on the mat."', 2);
+
+-- For Grammar ID 2 (Understanding Verbs, Lesson ID 2)
+INSERT INTO grammar_quiz (grammar_quiz_id, grammar_id, question_text, order_index) VALUES
+(3, 2, 'Which word is an action verb: "She quickly reads the book."', 1),
+(4, 2, 'Which of these is an auxiliary (helping) verb?', 2);
+
+-- For Grammar ID 3 (The Present Simple Tense, Lesson ID 3)
+INSERT INTO grammar_quiz (grammar_quiz_id, grammar_id, question_text, order_index) VALUES
+(5, 3, 'Choose the correct present simple form: "He ___ (play) football every Saturday."', 1),
+(6, 3, 'Which sentence uses the present simple tense correctly for a general truth?', 2);
+
+-- For Grammar ID 4 (Past Simple vs. Present Perfect, Lesson ID 4)
+INSERT INTO grammar_quiz (grammar_quiz_id, grammar_id, question_text, order_index) VALUES
+(7, 4, 'Complete the sentence with the correct tense: "I ___ (see) that movie last week."', 1),
+(8, 4, 'Complete the sentence: "She ___ (live) in London since 2010."', 2);
+
+-- For Grammar ID 5 (Expressing the Future, Lesson ID 5)
+INSERT INTO grammar_quiz (grammar_quiz_id, grammar_id, question_text, order_index) VALUES
+(9, 5, 'Which form is best for a spontaneous decision: "The phone is ringing! I ___ get it."', 1),
+(10, 5, 'They have decided on their holiday. They ___ (visit) Spain next month.', 2);
+
+
+-- Options for quiz questions
+
+-- Options for Grammar Quiz ID 1 (Proper Noun?)
+INSERT INTO quiz_option (option_id, grammar_quiz_id, option_text, is_correct) VALUES
+(1, 1, 'city', FALSE),
+(2, 1, 'London', TRUE),
+(3, 1, 'book', FALSE),
+(4, 1, 'happiness', FALSE);
+
+-- Options for Grammar Quiz ID 2 (Common Noun: "The cat sat on the mat.")
+INSERT INTO quiz_option (option_id, grammar_quiz_id, option_text, is_correct) VALUES
+(5, 2, 'The', FALSE),
+(6, 2, 'cat', TRUE), -- Could also be 'mat', but 'cat' is a good primary example
+(7, 2, 'sat', FALSE),
+(8, 2, 'on', FALSE);
+
+-- Options for Grammar Quiz ID 3 (Action verb: "She quickly reads the book.")
+INSERT INTO quiz_option (option_id, grammar_quiz_id, option_text, is_correct) VALUES
+(9, 3, 'quickly', FALSE),
+(10, 3, 'reads', TRUE),
+(11, 3, 'the', FALSE),
+(12, 3, 'book', FALSE);
+
+-- Options for Grammar Quiz ID 4 (Auxiliary verb?)
+INSERT INTO quiz_option (option_id, grammar_quiz_id, option_text, is_correct) VALUES
+(13, 4, 'run', FALSE),
+(14, 4, 'eat', FALSE),
+(15, 4, 'have (as in "have seen")', TRUE),
+(16, 4, 'beautiful', FALSE);
+
+-- Options for Grammar Quiz ID 5 ("He ___ (play) football every Saturday.")
+INSERT INTO quiz_option (option_id, grammar_quiz_id, option_text, is_correct) VALUES
+(17, 5, 'play', FALSE),
+(18, 5, 'plays', TRUE),
+(19, 5, 'playing', FALSE),
+(20, 5, 'is playing', FALSE);
+
+-- Options for Grammar Quiz ID 6 (Present simple for general truth)
+INSERT INTO quiz_option (option_id, grammar_quiz_id, option_text, is_correct) VALUES
+(21, 6, 'The sun rises in the east.', TRUE),
+(22, 6, 'I am reading a book now.', FALSE),
+(23, 6, 'She went to the market yesterday.', FALSE),
+(24, 6, 'They will travel to Italy next year.', FALSE);
+
+-- Options for Grammar Quiz ID 7 ("I ___ (see) that movie last week.")
+INSERT INTO quiz_option (option_id, grammar_quiz_id, option_text, is_correct) VALUES
+(25, 7, 'see', FALSE),
+(26, 7, 'have seen', FALSE),
+(27, 7, 'saw', TRUE),
+(28, 7, 'am seeing', FALSE);
+
+-- Options for Grammar Quiz ID 8 ("She ___ (live) in London since 2010.")
+INSERT INTO quiz_option (option_id, grammar_quiz_id, option_text, is_correct) VALUES
+(29, 8, 'lived', FALSE),
+(30, 8, 'has lived', TRUE),
+(31, 8, 'lives', FALSE),
+(32, 8, 'is living', FALSE);
+
+-- Options for Grammar Quiz ID 9 ("The phone is ringing! I ___ get it.")
+INSERT INTO quiz_option (option_id, grammar_quiz_id, option_text, is_correct) VALUES
+(33, 9, 'am going to', FALSE),
+(34, 9, 'will', TRUE),
+(35, 9, 'am', FALSE),
+(36, 9, 'do', FALSE);
+
+-- Options for Grammar Quiz ID 10 ("They ___ (visit) Spain next month.")
+INSERT INTO quiz_option (option_id, grammar_quiz_id, option_text, is_correct) VALUES
+(37, 10, 'will visit', FALSE), -- plausible but 'are going to visit' is better for pre-decided plans
+(38, 10, 'are going to visit', TRUE),
+(39, 10, 'visit', FALSE),
+(40, 10, 'visited', FALSE);
+
+
+-- User answers to track progress
+
+-- User 101 (John Doe)
+INSERT INTO quiz_user_submission (user_id, question_id, selected_option_id) VALUES
+(1, 1, 2), -- Correct (London)
+(1, 2, 5), -- Incorrect (The)
+(1, 5, 18); -- Correct (plays)
+
+-- User 102 (Jane Smith)
+INSERT INTO quiz_user_submission (user_id, question_id, selected_option_id) VALUES
+(2, 1, 2), -- Correct (London)
+(2, 3, 10), -- Correct (reads)
+(2, 7, 27), -- Correct (saw)
+(2, 8, 30); -- Correct (has lived)
+
+-- User 103 (Learner Bob)
+INSERT INTO quiz_user_submission (user_id, question_id, selected_option_id) VALUES
+(3, 1, 1), -- Incorrect (city)
+(3, 5, 17), -- Incorrect (play)
+(3, 9, 34); -- Correct (will)
+
 # Test data
 #
 # INSERT INTO test (test_collection_id, `index`, title, enabled)
