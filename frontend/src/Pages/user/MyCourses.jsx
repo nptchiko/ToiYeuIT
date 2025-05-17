@@ -1,5 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   BookOpen,
   Clock,
@@ -33,6 +34,7 @@ const levelBgs = {
 function MyCourses() {
   const [selectedLevel, setSelectedLevel] = useState("all");
   const [allCourses, setAllCoures] = useState([]);
+  const navigate = useNavigate();
   useEffect(() => {
     async function fetchCourses() {
       try {
@@ -62,7 +64,15 @@ function MyCourses() {
   const findCourse = getCurrentCourses();
   return (
     <div className="p-10 ">
-      <div className="text-2xl font-sent font-bold">Khóa học của tôi</div>
+      <div className="flex justify-between">
+        <div className="text-2xl font-sent font-bold">Khóa học của tôi</div>
+        <div
+          onClick={() => navigate("/history-order")}
+          className="text-lg font-sent font-bold hover:text-blue-600 cursor-pointer"
+        >
+          Xem lịch sử giao dịch
+        </div>
+      </div>
       {/* Course filter section - now with active functionality */}
       <div className="flex justify-center mb-5">
         <div className="w-full max-w-3xl flex flex-col md:flex-row gap-4 bg-white/60 backdrop-blur-md rounded-lg p-4 border border-gray-200 shadow-md">

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import TestOverview from "./TestOverview";
 import {
   BookOpen,
   Star,
@@ -28,7 +29,7 @@ const Overview = () => {
   const [allCourses, setAllCoures] = useState([]);
   const [test, setTest] = useState([]);
   useEffect(() => {
-    async function fetchCourses(params) {
+    async function fetchCourses() {
       try {
         const res = await OverviewAip.getUserOverview();
         const coursesWith = res.body.courses.map((course) => ({
@@ -166,82 +167,7 @@ const Overview = () => {
             Xem chi tiết
           </div>
         </div>
-        {test.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-16 px-4 bg-white/70 rounded-xl">
-            <BookOpen className="w-16 h-16 text-indigo-300 mb-4" />
-            <h3 className="text-xl font-bold text-indigo-800 mb-2">
-              Không tìm thấy đề thi
-            </h3>
-          </div>
-        )}
-        {test.length > 0 && (
-          <div className="h-[250px] overflow-y-auto pr-2 pb-6 rounded-lg border border-gray-100">
-            <div className="p-4 grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 xl:gap-5 gap-3">
-              {test.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center gap-4 border hover:border-indigo-400 hover:shadow-2xl rounded-2xl overflow-hidden duration-300 hover:-translate-y-1 border-gray-200 p-4 2xl:w-[300px] lg:w-[200px] w-[300px] cursor-pointer"
-                >
-                  <div className="h-12 w-12 bg-blue-50 flex justify-center items-center rounded-lg">
-                    <img src="https://api.prep.vn/images/skills/test_practice/listening.png" />
-                  </div>
-                  <p className="text-base font-bold">{item.title}</p>
-                </div>
-                // <>
-                //   {" "}
-                //   {/* đề thi listening */}
-                //   {item.skill === "Listening" && (
-                //     <div
-                //       key={item.id}
-                //       className="flex items-center gap-4 border hover:border-indigo-400 hover:shadow-2xl rounded-2xl overflow-hidden duration-300 hover:-translate-y-1 border-gray-200 p-4 2xl:w-[300px] lg:w-[200px] w-[300px] cursor-pointer"
-                //     >
-                //       <div className="h-12 w-12 bg-blue-50 flex justify-center items-center rounded-lg">
-                //         <img src="https://api.prep.vn/images/skills/test_practice/listening.png" />
-                //       </div>
-                //       <p className="text-base font-bold">{item.plantain}</p>
-                //     </div>
-                //   )}
-                //   {/* đề thi reading */}
-                //   {item.skill === "Reading" && (
-                //     <div
-                //       key={item.id}
-                //       className="flex items-center gap-4 border hover:border-indigo-400 hover:shadow-2xl rounded-2xl overflow-hidden duration-300 hover:-translate-y-1 border-gray-200 p-4 2xl:w-[300px] lg:w-[200px] w-[300px] cursor-pointer"
-                //     >
-                //       <div className="h-12 w-12 bg-blue-50 flex justify-center items-center rounded-lg">
-                //         <img src="https://api.prep.vn/images/skills/test_practice/reading.png" />
-                //       </div>
-                //       <p className="text-base font-bold">Đề 1</p>
-                //     </div>
-                //   )}
-                //   {/* đề thi writing */}
-                //   {item.skill === "Reading" && (
-                //     <div
-                //       key={item.id}
-                //       className="flex items-center gap-4 border hover:border-indigo-400 hover:shadow-2xl rounded-2xl overflow-hidden duration-300 hover:-translate-y-1 border-gray-200 p-4 2xl:w-[300px] lg:w-[200px] w-[300px] cursor-pointer"
-                //     >
-                //       <div className="h-12 w-12 bg-blue-50 flex justify-center items-center rounded-lg">
-                //         <img src="https://api.prep.vn/images/skills/test_practice/writing.png" />
-                //       </div>
-                //       <p className="text-base font-bold">Đề 1</p>
-                //     </div>
-                //   )}
-                //   {/* đề thi speaking */}
-                //   {item.skill === "Reading" && (
-                //     <div
-                //       key={item.id}
-                //       className="flex items-center gap-4 border hover:border-indigo-400 hover:shadow-2xl rounded-2xl overflow-hidden duration-300 hover:-translate-y-1 border-gray-200 p-4 2xl:w-[300px] lg:w-[200px] w-[300px] cursor-pointer"
-                //     >
-                //       <div className="h-12 w-12 bg-blue-50 flex justify-center items-center rounded-lg">
-                //         <img src="https://api.prep.vn/images/skills/test_practice/speaking.png" />
-                //       </div>
-                //       <p className="text-base font-bold">Đề 1</p>
-                //     </div>
-                //   )}
-                // </>
-              ))}
-            </div>
-          </div>
-        )}
+        <TestOverview />
       </div>
     </div>
   );
