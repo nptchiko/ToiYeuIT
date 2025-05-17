@@ -44,7 +44,7 @@ public class LessonController {
                 .build();
     }
 
-    @PostMapping("/{courseId}/{lessonId}")
+    @PostMapping("/{courseId}/{lessonId}/submit-answer")
     public ApiResponse<QuizUserSubmission> saveUserAnswer(@PathVariable Integer courseId, @PathVariable Long lessonId, @RequestBody QuizUserSubmissionRequest request) {
 
         return ApiResponse.<QuizUserSubmission>builder()
