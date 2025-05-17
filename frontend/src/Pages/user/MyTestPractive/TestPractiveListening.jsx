@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { BookOpen, Clock, Check, BookOpenCheck } from "lucide-react";
 import ListeningApi from "../../../api/ListeningApi";
-const TestPracticeReading = () => {
+const TestPracticeListeing = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -179,4 +179,4 @@ const TestPracticeReading = () => {
   );
 };
 
-export default TestPracticeReading;
+export default TestPracticeListeing;
