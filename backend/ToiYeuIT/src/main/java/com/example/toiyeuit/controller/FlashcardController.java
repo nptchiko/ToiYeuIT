@@ -6,12 +6,16 @@ import com.example.toiyeuit.dto.response.FlashcardResponse;
 import com.example.toiyeuit.exception.FlashcardServiceLogicException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
 import com.example.toiyeuit.service.FlashcardService;
+import com.example.toiyeuit.utils.SecurityUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/decks/{deckId}/flashcards")
 public class FlashcardController {

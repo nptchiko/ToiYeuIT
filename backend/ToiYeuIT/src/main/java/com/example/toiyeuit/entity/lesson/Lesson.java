@@ -1,5 +1,7 @@
 package com.example.toiyeuit.entity.lesson;
+
 import com.example.toiyeuit.entity.course.Course;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -25,8 +27,6 @@ public class Lesson {
 
     String description;
 
-    Integer sections;
-
     @Column(name = "is_submitted")
     Boolean isSubmitted = false;
 
@@ -50,6 +50,7 @@ public class Lesson {
     Course course;
 
     @OneToOne(mappedBy = "lesson", cascade = CascadeType.ALL)
+    @JsonBackReference
     Grammar grammar;
 
     @PrePersist

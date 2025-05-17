@@ -1,6 +1,7 @@
 package com.example.toiyeuit.entity.lesson;
 
 import com.example.toiyeuit.entity.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -29,6 +30,7 @@ public class QuizUserSubmission {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     User user;
 
     @ManyToOne

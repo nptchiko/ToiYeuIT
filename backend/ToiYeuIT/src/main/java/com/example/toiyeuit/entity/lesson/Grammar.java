@@ -1,5 +1,8 @@
 package com.example.toiyeuit.entity.lesson;
 
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -35,9 +38,11 @@ public class Grammar {
 
     @OneToOne
     @JoinColumn(name = "lesson_id", unique = true, nullable = false)
+    @JsonManagedReference
     Lesson lesson;
 
     @OneToMany(mappedBy = "grammar", cascade = CascadeType.ALL)
+    @JsonManagedReference
     Set<GrammarQuiz> quizQuestions;
 
     @PrePersist
