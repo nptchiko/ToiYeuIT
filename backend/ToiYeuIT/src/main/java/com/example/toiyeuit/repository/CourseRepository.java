@@ -56,4 +56,6 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
                     "WHERE  c.course_id = :id"
     )
     int toggleVisiable(int id, int isEnabled);
+
+
 }

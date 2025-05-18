@@ -14,4 +14,5 @@ public class FlashcardRequestDTO {
     private String frontContent;
     private String backContent;
     private String audioUrl;
+    private Boolean isFavorite;
 }

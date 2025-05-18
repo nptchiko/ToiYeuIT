@@ -6,6 +6,8 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter // auto get
@@ -34,4 +36,7 @@ public class FlashcardDeck {
     @ManyToOne
     @JoinColumn(name = "creator_id")
     User creator;
+
+    @OneToMany(mappedBy = "deck", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Flashcard> flashcards = new ArrayList<>();
 }

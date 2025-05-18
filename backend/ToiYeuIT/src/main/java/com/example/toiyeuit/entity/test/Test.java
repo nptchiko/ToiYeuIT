@@ -20,7 +20,6 @@ import lombok.*;
 public class Test {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     Integer id;
 
     @Column(name = "title")

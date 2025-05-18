@@ -12,6 +12,8 @@ import {
   X,
 } from "lucide-react";
 
+import flashcardService from "../../api/FlashcardApi";
+
 export default function Flashcard() {
   const [deckIndex, setDeckIndex] = useState(0);
   const [cardIndex, setCardIndex] = useState(0);
@@ -27,27 +29,40 @@ export default function Flashcard() {
   const [newCardVie, setNewCardVie] = useState("");
   const [newCardEng, setNewCardEng] = useState("");
   const [studyMode, setStudyMode] = useState("all"); // all, starred
-  const [decks, setDecks] = useState([
-    {
-      name: "Từ vựng cơ bản",
-      cards: [
-        { vietnamese: "một", english: "one", starred: false },
-        { vietnamese: "hai", english: "two", starred: false },
-        { vietnamese: "ba", english: "three", starred: false },
-        { vietnamese: "bốn", english: "four", starred: false },
-        { vietnamese: "năm", english: "five", starred: false },
-      ],
-    },
-    {
-      name: "Từ vựng động vật",
-      cards: [
-        { vietnamese: "con mèo", english: "cat", starred: false },
-        { vietnamese: "con chó", english: "dog", starred: false },
-        { vietnamese: "con voi", english: "elephant", starred: false },
-      ],
-    },
-  ]);
 
+  // const [decks, setDecks] = useState([
+  //   {
+  //     name: "Từ vựng cơ bản",
+  //     cards: [
+  //       { vietnamese: "một", english: "one", starred: false },
+  //       { vietnamese: "hai", english: "two", starred: false },
+  //       { vietnamese: "ba", english: "three", starred: false },
+  //       { vietnamese: "bốn", english: "four", starred: false },
+  //       { vietnamese: "năm", english: "five", starred: false },
+  //     ],
+  //   },
+  //   {
+  //     name: "Từ vựng động vật",
+  //     cards: [
+  //       { vietnamese: "con mèo", english: "cat", starred: false },
+  //       { vietnamese: "con chó", english: "dog", starred: false },
+  //       { vietnamese: "con voi", english: "elephant", starred: false },
+  //     ],
+  //   },
+  // ]);
+
+  const [decks, setDecks] = useState([]);
+  // Get cards from server
+  useEffect(() => {
+    async function getDecks() {
+      flashcardService.getAllDecks().then((decks) => {
+        setDecks(decks);
+      });
+    }
+
+    getDecks();
+  }, []);
+  flashcardService.getAllDecks();
   // Handle auto-play
   useEffect(() => {
     if (autoPlayEnabled) {
@@ -146,10 +161,22 @@ export default function Flashcard() {
     const cardInDeck = newDecks[deckIndex].cards.find(
       (c) =>
         c.english === currentCard.english &&
-        c.vietnamese === currentCard.vietnamese
+        c.vietnamese === currentCard.vietnamese,
     );
     if (cardInDeck) {
       cardInDeck.starred = !cardInDeck.starred;
+
+      const newCard = {
+        frontContent: cardInDeck.english,
+        backContent: cardInDeck.vietnamese,
+        isFavorite: cardInDeck.starred,
+      };
+
+      flashcardService.updateFlashcard(
+        decks[deckIndex].id,
+        decks[deckIndex].cards[cardIndex].id,
+        newCard,
+      );
       setDecks(newDecks);
     }
   };
@@ -157,18 +184,21 @@ export default function Flashcard() {
   const addNewDeck = () => {
     if (newDeckName.trim()) {
       setDecks([...decks, { name: newDeckName, cards: [] }]);
+      const newDeckObject = { name: newDeckName };
+      flashcardService.createNewDeck(newDeckObject);
       setNewDeckName("");
       setShowAddDeck(false);
     }
   };
 
-  const deleteDeck = () => {
+  const deleteDeck = async () => {
     if (decks.length <= 1) {
       alert("Không thể xóa bộ thẻ duy nhất!");
       return;
     }
     const newDecks = [...decks];
     newDecks.splice(deckIndex, 1);
+    await flashcardService.deleteDeckById(decks[deckIndex].id);
     setDecks(newDecks);
     setDeckIndex(0);
     setCardIndex(0);
@@ -183,6 +213,16 @@ export default function Flashcard() {
         english: newCardEng,
         starred: false,
       });
+      const newCardObject = {
+        frontContent: newCardEng,
+        backContent: newCardVie,
+        isFavorite: false,
+      };
+
+      flashcardService
+        .createNewFlashcard(decks[deckIndex].id, newCardObject)
+        .then((response) => console.log(response));
+
       setDecks(newDecks);
       setNewCardVie("");
       setNewCardEng("");
@@ -203,11 +243,22 @@ export default function Flashcard() {
       const cardInDeck = newDecks[deckIndex].cards.find(
         (c) =>
           c.english === currentCard.english &&
-          c.vietnamese === currentCard.vietnamese
+          c.vietnamese === currentCard.vietnamese,
       );
       if (cardInDeck) {
         cardInDeck.vietnamese = newCardVie;
         cardInDeck.english = newCardEng;
+        const newCard = {
+          frontContent: cardInDeck.english,
+          backContent: cardInDeck.vietnamese,
+          isFavorite: cardInDeck.starred,
+        };
+
+        flashcardService.updateFlashcard(
+          decks[deckIndex].id,
+          decks[deckIndex].cards[cardIndex].id,
+          newCard,
+        );
         setDecks(newDecks);
         setNewCardVie("");
         setNewCardEng("");
@@ -218,14 +269,18 @@ export default function Flashcard() {
 
   const deleteCard = () => {
     if (!currentCard) return;
+
     const newDecks = [...decks];
     const cardIndexInDeck = newDecks[deckIndex].cards.findIndex(
       (c) =>
         c.english === currentCard.english &&
-        c.vietnamese === currentCard.vietnamese
+        c.vietnamese === currentCard.vietnamese,
     );
     if (cardIndexInDeck !== -1) {
       newDecks[deckIndex].cards.splice(cardIndexInDeck, 1);
+
+      flashcardService.deleteFlashcardById(decks[deckIndex].id, currentCard.id);
+
       setDecks(newDecks);
       if (cardIndex >= filteredCards.length - 1) {
         setCardIndex(Math.max(0, filteredCards.length - 2));

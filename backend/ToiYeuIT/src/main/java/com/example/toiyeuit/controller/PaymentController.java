@@ -4,12 +4,15 @@ import com.example.toiyeuit.dto.request.OrderCourseRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.dto.response.OrderCourseResponse;
 import com.example.toiyeuit.dto.response.VNPayResponse;
+import com.example.toiyeuit.entity.course.CourseOrder;
 import com.example.toiyeuit.service.payment.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -52,5 +55,14 @@ public class PaymentController {
                 .body(paymentService.saveOrder(orderCourseRequest))
                 .message("Created")
                 .build();
+    }
+
+    @GetMapping("/order-history")
+    public ApiResponse<List<OrderCourseResponse>> history() {
+       return ApiResponse.<List<OrderCourseResponse>>builder()
+               .code(HttpStatus.OK.value())
+               .message("Retrieved course orders successfully.")
+               .body(paymentService.getOrderHistoryOfCurrentUser())
+               .build();
     }
 }

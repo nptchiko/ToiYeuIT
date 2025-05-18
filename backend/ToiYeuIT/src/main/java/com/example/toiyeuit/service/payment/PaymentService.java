@@ -14,6 +14,7 @@ import com.example.toiyeuit.enums.PaymentMethod;
 import com.example.toiyeuit.enums.PaymentStatus;
 import com.example.toiyeuit.enums.PredefinedRole;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
+import com.example.toiyeuit.mapper.CourseOrderMapper;
 import com.example.toiyeuit.repository.CourseRepository;
 import com.example.toiyeuit.repository.EnrollmentRepository;
 import com.example.toiyeuit.repository.OrderCourseRepository;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +38,7 @@ public class PaymentService {
     private final CourseRepository courseRepository;
     private final UserService userService;
     private final EnrollmentRepository enrollmentRepository;
+    private final CourseOrderMapper courseOrderMapper;
 
     public VNPayResponse createVnPayPayment(HttpServletRequest request) {
         long amount = Integer.parseInt(request.getParameter("amount")) * 100L;
@@ -64,30 +67,33 @@ public class PaymentService {
                 SecurityUtils.getCurrentUserLogin()
         );
 
-       var result = orderCourseRepository.save(CourseOrder.builder()
-                       .id(OrderKey.builder().user_id(user.getId()).course_id(course.getId()).build())
-               .course(course)
-               .user(user)
-               .paymentMethod(PaymentMethod.VNPAY)
-               .paymentStatus(PaymentStatus.fromString(orderCourseRequest.getPaymentMethod()))
-               .build());
+        var result = orderCourseRepository.save(CourseOrder.builder()
+                .id(OrderKey.builder().user_id(user.getId()).course_id(course.getId()).build())
+                .course(course)
+                .user(user)
+                .paymentMethod(PaymentMethod.VNPAY)
+                .paymentStatus(PaymentStatus.fromString(orderCourseRequest.getStatus()))
+                .build());
 
-       if (result.getPaymentStatus() == PaymentStatus.PAID){
-           enrollmentRepository.save(
-                   Enrollment.builder()
-                           .course(course)
-                           .status(CourseStatus.PENDING)
-                           .user(user)
-                           .build());
+        if (result.getPaymentStatus() == PaymentStatus.PAID) {
+            enrollmentRepository.save(
+                    Enrollment.builder()
+                            .course(course)
+                            .status(CourseStatus.PENDING)
+                            .user(user)
+                            .build());
 
-           userService.updateRole(user, PredefinedRole.STUDENT);
-       }
+            userService.updateRole(user, PredefinedRole.STUDENT);
+        }
 
-       return OrderCourseResponse.builder()
-               .courseId(orderCourseRequest.getCourseId())
-               .userId(user.getId())
-               .paymentMethod(orderCourseRequest.getPaymentMethod())
-               .status(orderCourseRequest.getStatus())
-               .build();
+        return courseOrderMapper.toResponse(result);
+    }
+
+    public List<OrderCourseResponse> getOrderHistoryOfCurrentUser() throws ResourceNotFoundException {
+        User user = userService.getUserByEmail(SecurityUtils.getCurrentUserLogin());
+
+        return orderCourseRepository.findByUserId(user.getId())
+                .stream().map(courseOrderMapper::toResponse)
+                .collect(Collectors.toList());
     }
 }

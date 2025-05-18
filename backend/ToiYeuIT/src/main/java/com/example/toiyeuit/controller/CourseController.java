@@ -2,7 +2,7 @@ package com.example.toiyeuit.controller;
 import com.example.toiyeuit.dto.request.CourseRequestDTO;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.entity.course.Course;
-import com.example.toiyeuit.enums.Level;
+import com.example.toiyeuit.enums.CourseLevel;
 import com.example.toiyeuit.exception.AlreadyExistsException;
 import com.example.toiyeuit.exception.CourseServiceLogicException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
@@ -51,7 +51,7 @@ public class CourseController {
         Course courseEntity = Course.builder()
                 .title(course.getTitle())
                 .description(course.getDescription())
-                .level(Level.fromString(course.getLevel()))
+                .level(CourseLevel.fromString(course.getLevel()))
                 .price(course.getPrice())
                 .enabled(course.getEnabled())
                 .duration(course.getDuration())
@@ -59,13 +59,6 @@ public class CourseController {
 
         Course createdCourse = courseRepository.save(courseEntity);
         return new ResponseEntity<>(createdCourse, HttpStatus.CREATED);
-    }
-
-    @PutMapping
-    public ResponseEntity<Course> updateCourse(@RequestBody Course course) throws CourseServiceLogicException,
-            ResourceNotFoundException {
-
-        return new ResponseEntity<>(courseService.update(course), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
