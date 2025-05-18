@@ -10,7 +10,6 @@ import {
   FileText,
   Check,
   Edit,
-  Eye,
   Plus,
   Search,
   ChevronDown,
@@ -20,7 +19,6 @@ import {
   Trash2,
   AlertTriangle,
   Loader2,
-  Torus,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
@@ -125,12 +123,13 @@ export default function TestManagement() {
         console.log(response.body);
 
         if (response && response.body) {
-          setTests(response.body);
+          const testsData = Array.isArray(response.body) ? response.body : [];
+          setTests(testsData);
 
           // Extract unique test sets safely
           const uniqueTestSets = [
             ...new Set(
-              response.body.map((test) => test.testSet || "Uncategorized")
+              testsData.map((test) => test.testSet || "Uncategorized")
             ),
           ];
           setTestSets(uniqueTestSets);
@@ -242,6 +241,7 @@ export default function TestManagement() {
     fileInputRef.current.click();
   };
 
+  // Update the handleFileChange function to remove the file upload attempt
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -259,38 +259,25 @@ export default function TestManagement() {
             try {
               const jsonData = JSON.parse(event.target.result);
 
-              // Store the parsed data for API submission
-              const parsedData = {
-                testData: jsonData.questions || [],
-                metadata: {
-                  totalQuestions: jsonData.questions
-                    ? jsonData.questions.length
-                    : 0,
-                  testType: jsonData.testType || "standard",
-                  // Add any other metadata you need from the JSON
-                },
-              };
+              // Count total questions across all parts
+              const totalQuestions = Array.isArray(jsonData)
+                ? jsonData.reduce(
+                    (total, part) => total + part.questions.length,
+                    0
+                  )
+                : 0;
 
-              // If the JSON has these fields, use them to populate the form
+              // Store the parsed data for API submission
               setNewTest((prev) => ({
                 ...prev,
                 name: jsonData.name || prev.name,
                 testSet: jsonData.testSet || prev.testSet,
-                // questions: jsonData.questions ? jsonData.questions.length : 0,
+                questions: totalQuestions,
                 duration: jsonData.duration || prev.duration,
-                // course: jsonData.course || prev.course,
-                parsedData: parsedData,
+                parsedData: {
+                  content: jsonData, // Store the entire JSON content
+                },
               }));
-
-              // Upload the file to the server
-              try {
-                const uploadResult = await TestAPI.uploadTestFile(file);
-                console.log("File uploaded successfully:", uploadResult);
-                // You could update the form with any additional data returned from the upload
-              } catch (uploadError) {
-                console.error("Error uploading file:", uploadError);
-                alert("Failed to upload the file. Please try again.");
-              }
             } catch (error) {
               console.error("Error parsing JSON file:", error);
               alert(
@@ -310,6 +297,8 @@ export default function TestManagement() {
     }
   };
 
+  //  handleSubmit
+  // Update the handleSubmit function to use the parsed content directly
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -333,52 +322,95 @@ export default function TestManagement() {
     setError(null);
 
     try {
+      let testSetId;
+
+      // If creating a new test set
+      if (newTest.isNewTestSet) {
+        // Create the test set first
+        const testSetResponse = await TestAPI.createTestSet(
+          newTest.testSet, // name
+          "", // skill
+          "" // description
+        );
+
+        if (testSetResponse && testSetResponse.body) {
+          testSetId = testSetResponse.body.id;
+
+          // Add the new test set to the local state
+          if (!testSets.includes(newTest.testSet)) {
+            setTestSets([...testSets, newTest.testSet]);
+            setExpandedSets((prev) => ({
+              ...prev,
+              [newTest.testSet]: true,
+            }));
+          }
+        } else {
+          throw new Error("Failed to create test set");
+        }
+      } else {
+        // Find the testSetId for the selected test set
+        const testsInSet = tests.filter(
+          (test) => test.testSet === newTest.testSet
+        );
+        testSetId = testsInSet.length > 0 ? testsInSet[0].testSetId : null;
+
+        if (!testSetId) {
+          throw new Error("Could not find test set ID");
+        }
+      }
+
       // Create new test object
       const testToAdd = {
         name: newTest.name,
-        testSet: newTest.testSet,
-        // questions: newTest.questions || 0,
+        testSetId: testSetId,
         duration: newTest.duration,
         status: newTest.status,
-        // course: newTest.course || "",
-        // Include any other fields needed by your API
-        parsedData: newTest.parsedData,
+        content: newTest.parsedData?.content || [],
       };
 
       // Send to API
+      console.log("hehehe", testToAdd);
       const createdTest = await TestAPI.createTest(testToAdd);
-      console.log("testset ", testToAdd.testSet);
-      // Add to tests array with the ID from the API response
-      setTests([...tests, createdTest]);
 
-      // Update test sets if a new one was added
-      if (newTest.isNewTestSet && !testSets.includes(newTest.testSet)) {
-        setTestSets([...testSets, newTest.testSet]);
-        setExpandedSets((prev) => ({
-          ...prev,
-          [newTest.testSet]: true,
-        }));
+      if (createdTest && createdTest.body) {
+        // Format the created test to match the expected structure
+        const newTestData = {
+          testId: createdTest.body.id,
+          id: createdTest.body.id,
+          name: createdTest.body.title,
+          testSet: newTest.testSet,
+          testSetId: testSetId,
+          status: createdTest.body.status,
+          duration: createdTest.body.duration,
+          questions: newTest.questions || 0,
+        };
+
+        // Add to tests array
+        setTests([...tests, newTestData]);
+
+        // Close modal and reset form
+        closeModal();
+
+        // Show success message
+        addToast("Test added successfully!", "success");
+      } else {
+        throw new Error("Invalid response format from API");
       }
-
-      // Close modal and reset form
-      closeModal();
-
-      // Show success message
-      alert("Test added successfully!");
     } catch (error) {
       console.error("Error creating test:", error);
       setError("Failed to create test. Please try again.");
-      alert("Failed to create test. Please try again.");
+      addToast.addToast("Failed to create test. Please try again.", "error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // Update the handleEditSubmit function to match the API requirements
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     // Validate form
     if (!selectedTest.name?.trim()) {
-      addToast("Please enter a test name", "error");
+      addToast.addToast("Please enter a test name", "error");
       return;
     }
     setIsSubmitting(true);
@@ -387,14 +419,14 @@ export default function TestManagement() {
       // Call API with the correct parameters: status, testId, name
       const response = await TestAPI.updateTest(
         selectedTest.status,
-        selectedTest.id,
+        selectedTest.id || selectedTest.testId,
         selectedTest.name
       );
       // Check if the response indicates success
       if (response && response.code === 200) {
         // Update the test in the local state
         const updatedTests = tests.map((test) =>
-          test.testId === selectedTest.id
+          test.testId === (selectedTest.id || selectedTest.testId)
             ? {
                 ...test,
                 name: selectedTest.name,
@@ -405,13 +437,22 @@ export default function TestManagement() {
         setTests(updatedTests);
         closeEditModal();
         // Show success message
-        addToast("Test updated successfully!", "success");
-      } else {
-        setError("Failed to update test. Please try again.");
+        addToast.addToast("Test updated successfully!", "success");
       }
     } catch (error) {
-      console.error("Error updating test:", error);
-      // setError("Failed to update test. Please try again.");
+      if (error.response) {
+        console.error("Server responded with status:", error.response.status);
+        console.error("Response data:", error.response.data);
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Axios error:", error.message);
+      }
+
+      setError(
+        error?.response?.data?.message || error.message || "Update failed."
+      );
+      addToast.addToast("Failed to update test. Please try again.", "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -437,7 +478,7 @@ export default function TestManagement() {
   const handleEditTest = (test) => {
     // Check if we have the test data with necessary fields
     if (!test || !test.testId) {
-      addToast("Invalid test selected for editing", "error");
+      addToast.addToast("Invalid test selected for editing", "error");
       return;
     }
 
@@ -445,6 +486,7 @@ export default function TestManagement() {
     // Make sure we're using a consistent structure for editing
     const testForEditing = {
       id: test.testId,
+      testId: test.testId, // Add this line to ensure both id and testId are available
       name: test.name,
       status: test.status,
       duration: test.duration,
@@ -462,10 +504,19 @@ export default function TestManagement() {
   };
 
   const handleDeleteTestSet = (testSet) => {
-    setSelectedTestSet(testSet);
+    // Tìm testSetId từ một test trong bộ này
+    const testsInSet = tests.filter(
+      (test) => (test.testSet || "Uncategorized") === testSet
+    );
+    const testSetId = testsInSet.length > 0 ? testsInSet[0].testSetId : null;
+
+    // Lưu cả tên và id của test set
+    setSelectedTestSet({
+      name: testSet,
+      id: testSetId,
+    });
     setIsDeleteTestSetModalOpen(true);
   };
-
   const confirmDeleteTest = async () => {
     if (!selectedTest) return;
 
@@ -474,11 +525,11 @@ export default function TestManagement() {
 
     try {
       // Delete the test via API - using the correct testId
-      await TestAPI.deleteTest(selectedTest.id);
+      await TestAPI.deleteTest(selectedTest.id || selectedTest.testId);
 
       // Remove the test from the local state
       const updatedTests = tests.filter(
-        (test) => test.testId !== selectedTest.id
+        (test) => test.testId !== (selectedTest.id || selectedTest.testId)
       );
       setTests(updatedTests);
 
@@ -495,7 +546,7 @@ export default function TestManagement() {
       }
 
       closeAllModals();
-      addToast("Test deleted successfully!", "success");
+      addToast.addToast("Test deleted successfully!", "success");
     } catch (error) {
       console.error("Error deleting test:", error);
       setError("Failed to delete test. Please try again.");
@@ -503,45 +554,51 @@ export default function TestManagement() {
       setIsSubmitting(false);
     }
   };
-  //cai any chu co API
+
   const confirmDeleteTestSet = async () => {
-    if (!selectedTestSet) return;
+    if (!selectedTestSet || !selectedTestSet.id) {
+      addToast.addToast(
+        "Không thể xóa bộ kiểm tra này. Thiếu ID bộ kiểm tra.",
+        "error"
+      );
+      return;
+    }
 
     setIsSubmitting(true);
     setError(null);
 
     try {
-      // Get all tests in this set
-      const testsInSet = tests.filter(
-        (test) => (test.testSet || "Uncategorized") === selectedTestSet
-      );
+      // Sử dụng id từ đối tượng selectedTestSet
+      await TestAPI.deleteTests(selectedTestSet.id);
 
-      // Delete each test in the set
-      for (const test of testsInSet) {
-        await TestAPI.deleteTest(test.id);
-      }
-
-      // Update local state
+      // Cập nhật state
       const updatedTests = tests.filter(
-        (test) => (test.testSet || "Uncategorized") !== selectedTestSet
+        (test) => (test.testSet || "Uncategorized") !== selectedTestSet.name
       );
       setTests(updatedTests);
 
-      // Remove the test set
-      const updatedTestSets = testSets.filter((set) => set !== selectedTestSet);
+      // Xóa bộ kiểm tra
+      const updatedTestSets = testSets.filter(
+        (set) => set !== selectedTestSet.name
+      );
       setTestSets(updatedTestSets);
 
       closeAllModals();
-      alert("Test set and all its tests deleted successfully!");
+      addToast.addToast(
+        "Bộ kiểm tra và tất cả các bài kiểm tra đã được xóa thành công!",
+        "success"
+      );
     } catch (error) {
-      console.error("Error deleting test set:", error);
-      setError("Failed to delete test set. Please try again.");
-      alert("Failed to delete test set. Please try again.");
+      console.error("Lỗi khi xóa bộ kiểm tra:", error);
+      setError("Không thể xóa bộ kiểm tra. Vui lòng thử lại.");
+      addToast.addToast(
+        "Không thể xóa bộ kiểm tra. Vui lòng thử lại.",
+        "error"
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
-
   // const closeViewModal = () => {
   //   setIsViewModalOpen(false);
   //   setSelectedTest(null);
@@ -836,6 +893,7 @@ export default function TestManagement() {
                               <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                 Status
                               </th>
+                              <th className="px-6 py-3.5 bg-muted/50"></th>
                               <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                 Actions
                               </th>
@@ -887,7 +945,7 @@ export default function TestManagement() {
                                   </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                  <div className="flex space-x-2">
+                                  <div className="flex space-x-2 justify-end ">
                                     {/* <button
                                       onClick={() => handleViewTest(test)}
                                       className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-primary rounded-lg hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30 transition-colors shadow-sm"
@@ -1044,25 +1102,6 @@ export default function TestManagement() {
                     required
                   />
                 </div>
-
-                {/* Course */}
-                {/* <div className="space-y-2">
-                  <label
-                    htmlFor="course"
-                    className="block text-sm font-medium text-foreground"
-                  >
-                    Course
-                  </label>
-                  <input
-                    type="text"
-                    id="course"
-                    name="course"
-                    value={newTest.course}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
-                    placeholder="Enter course name"
-                  />
-                </div> */}
 
                 {/* Test Set Selection */}
                 <div className="space-y-2">
@@ -1237,93 +1276,6 @@ export default function TestManagement() {
         </div>
       )}
 
-      {/* View Test Modal */}
-      {/* {isViewModalOpen && selectedTest && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
-          <div
-            ref={modalRef}
-            className="bg-card rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-border animate-scaleIn"
-          >
-            <div className="flex justify-between items-center p-6 border-b border-border bg-gradient-to-r from-primary to-blue-700 text-white">
-              <h3 className="text-xl font-bold">Test Details</h3>
-              <button
-                onClick={closeViewModal}
-                className="text-white/80 hover:text-white transition-colors bg-white/10 rounded-full p-1"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="p-6">
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h4 className="text-xl font-bold text-foreground">
-                    {selectedTest.name}
-                  </h4>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                      selectedTest.status
-                    )}`}
-                  >
-                    {selectedTest.status}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-6 mt-4">
-                  <div className="bg-muted/50 p-4 rounded-lg">
-                    <p className="text-sm text-muted-foreground mb-1">
-                      Test Set
-                    </p>
-                    <p className="font-medium text-foreground">
-                      {selectedTest.testSet || "Uncategorized"}
-                    </p>
-                  </div>
-                  <div className="bg-muted/50 p-4 rounded-lg">
-                    <p className="text-sm text-muted-foreground mb-1">Course</p>
-                    <p className="font-medium text-foreground">
-                      {selectedTest.course}
-                    </p>
-                  </div>
-                  <div className="bg-muted/50 p-4 rounded-lg">
-                    <p className="text-sm text-muted-foreground mb-1">
-                      Questions
-                    </p>
-                    <p className="font-medium text-foreground">
-                      {selectedTest.questions}
-                    </p>
-                  </div>
-                  <div className="bg-muted/50 p-4 rounded-lg">
-                    <p className="text-sm text-muted-foreground mb-1">
-                      Duration
-                    </p>
-                    <p className="font-medium text-foreground flex items-center">
-                      <Clock className="h-4 w-4 mr-1.5 text-muted-foreground" />
-                      {selectedTest.duration}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-border">
-                  <h5 className="font-medium mb-3">Test Description</h5>
-                  <p className="text-muted-foreground text-sm bg-muted/30 p-4 rounded-lg">
-                    {selectedTest.description ||
-                      "No description available for this test."}
-                  </p>
-                </div>
-
-                <div className="mt-6 flex justify-end">
-                  <button
-                    onClick={closeViewModal}
-                    className="px-4 py-2.5 bg-gradient-to-r from-primary to-blue-700 text-white rounded-lg hover:from-primary/90 hover:to-blue-800 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )} */}
       {/* Edit Test Modal */}
       {isEditModalOpen && selectedTest && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
@@ -1577,11 +1529,12 @@ export default function TestManagement() {
 
               <p className="mb-2">
                 Are you sure you want to delete the test set{" "}
-                <span className="font-semibold">"{selectedTestSet}"</span>?
+                <span className="font-semibold">"{selectedTestSet.name}"</span>?
               </p>
               <p className="mb-6 text-sm text-muted-foreground">
                 This will permanently delete{" "}
-                {groupedTests[selectedTestSet]?.length || 0} tests in this set.
+                {groupedTests[selectedTestSet.name]?.length || 0} tests in this
+                set.
               </p>
 
               <div className="flex justify-end space-x-3">
