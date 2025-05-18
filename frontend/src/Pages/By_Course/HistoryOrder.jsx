@@ -1,11 +1,14 @@
 import React from "react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import HistoryOrderApi from "../../api/HistoryOrderApi";
+import { ArrowRight, Search } from "lucide-react";
 
 const HistoryOrder = () => {
   const [historyOrder, setHistoryOrder] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchHistory() {
@@ -13,10 +16,8 @@ const HistoryOrder = () => {
       try {
         const req = await HistoryOrderApi.getHistoryOrder();
         setHistoryOrder(req.body);
-        setError(null);
       } catch (error) {
         console.error("Lỗi khi tải lịch sử giao dịch", error);
-        setError("Không thể tải lịch sử giao dịch. Vui lòng thử lại sau.");
       } finally {
         setIsLoading(false);
       }
@@ -57,6 +58,17 @@ const HistoryOrder = () => {
     }).format(date);
   };
 
+  const filteredOrders = historyOrder.filter((order) =>
+    [
+      order.courseTitle,
+      getStatusText(order.status),
+      order.paymentMethod,
+      formatDate(order.createdAt),
+    ].some((field) =>
+      field.toString().toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -65,72 +77,42 @@ const HistoryOrder = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen flex justify-center items-center">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-lg">
-          <div className="flex items-center">
-            <svg
-              className="h-8 w-8 text-red-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              ></path>
-            </svg>
-            <h3 className="ml-3 text-lg font-medium text-red-800">
-              Đã xảy ra lỗi
-            </h3>
-          </div>
-          <div className="mt-2 text-sm text-red-700">{error}</div>
-          <button
-            className="mt-4 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md transition-colors"
-            onClick={() => window.location.reload()}
-          >
-            Thử lại
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">
-        Lịch sử giao dịch
-      </h1>
-      <img
-        src="https://drive.google.com/file/d/1Dl4B9Ou71AJHGCUVO6SMV8PnDduiZ8Z6/view?usp=sharing"
-        alt="Lịch sử giao dịch"
-        className="w-full max-w-md mx-auto"
-      />
-      {historyOrder.length === 0 ? (
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Lịch sử giao dịch</h1>
+        <button
+          onClick={() => navigate("/sidebar/my-course")}
+          className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md transition-colors"
+          aria-label="Đi tới khóa học của tôi"
+        >
+          <ArrowRight className="h-5 w-5" />
+        </button>
+      </div>
+      {/* Search Bar */}
+      <div className="mb-6">
+        <div className="relative max-w-md">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Tìm kiếm giao dịch (tên khóa học, trạng thái, ngày giờ)"
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+        </div>
+      </div>
+      {filteredOrders.length === 0 ? (
         <div className="bg-gray-50 rounded-xl p-8 text-center">
-          <svg
-            className="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            ></path>
-          </svg>
           <h3 className="mt-2 text-lg font-medium text-gray-900">
-            Không có giao dịch nào
+            {searchQuery
+              ? "Không tìm thấy giao dịch"
+              : "Không có giao dịch nào"}
           </h3>
           <p className="mt-1 text-gray-500">
-            Bạn chưa thực hiện giao dịch nào.
+            {searchQuery
+              ? "Không có giao dịch nào khớp với tìm kiếm của bạn."
+              : "Bạn chưa thực hiện giao dịch nào."}
           </p>
         </div>
       ) : (
@@ -140,10 +122,10 @@ const HistoryOrder = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Khóa học ID
+                    Tên khóa học
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Người dùng ID
+                    Người dùng
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Trạng thái
@@ -157,13 +139,13 @@ const HistoryOrder = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {historyOrder.map((order, index) => (
+                {filteredOrders.map((order, index) => (
                   <tr key={index} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {order.courseId}
+                      {order.courseTitle}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {order.userId}
+                      {order.username}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
