@@ -1,9 +1,7 @@
 package com.example.toiyeuit.entity.test;
 
 import com.example.toiyeuit.entity.question.Question;
-import com.example.toiyeuit.entity.key.TestKey;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -17,23 +15,21 @@ import lombok.experimental.FieldDefaults;
 @Table(name = "test_detail")
 // có thể dùng khóa phức nhưng dài ko làm
 public class TestDetail {
-    @EmbeddedId
-    TestKey id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "belong_to")
-    @MapsId(value = "test_id")
     Test test;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "question_id")
-    @MapsId(value = "ques_id")
     Question question;
 
-    @Column(nullable = false)
+    @Column(name = "indexx", nullable = false)
     int index;
 
-    @Size(min = 1, max = 7)
     int part;
 }
 

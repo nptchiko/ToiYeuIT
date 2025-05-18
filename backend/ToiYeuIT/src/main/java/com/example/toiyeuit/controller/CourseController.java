@@ -1,12 +1,7 @@
 package com.example.toiyeuit.controller;
-import com.example.toiyeuit.dto.request.CourseRequestDTO;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.entity.course.Course;
-import com.example.toiyeuit.enums.CourseLevel;
-import com.example.toiyeuit.exception.AlreadyExistsException;
-import com.example.toiyeuit.exception.CourseServiceLogicException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
-import com.example.toiyeuit.repository.CourseRepository;
 import com.example.toiyeuit.service.CourseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +14,9 @@ import java.util.List;
 public class CourseController {
 
     private final CourseService courseService;
-    private final CourseRepository courseRepository;
 
-    public CourseController(CourseService courseService, CourseRepository courseRepository) {
+    public CourseController(CourseService courseService){
         this.courseService = courseService;
-        this.courseRepository = courseRepository;
     }
 
     @GetMapping
@@ -43,28 +36,4 @@ public class CourseController {
 
         return new ResponseEntity<>(course, HttpStatus.OK);
     }
-
-    @PostMapping
-    public ResponseEntity<Course> createCourse(@RequestBody CourseRequestDTO course) throws CourseServiceLogicException,
-            AlreadyExistsException {
-
-        Course courseEntity = Course.builder()
-                .title(course.getTitle())
-                .description(course.getDescription())
-                .level(CourseLevel.fromString(course.getLevel()))
-                .price(course.getPrice())
-                .enabled(course.getEnabled())
-                .duration(course.getDuration())
-                .build();
-
-        Course createdCourse = courseRepository.save(courseEntity);
-        return new ResponseEntity<>(createdCourse, HttpStatus.CREATED);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteById(@PathVariable Integer id) throws ResourceNotFoundException {
-        courseRepository.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
 }

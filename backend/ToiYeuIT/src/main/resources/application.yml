@@ -67,6 +67,9 @@ rsa:
   public-key: classpath:certs/public.pem
 
 logging:
+  file:
+    name: springboot-logs.log
+    path: ./logs/
   level:
     org:
       springframework:

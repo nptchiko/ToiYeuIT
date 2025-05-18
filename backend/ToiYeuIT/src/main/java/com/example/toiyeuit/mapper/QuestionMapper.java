@@ -1,8 +1,12 @@
 package com.example.toiyeuit.mapper;
 
+import com.example.toiyeuit.dto.request.QuestionRequest;
 import com.example.toiyeuit.dto.response.QuestionResponse;
 import com.example.toiyeuit.entity.question.MultichoiceDetail;
 import com.example.toiyeuit.entity.question.Question;
+import com.example.toiyeuit.enums.QuestionScope;
+import com.example.toiyeuit.enums.QuestionType;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -29,4 +33,9 @@ public interface QuestionMapper {
 
         return result;
     }
+
+    @Mapping(source = "type", target = "questionType")
+    @Mapping(source = "scope", target = "questionScope")
+    @Mapping(target = "options", source = "request.options")
+    Question toQuestion(QuestionRequest request, QuestionType type, QuestionScope scope);
 }

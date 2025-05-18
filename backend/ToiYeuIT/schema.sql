@@ -75,7 +75,7 @@ create table test
     id                 int auto_increment
         primary key,
     test_collection_id int              not null,
-    `index`            int              not null,
+    indexx            int              not null,
     title              varchar(255)     null,
     enabled            bit default b'1' null,
     constraint FK34np1jcju9km4vaswfl1oy9cp
@@ -119,13 +119,14 @@ create table question
 
 create table multichoice_detail
 (
+    id int auto_increment,
     ques_id            bigint                    not null,
-    `key`              enum ('A', 'B', 'C', 'D') not null,
+    answer_key             enum ('A', 'B', 'C', 'D') not null,
     answer_description varchar(255)              null,
-    primary key (ques_id, `key`),
+    primary key (id),
     constraint multichoice_detail_ibfk_1
         foreign key (ques_id) references question (ques_id)
-            on update cascade
+            on update cascade on delete cascade
 );
 create table exercise_detail
 (
@@ -181,11 +182,12 @@ create table exercise_result
 
 create table test_detail
 (
+    id int auto_increment,
     belong_to   int    not null,
     question_id bigint not null,
     part        int    not null,
-    `index`     int    not null,
-    primary key (belong_to, question_id),
+    indexx     int    not null,
+    primary key (id),
     constraint test_detail_ibfk_1
         foreign key (belong_to) references test (id)
             on delete cascade,

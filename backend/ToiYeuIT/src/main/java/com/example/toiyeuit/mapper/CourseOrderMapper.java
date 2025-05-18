@@ -11,11 +11,13 @@ public interface CourseOrderMapper {
 
     CourseOrderMapper INSTANCE = Mappers.getMapper(CourseOrderMapper.class);
 
-    @Mapping(source = "course.id", target = "courseId")
-    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "course.title", target = "courseTitle")
+    @Mapping(source = "user.username", target = "username")
     @Mapping(source = "paymentStatus", target = "status")
     @Mapping(source = "paymentMethod", target = "paymentMethod")
     @Mapping(source = "createdAt", target = "createdAt")
+ // @Mapping(source = "course.imageUrl", target = "courseThumbnailUrl")
+    @Mapping(expression = "java(new String(\"fake link\"))", target = "courseThumbnailUrl")
     OrderCourseResponse toResponse(CourseOrder courseOrder);
 }
 
