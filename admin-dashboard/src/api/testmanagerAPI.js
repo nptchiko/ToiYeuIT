@@ -28,10 +28,9 @@ api.interceptors.request.use(
 // Tests API service
 const TestAPI = {
   // Get all tests with pagination
-  getAllTests: async (page = 1, size = 10) => {
+  getAllTests: async (page = 1, size = 50) => {
     try {
       const response = await api.get(`/admin/tests?page=${page}&size=${size}`);
-      console.log(response.data.body);
       return response.data;
     } catch (error) {
       console.error("Error fetching tests:", error);
@@ -39,10 +38,31 @@ const TestAPI = {
     }
   },
 
-  // Create a new test
-  createTest: async (testSetId, name) => {
+  // Create a new test set
+  createTestSet: async (name, skill = "", description = "") => {
     try {
-      const response = await api.post("/admin/tests", { testSetId, name });
+      const response = await api.post("/admin/tests", {
+        name,
+        skill,
+        description,
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error creating test set:", error);
+      throw error;
+    }
+  },
+
+  // Create a new test
+  createTest: async (testData) => {
+    try {
+      // The API expects testSetId, title, and content in the request body
+      const response = await api.post("/admin/tests/test", {
+        testSetId: testData.testSetId,
+        title: testData.name,
+        content: testData.content,
+      });
+      console.log("response createTest ", response.data);
       return response.data;
     } catch (error) {
       console.error("Error creating test:", error);
@@ -53,7 +73,11 @@ const TestAPI = {
   // Update an existing test
   updateTest: async (status, testId, name) => {
     try {
-      const response = await api.put(`/admin/tests`, { status, testId, name });
+      const response = await api.put(`/admin/tests/test`, {
+        status,
+        testId,
+        name,
+      });
       return response.data;
     } catch (error) {
       console.error("Error updating test:", error);
@@ -64,7 +88,7 @@ const TestAPI = {
   // Delete a test
   deleteTest: async (testId) => {
     try {
-      const response = await api.delete(`/admin/tests/${testId}`);
+      const response = await api.delete(`/admin/tests/test/${testId}`);
       return response.data;
     } catch (error) {
       console.error("Error deleting test:", error);
@@ -74,11 +98,20 @@ const TestAPI = {
   // Get test details
   getTestById: async (testId) => {
     try {
-      const response = await api.get(`/admin/tests/${testId}`);
+      const response = await api.get(`/admin/tests/test/${testId}`);
 
       return response.data;
     } catch (error) {
       console.error(`Error fetching test with ID ${testId}:`, error);
+      throw error;
+    }
+  },
+  deleteTests: async (testSetId) => {
+    try {
+      const response = await api.delete(`/admin/tests/${testSetId}`);
+      return response.data;
+    } catch (error) {
+      console.error("error deleting test: ", error);
       throw error;
     }
   },
