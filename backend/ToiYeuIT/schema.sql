@@ -56,7 +56,7 @@ CREATE TABLE `course` (
 
 -- Lesson table to store lesson information
 CREATE TABLE lesson (
-    lesson_id INT PRIMARY KEY AUTO_INCREMENT,
+    lesson_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     course_id INT NOT NULL,
     title VARCHAR(100) NOT NULL,
     description VARCHAR(255),
@@ -70,48 +70,6 @@ CREATE TABLE lesson (
 );
 
 -- Grammar content for lessons (required for each lesson)
-CREATE TABLE grammar (
-    grammar_id INT PRIMARY KEY AUTO_INCREMENT,
-    lesson_id INT NOT NULL UNIQUE, -- Each lesson must have exactly one grammar entry
-    title VARCHAR(100) NOT NULL,
-    content TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_grammar_lesson FOREIGN KEY (lesson_id) REFERENCES lesson(lesson_id) ON DELETE CASCADE
-);
-
--- Quiz questions for grammar sections
-CREATE TABLE grammar_quiz (
-    grammar_quiz_id INT PRIMARY KEY AUTO_INCREMENT,
-    grammar_id INT NOT NULL,
-    question_text TEXT NOT NULL,
-    order_index INT NOT NULL, -- To maintain order of questions
-    CONSTRAINT fk_quiz_grammar FOREIGN KEY (grammar_id) REFERENCES grammar(grammar_id) ON DELETE CASCADE
-);
-
--- Options for quiz questions
-CREATE TABLE quiz_option (
-    option_id INT PRIMARY KEY AUTO_INCREMENT,
-    grammar_quiz_id INT NOT NULL,
-    option_text TEXT NOT NULL,
-    is_correct BOOLEAN DEFAULT FALSE,
-    CONSTRAINT fk_option_question FOREIGN KEY (grammar_quiz_id) REFERENCES grammar_quiz(grammar_quiz_id) ON DELETE CASCADE
-);
-
--- User answers to track progress
-CREATE TABLE quiz_user_submission (
-    submission_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id BIGINT NOT NULL,
-    question_id INT NOT NULL,
-    selected_option_id INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT uk_quiz_user_question UNIQUE (user_id, question_id),
-    CONSTRAINT fk_submission_user FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE,
-    CONSTRAINT fk_submission_question FOREIGN KEY (question_id) REFERENCES grammar_quiz(grammar_quiz_id) ON DELETE CASCADE,
-    CONSTRAINT fk_submission_option FOREIGN KEY (selected_option_id) REFERENCES quiz_option(option_id) ON DELETE SET NULL
-);
-
 create table test_collection
 (
     id          int auto_increment
@@ -177,6 +135,48 @@ create table multichoice_detail
             on update cascade on delete cascade
 );
 
+CREATE TABLE grammar (
+                         grammar_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                         lesson_id BIGINT NOT NULL UNIQUE, -- Each lesson must have exactly one grammar entry
+                         title VARCHAR(100) NOT NULL,
+                         content TEXT NOT NULL,
+                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                         CONSTRAINT fk_grammar_lesson FOREIGN KEY (lesson_id) REFERENCES lesson(lesson_id) ON DELETE CASCADE
+);
+
+-- Quiz questions for grammar sections
+CREATE TABLE grammar_quiz (
+                              grammar_quiz_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                              grammar_id BIGINT NOT NULL,
+                              question_text TEXT NOT NULL,
+                              order_index INT NOT NULL, -- To maintain order of questions
+                              CONSTRAINT fk_quiz_grammar FOREIGN KEY (grammar_id) REFERENCES grammar(grammar_id) ON DELETE CASCADE
+);
+
+-- Options for quiz questions
+CREATE TABLE quiz_option (
+                             option_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                             grammar_quiz_id BIGINT NOT NULL,
+                             option_text TEXT NOT NULL,
+                             is_correct BOOLEAN DEFAULT FALSE,
+                             CONSTRAINT fk_option_question FOREIGN KEY (grammar_quiz_id) REFERENCES grammar_quiz(grammar_quiz_id) ON DELETE CASCADE
+);
+
+-- User answers to track progress
+CREATE TABLE quiz_user_submission
+(
+    submission_id      BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id            BIGINT NOT NULL,
+    question_id        BIGINT NOT NULL,
+    selected_option_id BIGINT    NOT NULL,
+    created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT uk_quiz_user_question UNIQUE (user_id, question_id),
+    CONSTRAINT fk_submission_user FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_submission_question FOREIGN KEY (question_id) REFERENCES grammar_quiz (grammar_quiz_id) ON DELETE CASCADE,
+    CONSTRAINT fk_submission_option FOREIGN KEY (selected_option_id) REFERENCES quiz_option (option_id) ON DELETE CASCADE
+);
 create table test_detail
 (
     id int auto_increment,
