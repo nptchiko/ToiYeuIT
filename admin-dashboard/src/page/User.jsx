@@ -18,22 +18,32 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Loader2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 
 export default function UsersPage() {
+  // Helper function to convert gender from backend format (m/f) to display format (Nam/Nữ)
+  const formatGender = (gender) => {
+    if (gender === "m") return "Nam";
+    if (gender === "f") return "Nữ";
+    return gender; // Return original if not m or f
+  };
+
   // State hooks
   const [searchTerm, setSearchTerm] = useState("");
   const [users, setUsers] = useState([]);
   const [displayedUsers, setDisplayedUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({});
-  const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false); // infinite scroll
-  const [displayCount] = useState(10); // Initial display count
-  const observerRef = useRef(null);
-  const lastUserElementRef = useRef(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
   // Modal states
   const [activeModal, setActiveModal] = useState(null);
@@ -41,14 +51,15 @@ export default function UsersPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [editFormData, setEditFormData] = useState({
     name: "",
-    email: "",
     role: "",
     status: "",
+    phone: "",
+    gender: "",
   });
   const [newUserData, setNewUserData] = useState({
     username: "",
     email: "",
-    role: "Học viên",
+    role: "USER",
     phone: "",
     gender: "Nam",
   });
@@ -73,93 +84,15 @@ export default function UsersPage() {
     };
   }, [isDropdownOpen]);
 
-  // Fetch data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setIsLoading(true);
-        // Call API to get user list
-        const response = await userService.getUsers();
-        // Process returned data
-        const fetchedUsers = response.data.map((user) => ({
-          id: user.id,
-          name: user.username,
-          email: user.email,
-          role: user.role,
-          status: "Đang hoạt động",
-          registrationDate: new Date().toLocaleDateString("vi-VN"),
-          phone: user.phone,
-          gender: user.gender,
-          avatar: "/placeholder.svg?height=40&width=40",
-        }));
-
-        setUsers(fetchedUsers);
-
-        // Create stats from data
-        const statsData = {
-          totalUsers: fetchedUsers.length,
-          totalStudents: fetchedUsers.filter((user) => user.role === "USER")
-            .length,
-          newRegistrations: Math.floor(fetchedUsers.length * 0.2), // Assume 20% are new registrations
-          usersTrend: { percentage: 5.2 },
-          studentsTrend: { percentage: 2.1 },
-          registrationTrend: { percentage: 3.7 },
-        };
-
-        setStats(statsData);
-
-        // Display first 10 users
-        setDisplayedUsers(fetchedUsers.slice(0, displayCount));
-        setHasMore(fetchedUsers.length > displayCount);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-        // Fallback to mock data if API fails
-        const mockUsers = Array(20)
-          .fill(0)
-          .map((_, index) => ({
-            id: index + 1,
-            name: `Người dùng ${index + 1}`,
-            email: `user${index + 1}@example.com`,
-            role: "Học viên",
-            status: index % 5 === 0 ? "Không hoạt động" : "Đang hoạt động",
-            registrationDate: new Date().toLocaleDateString("vi-VN"),
-            phone: `098765432${index % 10}`,
-            gender: index % 2 === 0 ? "Nam" : "Nữ",
-            avatar: "/placeholder.svg?height=40&width=40",
-          }));
-
-        setUsers(mockUsers);
-        setDisplayedUsers(mockUsers.slice(0, displayCount));
-        setHasMore(mockUsers.length > displayCount);
-
-        // Create stats from sample data
-        const statsData = {
-          totalUsers: mockUsers.length,
-          totalStudents: mockUsers.filter((user) => user.role === "Học viên")
-            .length,
-          newRegistrations: Math.floor(mockUsers.length * 0.2),
-          usersTrend: { percentage: 5.2 },
-          studentsTrend: { percentage: 2.1 },
-          registrationTrend: { percentage: 3.7 },
-        };
-
-        setStats(statsData);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [displayCount]);
-
-  // Load more data when scrolling
-  const loadMoreUsers = useCallback(async () => {
-    if (loadingMore || !hasMore) return;
-    setLoadingMore(true);
-
+  // Fetch data with pagination
+  const fetchUsers = useCallback(async () => {
     try {
-      const response = await userService.getUsers();
-      const newUsers = response.data.data.map((user) => ({
+      setIsLoading(true);
+      // Call API to get user list with pagination
+      const response = await userService.getUsers(currentPage, pageSize);
+
+      // Process returned data
+      const fetchedUsers = response.users.map((user) => ({
         id: user.id,
         name: user.username,
         email: user.email,
@@ -167,45 +100,91 @@ export default function UsersPage() {
         status: "Đang hoạt động",
         registrationDate: new Date().toLocaleDateString("vi-VN"),
         phone: user.phone,
-        gender: user.gender,
+        gender: formatGender(user.gender), // Format gender for display
+        rawGender: user.gender, // Keep original value for API
+        avatar: "/placeholder.svg?height=40&width=40",
       }));
-      setDisplayedUsers([...displayedUsers, ...newUsers]);
-      setHasMore(newUsers.length === 10); // Assume each page has 10 items
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoadingMore(false);
-    }
-  }, [displayedUsers, loadingMore, hasMore]);
 
-  // Set up intersection observer for infinite scroll
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (
-          entries[0].isIntersecting &&
-          hasMore &&
-          !loadingMore &&
-          !isLoading
-        ) {
-          loadMoreUsers();
-        }
-      },
-      { threshold: 0.5 }
-    );
+      setUsers(fetchedUsers);
+      setDisplayedUsers(fetchedUsers);
 
-    observerRef.current = observer;
-
-    if (lastUserElementRef.current) {
-      observer.observe(lastUserElementRef.current);
-    }
-
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
+      if (response.pagination) {
+        setTotalItems(response.pagination.totalItems);
+        setTotalPages(response.pagination.totalPages);
+      } else {
+        const estimatedTotal = response.length * 5;
+        setTotalItems(estimatedTotal);
+        setTotalPages(Math.ceil(estimatedTotal / pageSize));
       }
-    };
-  }, [hasMore, loadingMore, isLoading, loadMoreUsers]);
+      // Create stats from data
+      const statsData = {
+        totalUsers: fetchedUsers.length + (currentPage - 1) * pageSize, // Placeholder
+        totalStudents: fetchedUsers.filter((user) => user.role === "USER")
+          .length,
+        newRegistrations: Math.floor(fetchedUsers.length * 0.2),
+        usersTrend: { percentage: 5.2 },
+        studentsTrend: { percentage: 2.1 },
+        registrationTrend: { percentage: 3.7 },
+      };
+
+      setStats(statsData);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      // Fallback to mock data if API fails
+      const mockUsers = Array(pageSize)
+        .fill(0)
+        .map((_, index) => ({
+          id: (currentPage - 1) * pageSize + index + 1,
+          name: `Người dùng ${(currentPage - 1) * pageSize + index + 1}`,
+          email: `user${(currentPage - 1) * pageSize + index + 1}@example.com`,
+          role: "USER",
+          status: index % 5 === 0 ? "Không hoạt động" : "Đang hoạt động",
+          registrationDate: new Date().toLocaleDateString("vi-VN"),
+          phone: `098765432${index % 10}`,
+          gender: index % 2 === 0 ? "Nam" : "Nữ",
+          rawGender: index % 2 === 0 ? "m" : "f", // Keep original value for API
+          avatar: "/placeholder.svg?height=40&width=40",
+        }));
+
+      setUsers(mockUsers);
+      setDisplayedUsers(mockUsers);
+
+      // Mock pagination data
+      setTotalItems(100); // Assume 100 total users
+      setTotalPages(10); // Assume 10 pages (100/10)
+
+      // Create stats from sample data
+      const statsData = {
+        totalUsers: 100, // Placeholder
+        totalStudents: mockUsers.filter((user) => user.role === "USER").length,
+        newRegistrations: Math.floor(mockUsers.length * 0.2),
+        usersTrend: { percentage: 5.2 },
+        studentsTrend: { percentage: 2.1 },
+        registrationTrend: { percentage: 3.7 },
+      };
+
+      setStats(statsData);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, pageSize]);
+
+  // Fetch users when pagination changes
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers, currentPage]);
+
+  // Handle page change
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  // Handle page size change
+  const handlePageSizeChange = (e) => {
+    const newSize = Number.parseInt(e.target.value);
+    setPageSize(newSize);
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
 
   // Memoized filtered users
   const filteredUsers = useMemo(() => {
@@ -237,13 +216,22 @@ export default function UsersPage() {
     setSelectedUser(user);
 
     if (modalType === "edit" && user) {
+      // For edit modal, convert display gender back to raw value for API
+      const rawGender =
+        user.rawGender ||
+        (user.gender === "Nam"
+          ? "m"
+          : user.gender === "Nữ"
+          ? "f"
+          : user.gender);
+
       setEditFormData({
         name: user.name,
-        email: user.email,
         role: user.role,
         status: user.status,
         phone: user.phone,
-        gender: user.gender,
+        gender: user.gender, // Use display gender for UI
+        rawGender: rawGender, // Keep raw gender for API
       });
     }
   };
@@ -267,12 +255,6 @@ export default function UsersPage() {
   // CRUD operations
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    // validate email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(editFormData.email)) {
-      alert("Email không hợp lệ");
-      return;
-    }
 
     // Validate phone number
     if (editFormData.phone && !/^\d{10}$/.test(editFormData.phone)) {
@@ -282,14 +264,25 @@ export default function UsersPage() {
 
     try {
       // Prepare data for API
-      const genderForBackend = editFormData.gender === "Nam" ? "M" : "F";
+      const genderForBackend =
+        editFormData.gender === "Nam"
+          ? "m"
+          : editFormData.gender === "Nữ"
+          ? "f"
+          : editFormData.rawGender || editFormData.gender;
+
+      // Convert status to boolean for API
+      const statusForBackend =
+        typeof editFormData.status === "boolean"
+          ? editFormData.status
+          : editFormData.status === "Đang hoạt động";
+
       const payload = {
         username: editFormData.name,
-        email: editFormData.email,
         role: editFormData.role,
         phone: editFormData.phone,
         gender: genderForBackend,
-        status: editFormData.status,
+        status: statusForBackend,
       };
 
       // Call API to update user
@@ -301,41 +294,23 @@ export default function UsersPage() {
         // Continue updating UI even if API fails
       }
 
-      // Update state
+      // Update state with consistent status format
       const updatedUsers = users.map((user) =>
         user.id === selectedUser.id
           ? {
               ...user,
-              id: editFormData.id,
               name: editFormData.name,
-              email: editFormData.email,
               role: editFormData.role,
-              status: editFormData.status,
+              status: statusForBackend ? "Đang hoạt động" : "Không hoạt động",
               phone: editFormData.phone,
               gender: editFormData.gender,
+              rawGender: genderForBackend,
             }
           : user
       );
 
       setUsers(updatedUsers);
-
-      // Update displayedUsers
-      const updatedDisplayedUsers = displayedUsers.map((user) =>
-        user.id === selectedUser.id
-          ? {
-              ...user,
-              id: editFormData.id,
-              name: editFormData.name,
-              email: editFormData.email,
-              role: editFormData.role,
-              status: editFormData.status,
-              phone: editFormData.phone,
-              gender: editFormData.gender,
-            }
-          : user
-      );
-
-      setDisplayedUsers(updatedDisplayedUsers);
+      setDisplayedUsers(updatedUsers);
       closeModal();
     } catch (error) {
       console.error("Error updating user:", error);
@@ -350,7 +325,7 @@ export default function UsersPage() {
     if (
       !newUserData.username.trim() ||
       !newUserData.email.trim() ||
-      !newUserData.password.trim()
+      !newUserData.password?.trim()
     ) {
       alert("Vui lòng điền đầy đủ thông tin bắt buộc");
       return;
@@ -388,11 +363,10 @@ export default function UsersPage() {
 
         // Get ID from response if available
         let newUserId;
-        if (response.data && response.data.id) {
-          newUserId = response.data.id;
+        if (response.data?.body?.id) {
+          newUserId = response.data.body.id;
         } else {
-          // If backend doesn't return ID, create temporary ID in frontend
-          newUserId = Date.now().toString(); // Use timestamp as temporary ID
+          newUserId = Date.now().toString();
         }
 
         // Create new user for frontend
@@ -400,29 +374,29 @@ export default function UsersPage() {
           id: newUserId,
           name: newUserData.username,
           email: newUserData.email,
-          role: newUserData.role || "Học viên",
+          role:
+            response.data?.body?.role ||
+            response.data?.role ||
+            newUserData.role ||
+            "USER",
           status: "Đang hoạt động",
           registrationDate: new Date().toLocaleDateString("vi-VN"),
           phone: newUserData.phone || "",
-          gender: newUserData.gender, // Keep original display value "Nam" or "Nữ"
+          gender: newUserData.gender,
+          rawGender: genderForBackend,
           avatar: "/placeholder.svg?height=40&width=40",
         };
 
         // Update state
         setUsers((prevUsers) => [newUser, ...prevUsers]);
-
-        // Update displayedUsers
-        setDisplayedUsers((prevDisplayed) => [
-          newUser,
-          ...prevDisplayed.slice(0, prevDisplayed.length - 1),
-        ]);
+        setDisplayedUsers((prevDisplayed) => [newUser, ...prevDisplayed]);
 
         // Update stats
         setStats((prev) => ({
           ...prev,
           totalUsers: prev.totalUsers + 1,
           totalStudents:
-            newUserData.role === "Học viên"
+            newUserData.role === "USER"
               ? prev.totalStudents + 1
               : prev.totalStudents,
           newRegistrations: prev.newRegistrations + 1,
@@ -433,11 +407,14 @@ export default function UsersPage() {
         setNewUserData({
           username: "",
           email: "",
-          password: "", // Add password field to reset state
-          role: "Học viên",
+          password: "",
+          role: "USER",
           phone: "",
           gender: "Nam",
         });
+
+        // Refresh the current page to show the new user
+        fetchUsers();
       } catch (apiError) {
         console.error("API error:", apiError);
         alert("Có lỗi xảy ra khi thêm người dùng mới");
@@ -462,28 +439,71 @@ export default function UsersPage() {
       // Update state
       const updatedUsers = users.filter((user) => user.id !== selectedUser.id);
       setUsers(updatedUsers);
-
-      // Update displayedUsers
-      const updatedDisplayedUsers = displayedUsers.filter(
-        (user) => user.id !== selectedUser.id
-      );
-      setDisplayedUsers(updatedDisplayedUsers);
+      setDisplayedUsers(updatedUsers);
 
       // Update stats
       setStats((prev) => ({
         ...prev,
         totalUsers: prev.totalUsers - 1,
         totalStudents:
-          selectedUser.role === "Học viên"
+          selectedUser.role === "USER"
             ? prev.totalStudents - 1
             : prev.totalStudents,
       }));
 
       closeModal();
+
+      // If we deleted the last user on this page and it's not the first page, go to previous page
+      if (updatedUsers.length === 0 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      } else {
+        // Otherwise refresh the current page
+        fetchUsers();
+      }
     } catch (error) {
       console.error("Error deleting user:", error);
       alert("Có lỗi xảy ra khi xóa người dùng");
     }
+  };
+
+  // Generate pagination numbers
+  const generatePaginationNumbers = () => {
+    const pages = [];
+    const maxPagesToShow = 5;
+
+    if (totalPages <= maxPagesToShow) {
+      // If there are fewer than maxPagesToShow pages, show all
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Show ellipsis for larger number of pages
+      if (currentPage <= 3) {
+        // At beginning, show 1, 2, 3, ..., totalPages
+        for (let i = 1; i <= 3; i++) {
+          pages.push(i);
+        }
+        pages.push("...");
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        // At end, show 1, ..., totalPages-2, totalPages-1, totalPages
+        pages.push(1);
+        pages.push("...");
+        for (let i = totalPages - 2; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push("...");
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push("...");
+        pages.push(totalPages);
+      }
+    }
+
+    return pages;
   };
 
   return (
@@ -681,39 +701,24 @@ export default function UsersPage() {
                     ? Array(5)
                         .fill(0)
                         .map((_, index) => <UserSkeleton key={index} />)
-                    : filteredUsers.map((user, index) => {
-                        // Check if this is the last item
-                        const isLastItem = index === filteredUsers.length - 1;
-
-                        return (
-                          <UserRow
-                            key={user.id}
-                            user={user}
-                            ref={isLastItem ? lastUserElementRef : null}
-                            onView={() => openModal("view", user)}
-                            onEdit={() => openModal("edit", user)}
-                            onDelete={() => openModal("delete", user)}
-                          />
-                        );
-                      })}
+                    : filteredUsers.map((user) => (
+                        <UserRow
+                          key={user.id}
+                          user={user}
+                          onView={() => openModal("view", user)}
+                          onEdit={() => openModal("edit", user)}
+                          onDelete={() => openModal("delete", user)}
+                        />
+                      ))}
                 </tbody>
               </table>
             </div>
 
-            {/* Loading indicator for infinite scroll */}
-            {loadingMore && (
+            {/* Loading indicator */}
+            {isLoading && (
               <div className="flex justify-center items-center py-4">
                 <Loader2 className="h-6 w-6 text-primary animate-spin" />
-                <span className="ml-2 text-muted-foreground">
-                  Đang tải thêm...
-                </span>
-              </div>
-            )}
-
-            {/* End of list message */}
-            {!hasMore && filteredUsers.length > 0 && (
-              <div className="text-center py-4 text-muted-foreground">
-                Displayed all users ...
+                <span className="ml-2 text-muted-foreground">Loading...</span>
               </div>
             )}
 
@@ -721,6 +726,106 @@ export default function UsersPage() {
             {filteredUsers.length === 0 && !isLoading && (
               <div className="text-center py-8 text-muted-foreground">
                 No user found....
+              </div>
+            )}
+
+            {/* Pagination Controls */}
+            {filteredUsers.length > 0 && !isLoading && (
+              <div className="mt-6 flex flex-col sm:flex-row justify-between items-center">
+                <div className="flex items-center space-x-2 mb-4 sm:mb-0">
+                  <span className="text-sm text-muted-foreground">
+                    Rows per page:
+                  </span>
+                  <select
+                    className="border border-input rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                    value={pageSize}
+                    onChange={handlePageSizeChange}
+                  >
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                  </select>
+                  <span className="text-sm text-muted-foreground">
+                    Showing{" "}
+                    {Math.min((currentPage - 1) * pageSize + 1, totalItems)} to{" "}
+                    {Math.min(currentPage * pageSize, totalItems)} of{" "}
+                    {totalItems} entries
+                  </span>
+                </div>
+
+                <div className="flex items-center space-x-1">
+                  <button
+                    onClick={() => handlePageChange(1)}
+                    disabled={currentPage === 1}
+                    className={`px-3 py-1.5 border border-input rounded-md ${
+                      currentPage === 1
+                        ? "bg-muted text-muted-foreground cursor-not-allowed"
+                        : "hover:bg-accent hover:text-accent-foreground"
+                    }`}
+                  >
+                    First
+                  </button>
+
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`px-3 py-1.5 border border-input rounded-md ${
+                      currentPage === 1
+                        ? "bg-muted text-muted-foreground cursor-not-allowed"
+                        : "hover:bg-accent hover:text-accent-foreground"
+                    }`}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+
+                  {generatePaginationNumbers().map((page, index) =>
+                    page === "..." ? (
+                      <span
+                        key={`ellipsis-${index}`}
+                        className="px-3 py-1.5 text-muted-foreground"
+                      >
+                        ...
+                      </span>
+                    ) : (
+                      <button
+                        key={`page-${page}`}
+                        onClick={() => handlePageChange(page)}
+                        className={`px-3 py-1.5 border border-input rounded-md ${
+                          currentPage === page
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-accent hover:text-accent-foreground"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  )}
+
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`px-3 py-1.5 border border-input rounded-md ${
+                      currentPage === totalPages
+                        ? "bg-muted text-muted-foreground cursor-not-allowed"
+                        : "hover:bg-accent hover:text-accent-foreground"
+                    }`}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+
+                  <button
+                    onClick={() => handlePageChange(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className={`px-3 py-1.5 border border-input rounded-md ${
+                      currentPage === totalPages
+                        ? "bg-muted text-muted-foreground cursor-not-allowed"
+                        : "hover:bg-accent hover:text-accent-foreground"
+                    }`}
+                  >
+                    Last
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -736,16 +841,8 @@ export default function UsersPage() {
         <EditUserModal
           user={selectedUser}
           formData={editFormData}
-          onChange={handleEditInputChange}
+          onInputChange={handleEditInputChange}
           onSubmit={handleEditSubmit}
-          onClose={closeModal}
-        />
-      )}
-
-      {activeModal === "delete" && selectedUser && (
-        <DeleteUserModal
-          user={selectedUser}
-          onConfirm={confirmDeleteUser}
           onClose={closeModal}
         />
       )}
@@ -755,6 +852,14 @@ export default function UsersPage() {
           formData={newUserData}
           onChange={handleNewUserInputChange}
           onSubmit={handleAddSubmit}
+          onClose={closeModal}
+        />
+      )}
+
+      {activeModal === "delete" && selectedUser && (
+        <DeleteUserModal
+          user={selectedUser}
+          onConfirm={confirmDeleteUser}
           onClose={closeModal}
         />
       )}

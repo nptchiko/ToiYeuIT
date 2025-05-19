@@ -46,8 +46,12 @@ api.interceptors.response.use(
 // User related API calls
 const userService = {
   // Get all users
-  getUsers: async () => {
-    return api.get("/api/users");
+  getUsers: async (page = 1, size = 9) => {
+    const response = await api.get(
+      `/api/admin/users?page=${page}&size=${size}`
+    );
+    console.log("hehe", response.data.body);
+    return response.data.body;
   },
 
   // Create a new user
@@ -57,12 +61,12 @@ const userService = {
 
   // Update a user
   updateUser: async (userId, userData) => {
-    return api.put(`/api/users/${userId}`, userData);
+    return api.put(`/api/admin/users/${userId}`, userData);
   },
 
   // Delete a user
   deleteUser: async (userId) => {
-    return api.delete(`/api/users/${userId}`);
+    return api.delete(`/api/admin/users/${userId}`);
   },
 };
 
