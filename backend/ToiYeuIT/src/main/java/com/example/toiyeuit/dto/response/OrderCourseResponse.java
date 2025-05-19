@@ -10,8 +10,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class OrderCourseResponse {
-    private Integer courseId;
-    private Long userId;
+    private String courseTitle;
+    private String username;
+    private String courseThumbnailUrl;
     private String status;
     private String paymentMethod;
     private LocalDateTime createdAt;

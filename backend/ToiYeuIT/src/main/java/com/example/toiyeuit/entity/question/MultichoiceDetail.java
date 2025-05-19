@@ -1,6 +1,5 @@
 package com.example.toiyeuit.entity.question;
 
-import com.example.toiyeuit.entity.key.Key;
 import com.example.toiyeuit.enums.AnswerKey;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,22 +16,21 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE) //Entity
 @Table(name = "multichoice_detail")
 public class MultichoiceDetail {
-    @EmbeddedId
-    @JsonIgnore
-    Key id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
 
     @ManyToOne
     @JsonIgnore
-    @MapsId("question_id")
     @JoinColumn(name = "ques_id")
     Question question;
 
     @JsonProperty("key")
-    AnswerKey getAnswerKey(){
-        return id.getKey();
-    }
+    @Enumerated(EnumType.STRING)
+    AnswerKey answerKey;
 
     @Column(name = "answer_description")
     String description;
+
 
 }

@@ -1,6 +1,7 @@
-package com.example.toiyeuit.dto.admin.test;
+package com.example.toiyeuit.dto.request;
 
 
+import com.example.toiyeuit.entity.question.MultichoiceDetail;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -14,8 +15,10 @@ import java.util.Set;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TestCreationRequest {
-    long testSetId;
-    String title;
-    Set<TestDetailCreationRequest> content;
+public class QuestionRequest {
+    String description;
+    String audioSource;
+    String imageSource;
+    Set<MultichoiceDetail> options;
+    String correctAnswer;
 }

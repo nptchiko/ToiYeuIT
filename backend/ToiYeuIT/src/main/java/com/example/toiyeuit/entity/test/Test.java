@@ -25,6 +25,7 @@ public class Test {
     @Column(name = "title")
     String title;
 
+    @Column(name = "indexx")
     int index;
 
     @JsonIgnore

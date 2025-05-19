@@ -21,11 +21,9 @@ public class UserController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final UserService userService;
-    private final UserRepository userRepository;
 
     public UserController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
-        this.userRepository = userRepository;
     }
 ///  ADMIN ///
     @DeleteMapping("/{id}")
