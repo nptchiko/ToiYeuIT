@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -53,7 +54,8 @@ public class LessonService {
             throw new ResourceNotFoundException("Course with id " + courseId + " not found");
         }
 
-        if (!lessonRepository.existsById(lessonId)) {
+        Optional<Lesson> lesson = lessonRepository.findById(lessonId);
+        if (lesson.isEmpty()) {
             throw new ResourceNotFoundException("Lesson with id " + lessonId + " not found");
         }
 
@@ -84,6 +86,20 @@ public class LessonService {
                 .selectedOption(quizOption)
                 .build();
 
-        return quizUserSubmissionRepository.save(quizUserSubmission);
+        QuizUserSubmission returnedQuizUserSubmission = quizUserSubmissionRepository.save(quizUserSubmission);
+
+        Optional<Grammar> grammar = grammarRespository.findByLessonId(lessonId);
+        if (grammar.isPresent()) {
+            List<GrammarQuiz> quizzes = grammarQuizRepository.findAllByGrammarId(grammar.get().getId());
+            for (var quiz : quizzes) {
+                if (!quizUserSubmissionRepository.existsByUserIdAndQuestionId(user.getId(), quiz.getId())) {
+                    return returnedQuizUserSubmission;
+                }
+            }
+        }
+
+        lesson.get().setIsSubmitted(true);
+        lessonRepository.save(lesson.get());
+        return returnedQuizUserSubmission;
     }
 }
