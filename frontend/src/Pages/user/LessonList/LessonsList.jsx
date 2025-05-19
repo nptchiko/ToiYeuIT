@@ -1,51 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CheckCircle, Clock } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-const data = [
-  {
-    id: 1,
-    title: "Giới thiệu về khóa học",
-    submitted: true,
-    sections: "2",
-    description:
-      "Bài học giới thiệu tổng quan về khóa học TOEIC, các phần thi và chiến lược học tập hiệu quả.",
-  },
-  {
-    id: 2,
-    title: "Listening: Tranh tả người",
-    submitted: false,
-    sections: "3",
-    description:
-      "Học cách nghe và hiểu các bức tranh mô tả người trong phần thi Listening.",
-  },
-  {
-    id: 3,
-    title: "Reading: Giới thiệu chung về Part 5",
-    submitted: true,
-    sections: "3",
-    description:
-      "Tìm hiểu về cấu trúc và chiến lược làm bài trong Reading Part 5.",
-  },
-];
-
+import { useNavigate, useLocation } from "react-router-dom";
+import LessonsListApi from "../../../api/LessonsListApi";
 const LessonsList = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { id } = location.state;
   const [activeLesson, setActiveLesson] = useState(null);
-  const completedLessons = data.filter((lesson) => lesson.submitted).length;
-  const totalLessons = data.length;
-
+  const [data, setData] = useState([]);
+  console.log(id);
+  useEffect(() => {
+    async function fetchLessonsLiSt() {
+      try {
+        const req = await LessonsListApi.getLessonList(id);
+        setData(req.body);
+      } catch (error) {
+        console.error("loi khi lay lesson");
+      }
+    }
+    fetchLessonsLiSt();
+  }, [id]);
   const handleClick = (lesson) => {
-    navigate("/lessonDetail", {
+    navigate("/lesson-detail", {
       state: {
-        id: lesson.id,
-        title: lesson.title,
-        sections: lesson.sections,
-        description: lesson.description,
-        submitted: lesson.submitted,
+        id_i: lesson.id,
+        id_ii: lesson.course.id,
       },
     });
   };
-
+  const completedLessons = data.filter((lesson) => lesson.isSubmitted).length;
+  const totalLessons = data.length;
   const handleLessonClick = (lesson) => {
     setActiveLesson(lesson.id === activeLesson ? null : lesson.id);
   };
@@ -60,11 +44,11 @@ const LessonsList = () => {
       </div>
       <div className="h-px bg-gray-200 mb-4"></div>
       <div className="space-y-4">
-        {data.map((lesson) => (
+        {data.map((lesson, index) => (
           <div key={lesson.id}>
             <div
               className={`flex items-center p-4 cursor-pointer border rounded-lg ${
-                lesson.submitted ? "bg-white" : "bg-gray-50"
+                lesson.isSubmitted ? "bg-white" : "bg-gray-50"
               } ${
                 activeLesson === lesson.id
                   ? "border-blue-500"
@@ -74,14 +58,12 @@ const LessonsList = () => {
             >
               <div
                 className={`flex-shrink-0 h-16 w-16 rounded-lg flex flex-col items-center justify-center ${
-                  lesson.submitted
+                  lesson.isSubmitted
                     ? "bg-green-500 text-white"
                     : "bg-gray-200 text-gray-700"
                 }`}
               >
-                <div className="text-xl font-bold">
-                  {lesson.id.toString().padStart(2, "0")}
-                </div>
+                <div className="text-xl font-bold">{index + 1}</div>
                 <div className="text-xs uppercase">Lesson</div>
               </div>
               <div className="ml-4 flex-grow">
@@ -109,13 +91,13 @@ const LessonsList = () => {
                   )}
                   <button
                     className={`px-4 py-2 rounded-lg font-medium ${
-                      lesson.submitted
+                      lesson.isSubmitted
                         ? "bg-green-100 text-green-800 border border-green-200"
                         : "bg-blue-600 text-white hover:bg-blue-700"
                     }`}
                     onClick={() => handleClick(lesson)}
                   >
-                    {lesson.submitted ? "Xem lại bài học" : "Tiếp tục học"}
+                    {lesson.isSubmitted ? "Xem lại bài học" : "Tiếp tục học"}
                   </button>
                 </div>
               </div>
