@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,8 +48,8 @@ public class UserService {
     TestRepository testRepository;
     CourseRepository courseRepository;
 
-    public List<UserResponse> getAllUsers() {
-        return userRepository.findAll().stream()
+    public List<UserResponse> getAllUsers(Pageable pageable) {
+        return userRepository.findAll(pageable).stream()
                 .map(userMapper::toUserResponse)
                 .collect(Collectors.toList());
     }
@@ -141,7 +142,7 @@ public class UserService {
 
     public OverviewResponse getOverviewInfo(){
         String email = SecurityUtils.getCurrentUserLogin();
-        var user = getUserByEmail("mikudeptrai@gmail.com");
+        var user = getUserByEmail(email);
 
         List<Course> cor = courseRepository.retrieveAllCourseOfUser(user.getId());
         List<TestResponse> tests = testRepository.retrieveBySubmission(user.getId());

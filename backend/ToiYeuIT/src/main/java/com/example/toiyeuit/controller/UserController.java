@@ -25,26 +25,6 @@ public class UserController {
     public UserController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
     }
-///  ADMIN ///
-    @DeleteMapping("/{id}")
-    public ApiResponse<?> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ApiResponse.builder()
-                .code(HttpStatus.OK.value())
-                .build();
-    }
-    @GetMapping("/{id}")
-    public UserResponse getUserByID(@PathVariable("id") Long id){
-        var info = userService.getUserById(id);
-
-        return info;
-    }
-
-    @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
-    }
-/// ADMIN ///
 
 
 
