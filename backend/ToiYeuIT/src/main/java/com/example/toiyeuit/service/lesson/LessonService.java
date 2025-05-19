@@ -13,6 +13,7 @@ import com.example.toiyeuit.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,13 +35,15 @@ public class LessonService {
         return lessonRepository.findAllByCourseId(courseId);
     }
 
-    public GrammarDTO findGrammarByLessonId(Long lessonId) {
+    public GrammarDTO findGrammarByLessonId(Integer courseId, Long lessonId) throws ResourceNotFoundException {
+        checkValidCourseIdAndLessonId(courseId, lessonId);
 
         Grammar grammar = grammarRespository.findByLessonId(lessonId)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson with id " + lessonId + " not found"));
         return GrammarDTO.fromEntity(grammar);
     }
 
+    @Transactional
     public QuizUserSubmission updateUserSubmission(QuizUserSubmission quiz, QuizUserSubmissionRequest request)
             throws ResourceNotFoundException {
         QuizOption option = quizOptionRepository
@@ -49,7 +52,9 @@ public class LessonService {
         return quizUserSubmissionRepository.save(quiz);
     }
 
-    public QuizUserSubmission saveUserSubmission(Integer courseId, Long lessonId, QuizUserSubmissionRequest request) {
+    @Transactional
+    public QuizUserSubmission saveUserSubmission(Integer courseId, Long lessonId, QuizUserSubmissionRequest request) throws
+            ResourceNotFoundException {
         if (!courseRepository.existsById(courseId)) {
             throw new ResourceNotFoundException("Course with id " + courseId + " not found");
         }
@@ -62,6 +67,8 @@ public class LessonService {
         User user = userRepository.findByEmail(SecurityUtils.getCurrentUserLogin()).orElseThrow(
                 () -> new LessonServiceLogicException("You must logged in to save your answer")
         );
+
+        checkValidCourseIdAndLessonId(courseId, lessonId);
 
        Optional<QuizUserSubmission> existedQuizUserSubmission = quizUserSubmissionRepository.findByUserIdAndQuestionId(user.getId(), request.getQuizId());
         if (existedQuizUserSubmission.isPresent()) {
@@ -101,5 +108,10 @@ public class LessonService {
         lesson.get().setIsSubmitted(true);
         lessonRepository.save(lesson.get());
         return returnedQuizUserSubmission;
+    }
+
+    public void checkValidCourseIdAndLessonId(Integer courseId, Long lessonId) throws ResourceNotFoundException {
+        lessonRepository.findByIdAndCourseId(lessonId, courseId).orElseThrow(() ->
+                new ResourceNotFoundException("Course id and lesson id not match. Please recheck if your course is consists of this lesson"));
     }
 }

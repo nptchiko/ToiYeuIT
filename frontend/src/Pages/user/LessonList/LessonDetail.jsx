@@ -71,10 +71,39 @@ const LessonDetail = () => {
     });
   };
 
-  const handleSubmitQuiz = () => {
-    // Here you would typically send the answers to the server
-    // For now, we'll just update the local state
-    setLocalSubmitted(true);
+  const handleSubmitQuiz = async () => {
+    try {
+      const courseId = id_ii;
+      const lessonId = id_i;
+
+      // Submit each answer sequentially
+      const submissionPromises = Object.entries(userAnswers).map(
+        ([questionId, optionId]) =>
+          LessonDetailApi.submitAnswer(
+            courseId,
+            lessonId,
+            questionId,
+            optionId,
+          ),
+      );
+
+      await Promise.all(submissionPromises);
+
+      setLocalSubmitted(true);
+
+      setLessonDetail({
+        ...lessonDetail,
+        lesson: {
+          ...lessonDetail.lesson,
+          isSubmitted: true,
+        },
+      });
+
+      alert("Bài trắc nghiệm đã được nộp thành công!");
+    } catch (error) {
+      console.error("Error submitting quiz answers:", error);
+      alert("Có lỗi xảy ra khi nộp bài. Vui lòng thử lại sau!");
+    }
   };
 
   const handleRetakeQuiz = () => {
@@ -91,7 +120,7 @@ const LessonDetail = () => {
       const selectedOptionId = userAnswers[question.id];
       if (selectedOptionId) {
         const selectedOption = question.options.find(
-          (opt) => opt.id === selectedOptionId
+          (opt) => opt.id === selectedOptionId,
         );
         if (selectedOption && selectedOption.isCorrect) {
           correct++;
@@ -264,7 +293,7 @@ const LessonDetail = () => {
                                   key={option.id}
                                   className={`p-2 rounded cursor-pointer hover:bg-gray-100 ${getOptionClassName(
                                     question,
-                                    option.id
+                                    option.id,
                                   )}`}
                                   onClick={() =>
                                     handleAnswerSelect(question.id, option.id)
@@ -291,7 +320,7 @@ const LessonDetail = () => {
                               userAnswers[question.id] &&
                               !isOptionCorrect(
                                 question,
-                                userAnswers[question.id]
+                                userAnswers[question.id],
                               ) && (
                                 <p className="text-red-600 mt-2 ml-4">
                                   Đáp án đúng là:{" "}

@@ -40,7 +40,7 @@ public class LessonController {
         return ApiResponse.<GrammarDTO>builder()
                 .message("Successfully retrieved grammar")
                 .code(200)
-                .body(lessonService.findGrammarByLessonId(lessonId))
+                .body(lessonService.findGrammarByLessonId(courseId, lessonId))
                 .build();
     }
 

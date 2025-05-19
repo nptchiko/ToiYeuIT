@@ -16,26 +16,33 @@ axiosClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 axiosClient.interceptors.response.use(
   (response) => response.data,
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 export const getLessonDetail = async (index_1, index_2) => {
   const res = await axiosClient.get(`/api/lessons/${index_1}/${index_2}`);
   return res;
 };
-export const submitTesAnswers = async (testId, score, context) => {
+export const submitAnswer = async (
+  courseId,
+  lessonId,
+  questionId,
+  optionId,
+) => {
   const payload = {
-    testId: testId,
-    score: score || 0,
-    context,
+    quizId: questionId,
+    optionId: optionId,
   };
-  const response = await axiosClient.post("/api/test-practice/submit", payload);
+  const response = await axiosClient.post(
+    `/api/lessons/${courseId}/${lessonId}/submit-answer`,
+    payload,
+  );
   return response;
 };
 export default {
   getLessonDetail,
-  submitTesAnswers,
+  submitAnswer,
 };
