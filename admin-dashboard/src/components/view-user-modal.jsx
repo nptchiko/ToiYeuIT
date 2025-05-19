@@ -6,7 +6,7 @@ export default function ViewUserModal({ user, onClose }) {
   return (
     <>
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-40"
+        className="fixed inset-0 bg-black bg-opacity-50 z-40 backdrop-blur-sm"
         onClick={onClose}
       ></div>
       <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
@@ -52,7 +52,15 @@ export default function ViewUserModal({ user, onClose }) {
               </div>
               <div className="bg-muted p-4 rounded-lg">
                 <p className="text-sm text-muted-foreground mb-1">Role</p>
-                <p className="font-medium text-card-foreground">{user.role}</p>
+                <p className="font-medium text-card-foreground">
+                  {user.role === "USER"
+                    ? "Student"
+                    : user.role === "TEACHER"
+                    ? "Teacher"
+                    : user.role === "ADMIN"
+                    ? "Admin"
+                    : user.role}
+                </p>
               </div>
               <div className="bg-muted p-4 rounded-lg">
                 <p className="text-sm text-muted-foreground mb-1">

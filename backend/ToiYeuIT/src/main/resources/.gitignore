@@ -1,0 +1,4 @@
+local.env.properties
+env.properties
+cert/
+!.gitignore

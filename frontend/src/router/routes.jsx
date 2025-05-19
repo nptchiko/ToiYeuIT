@@ -31,7 +31,9 @@ import HistoryInputReading from "../Pages/Practice/History_test/HistoryInputRrea
 import Vnpay from "../Pages/By_Course/Vnpay";
 import Successfull from "../Pages/By_Course/Successfull";
 import Failure from "../Pages/By_Course/Failure";
-
+import LessonDetail from "../Pages/user/LessonList/LessonDetail";
+import HistoryOrder from "../Pages/By_Course/HistoryOrder";
+import LessonsList from "../Pages/user/LessonList/LessonsList";
 const RoutersConfig = () => {
   const { user, loading } = useAuth();
 
@@ -107,6 +109,9 @@ const RoutersConfig = () => {
         <Route path="/vnpay" element={<Vnpay />} />
         <Route path="/check-input-reading" element={<CheckInputReading />} />
         <Route path="/profile" element={<UseProfileData />} />
+        <Route path="/history-order" element={<HistoryOrder />} />
+        <Route path="/lesson-detail" element={<LessonDetail />} />
+        <Route path="/lesson-list" element={<LessonsList />} />
         <Route path="/sidebar" element={<Sidebar />}>
           <Route index element={<Navigate to="overview" replace />} />
           <Route path="overview" element={<Overview />} />

@@ -23,9 +23,9 @@ import {
   Star,
   DollarSign,
   CalendarIcon,
-  CheckCircle,
   Trash2,
   Eye,
+  CheckCircle,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 
@@ -53,11 +53,37 @@ export default function CourseDashboard() {
       try {
         setLoading(true);
         const data = await courseService.getAllCourses();
-        setCourses(data);
-        setError(null);
+        if (Array.isArray(data)) {
+          // Ensure numeric fields are properly formatted
+          const formattedData = data.map((course) => ({
+            ...course,
+            price:
+              typeof course.price === "number"
+                ? course.price
+                : Number(course.price) || 0,
+            duration:
+              typeof course.duration === "number"
+                ? course.duration
+                : Number(course.duration) || 0,
+            students:
+              typeof course.students === "number"
+                ? course.students
+                : Number(course.students) || 0,
+            rating:
+              typeof course.rating === "number"
+                ? course.rating
+                : Number(course.rating) || 0,
+          }));
+          setCourses(formattedData);
+          setError(null);
+        } else {
+          setCourses([]);
+          setError("Invalid data from API");
+        }
       } catch (err) {
         console.error("Error fetching courses:", err);
-        setError("Không thể tải dữ liệu khóa học. Vui lòng thử lại sau.");
+        setError("Unable to load course data. Please try again later.");
+        setCourses([]);
       } finally {
         setLoading(false);
       }
@@ -140,7 +166,18 @@ export default function CourseDashboard() {
 
   // Handle course actions
   const handleEditCourse = (course) => {
-    setSelectedCourse(course);
+    // Ensure numeric fields are properly formatted before passing to form
+    setSelectedCourse({
+      ...course,
+      price:
+        typeof course.price === "number"
+          ? course.price
+          : Number(course.price) || 0,
+      duration:
+        typeof course.duration === "number"
+          ? course.duration
+          : Number(course.duration) || 0,
+    });
     setShowForm(true);
   };
 
@@ -163,30 +200,58 @@ export default function CourseDashboard() {
 
   const handleToggleVisibility = async (course) => {
     try {
+      setLoading(true);
       await courseService.toggleCourseVisibility(course.id, !course.enabled);
       // Refresh the course list
       setRefreshTrigger((prev) => prev + 1);
     } catch (err) {
       console.error("Error toggling course visibility:", err);
-      // You could add a toast notification here
+      setError(err.message || "Error changing course visibility status");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeleteCourse = async (courseId) => {
-    if (window.confirm("Bạn có chắc chắn muốn xóa khóa học này không?")) {
+    if (window.confirm("Are you sure you want to delete this course?")) {
       try {
+        setLoading(true);
         await courseService.deleteCourse(courseId);
         // Refresh the course list
         setRefreshTrigger((prev) => prev + 1);
+        setError(null);
       } catch (err) {
         console.error("Error deleting course:", err);
-        // You could add a toast notification here
+        setError("Error deleting course. Please try again later.");
+      } finally {
+        setLoading(false);
       }
     }
   };
 
+  // Format duration for display
+  const formatDuration = (duration) => {
+    if (!duration) return "No information";
+
+    // If duration is already a string with format like "6 tuần", return it
+    if (typeof duration === "string" && duration.includes(" ")) {
+      return duration;
+    }
+
+    // Otherwise format the number
+    const hours = Number(duration);
+    if (isNaN(hours)) return "No information";
+
+    if (hours < 24) {
+      return `${hours} giờ`;
+    } else {
+      const days = Math.floor(hours / 24);
+      return `${days} ngày`;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6 max-w-7xl">
         <h1 className="text-3xl font-bold mb-8  ">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
@@ -202,7 +267,7 @@ export default function CourseDashboard() {
               onClick={() => setRefreshTrigger((prev) => prev + 1)}
               className="ml-2 underline"
             >
-              Thử lại
+              Try again
             </button>
           </div>
         )}
@@ -210,24 +275,24 @@ export default function CourseDashboard() {
         {/* Thống kê */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <StatCard
-            icon={<Package className="h-6 w-6 text-blue-500" />}
-            title="Tổng khóa học"
+            icon={<Package className="h-6 w-6 text-primary" />}
+            title="Total Courses"
             value={stats.totalCourses}
             trend={{ value: "9.05%", isUp: true }}
             color="blue"
             loading={loading}
           />
           <StatCard
-            icon={<Users className="h-6 w-6 text-purple-500" />}
-            title="Tổng học viên"
+            icon={<Users className="h-6 w-6 text-[hsl(var(--chart-4))]" />}
+            title="Total Students"
             value={stats.totalStudents.toLocaleString()}
             trend={{ value: "12.3%", isUp: true }}
             color="purple"
             loading={loading}
           />
           <StatCard
-            icon={<Star className="h-6 w-6 text-amber-500" />}
-            title="Đánh giá trung bình"
+            icon={<Star className="h-6 w-6 text-[hsl(var(--chart-1))]" />}
+            title="Average Rating"
             value={stats.averageRating}
             trend={null}
             color="amber"
@@ -236,7 +301,7 @@ export default function CourseDashboard() {
         </div>
 
         {/* Thanh công cụ */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+        <div className="bg-card rounded-xl shadow-sm border border-border p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
             <div className="flex flex-1 gap-4 flex-wrap">
               {/* Dropdown Danh mục */}
@@ -247,32 +312,32 @@ export default function CourseDashboard() {
                 >
                   <Filter className="h-4 w-4" />
                   {categoryFilter === "all"
-                    ? "Tất cả khóa học"
+                    ? "All Courses"
                     : categoryFilter === "LR"
                     ? "Listening & Reading"
                     : "Speaking & Writing"}
                   <ChevronDown className="h-4 w-4" />
                 </button>
                 {showCategoryDropdown && (
-                  <div className="absolute left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-10 animate-fadeIn">
+                  <div className="absolute left-0 mt-2 w-56 bg-card rounded-lg shadow-lg border border-border z-10 animate-fadeIn">
                     <div className="py-1">
                       <button
                         onClick={() => {
                           setCategoryFilter("all");
                           setShowCategoryDropdown(false);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="w-full text-left px-4 py-2 text-sm text-muted-foreground hover:bg-secondary/80"
                       >
-                        Tất cả khóa học
+                        All Courses
                       </button>
                       <button
                         onClick={() => {
                           setCategoryFilter("LR");
                           setShowCategoryDropdown(false);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                        className="w-full text-left px-4 py-2 text-sm text-muted-foreground hover:bg-secondary/80 flex items-center"
                       >
-                        <Headphones className="h-4 w-4 mr-2 text-blue-500" />
+                        <Headphones className="h-4 w-4 mr-2 text-primary" />
                         Listening & Reading
                       </button>
                       <button
@@ -280,9 +345,9 @@ export default function CourseDashboard() {
                           setCategoryFilter("SW");
                           setShowCategoryDropdown(false);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                        className="w-full text-left px-4 py-2 text-sm text-muted-foreground hover:bg-secondary/80 flex items-center"
                       >
-                        <MessageSquare className="h-4 w-4 mr-2 text-purple-500" />
+                        <MessageSquare className="h-4 w-4 mr-2 text-[hsl(var(--chart-4))]" />
                         Speaking & Writing
                       </button>
                     </div>
@@ -298,113 +363,64 @@ export default function CourseDashboard() {
                 >
                   <Filter className="h-4 w-4" />
                   {levelFilter === "all"
-                    ? "Tất cả cấp độ"
+                    ? "All Levels"
                     : levelFilter === "basic"
-                    ? "Cơ bản"
+                    ? "Basic"
                     : levelFilter === "intermediate"
-                    ? "Trung cấp"
-                    : "Nâng cao"}
+                    ? "Intermediate"
+                    : "Advanced"}
                   <ChevronDown className="h-4 w-4" />
                 </button>
                 {showLevelDropdown && (
-                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10 animate-fadeIn">
+                  <div className="absolute left-0 mt-2 w-48 bg-card rounded-lg shadow-lg border border-border z-10 animate-fadeIn">
                     <div className="py-1">
                       <button
                         onClick={() => {
                           setLevelFilter("all");
                           setShowLevelDropdown(false);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="w-full text-left px-4 py-2 text-sm text-muted-foreground hover:bg-secondary/80"
                       >
-                        Tất cả cấp độ
+                        All Levels
                       </button>
                       <button
                         onClick={() => {
                           setLevelFilter("basic");
                           setShowLevelDropdown(false);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="w-full text-left px-4 py-2 text-sm text-muted-foreground hover:bg-secondary/80"
                       >
-                        Cơ bản
+                        Basic
                       </button>
                       <button
                         onClick={() => {
                           setLevelFilter("intermediate");
                           setShowLevelDropdown(false);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="w-full text-left px-4 py-2 text-sm text-muted-foreground hover:bg-secondary/80"
                       >
-                        Trung cấp
+                        Intermediate
                       </button>
                       <button
                         onClick={() => {
                           setLevelFilter("advanced");
                           setShowLevelDropdown(false);
                         }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="w-full text-left px-4 py-2 text-sm text-muted-foreground hover:bg-secondary/80"
                       >
-                        Nâng cao
+                        Advanced
                       </button>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Dropdown Trạng thái */}
-              {/* <div className="relative status-dropdown">
-                <button
-                  onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-secondary hover:bg-secondary/80 rounded-lg text-secondary-foreground font-medium transition-colors"
-                >
-                  <Filter className="h-4 w-4" />
-                  {statusFilter === "all"
-                    ? "Tất cả trạng thái"
-                    : statusFilter === "active"
-                    ? "Đang hoạt động"
-                    : "Ẩn"}
-                  <ChevronDown className="h-4 w-4" />
-                </button>
-                {showStatusDropdown && (
-                  <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10 animate-fadeIn">
-                    <div className="py-1">
-                      <button
-                        onClick={() => {
-                          setStatusFilter("all");
-                          setShowStatusDropdown(false);
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Tất cả trạng thái
-                      </button>
-                      <button
-                        onClick={() => {
-                          setStatusFilter("active");
-                          setShowStatusDropdown(false);
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Đang hoạt động
-                      </button>
-                      <button
-                        onClick={() => {
-                          setStatusFilter("hidden");
-                          setShowStatusDropdown(false);
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        Ẩn
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div> */}
-
               {/* Tìm kiếm */}
               <div className="relative flex-1 min-w-[200px]">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <input
                   type="text"
-                  placeholder="Tìm khóa học TOEIC..."
+                  placeholder="Search TOEIC courses..."
                   className="w-full pl-10 pr-4 py-2.5 bg-secondary border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -425,14 +441,14 @@ export default function CourseDashboard() {
               onClick={handleAddCourse}
               className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-lg font-medium shadow-sm transition-colors flex items-center gap-2 whitespace-nowrap"
             >
-              <Plus className="h-4 w-4" /> Tạo khóa học
+              <Plus className="h-4 w-4" /> Create Course
             </button>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="bg-white rounded-t-xl shadow-sm border border-gray-200">
-          <div className="border-b border-gray-200">
+        <div className="bg-card rounded-t-xl shadow-sm border border-border">
+          <div className="border-b border-border">
             <div className="flex">
               <button
                 onClick={() => setView("grid")}
@@ -442,7 +458,7 @@ export default function CourseDashboard() {
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <Grid className="h-4 w-4" /> Thẻ
+                <Grid className="h-4 w-4" /> Cards
               </button>
               <button
                 onClick={() => setView("list")}
@@ -452,7 +468,7 @@ export default function CourseDashboard() {
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <List className="h-4 w-4" /> Danh sách
+                <List className="h-4 w-4" /> List
               </button>
             </div>
           </div>
@@ -470,7 +486,10 @@ export default function CourseDashboard() {
                 {filteredCourses.map((course) => (
                   <CourseCard
                     key={course.id}
-                    course={course}
+                    course={{
+                      ...course,
+                      duration: formatDuration(course.duration),
+                    }}
                     onEdit={() => handleEditCourse(course)}
                     onToggleVisibility={() => handleToggleVisibility(course)}
                     onDelete={() => handleDeleteCourse(course.id)}
@@ -480,14 +499,14 @@ export default function CourseDashboard() {
                 {/* Thêm khóa học */}
                 <div
                   onClick={handleAddCourse}
-                  className="border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center h-[450px] cursor-pointer hover:bg-gray-50 transition-colors group"
+                  className="border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center h-[450px] cursor-pointer hover:bg-secondary/80 transition-colors group"
                 >
                   <div className="flex flex-col items-center justify-center p-6">
-                    <div className="h-14 w-14 rounded-full bg-blue-100 flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
-                      <Plus className="h-6 w-6 text-blue-600" />
+                    <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
+                      <Plus className="h-6 w-6 text-primary" />
                     </div>
-                    <p className="text-gray-600 font-medium group-hover:text-gray-800">
-                      Thêm khóa học
+                    <p className="text-muted-foreground font-medium group-hover:text-foreground">
+                      Create Course
                     </p>
                   </div>
                 </div>
@@ -496,36 +515,36 @@ export default function CourseDashboard() {
               <div className="overflow-x-auto">
                 <table className="min-w-full">
                   <thead>
-                    <tr className="bg-gray-50">
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tl-lg">
-                        Khóa học
+                    <tr className="bg-secondary">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider rounded-tl-lg">
+                        Course
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Cấp độ
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Level
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Thời lượng
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Time
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Đánh giá
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Rate
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Học viên
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Students
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Giá
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Price
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Trạng thái
+                      <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        State
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider rounded-tr-lg">
-                        Thao tác
+                      <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider rounded-tr-lg">
+                        peration
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200 bg-white">
+                  <tbody className="divide-y divide-border bg-card">
                     {filteredCourses.map((course) => (
-                      <tr key={course.id} className="hover:bg-gray-50">
+                      <tr key={course.id} className="hover:bg-secondary/80">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div
@@ -537,10 +556,10 @@ export default function CourseDashboard() {
                               {course.type}
                             </div>
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">
+                              <div className="text-sm font-medium text-foreground">
                                 {course.title}
                               </div>
-                              <div className="text-xs text-gray-500 max-w-xs truncate">
+                              <div className="text-xs text-muted-foreground max-w-xs truncate">
                                 {course.description}
                               </div>
                             </div>
@@ -559,24 +578,24 @@ export default function CourseDashboard() {
                             {course.level}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {course.duration}
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                          {formatDuration(course.duration)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <Star className="h-4 w-4 text-[hsl(var(--chart-1))] mr-1" />
-                            <span className="text-sm text-gray-700">
+                            <span className="text-sm text-foreground">
                               {course.rating}
                             </span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                           {course.students
                             ? course.students.toLocaleString()
                             : 0}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {course.price.toLocaleString("vi-VI")} VND
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                          {Number(course.price).toLocaleString("vi-VI")} VND
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
@@ -586,37 +605,35 @@ export default function CourseDashboard() {
                                 : "bg-destructive/20 text-destructive"
                             }`}
                           >
-                            {course.enabled ? "Hoạt động" : "Ẩn"}
+                            {course.enabled ? "Active" : "Hidden"}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <div className="flex items-center justify-end gap-2">
                             <button
                               onClick={() => handleEditCourse(course)}
-                              className="text-blue-600 hover:text-blue-800 p-1 rounded-full hover:bg-blue-100"
-                              title="Chỉnh sửa"
+                              className="text-primary hover:text-primary/80 p-1 rounded-full hover:bg-primary/10"
+                              title="Edit"
                             >
                               <Edit className="h-4 w-4" />
                             </button>
                             <button
                               onClick={() => handleToggleVisibility(course)}
-                              className="text-gray-600 hover:text-gray-800 p-1 rounded-full hover:bg-gray-100"
+                              className="text-muted-foreground hover:text-foreground p-1 rounded-full hover:bg-secondary/80"
                               title={
-                                course.enabled
-                                  ? "Ẩn khóa học"
-                                  : "Hiển thị khóa học"
+                                course.enabled ? "Hide Course" : "Show Course"
                               }
                             >
                               {course.enabled ? (
-                                <EyeOff className="h-4 w-4" />
-                              ) : (
                                 <Eye className="h-4 w-4" />
+                              ) : (
+                                <EyeOff className="h-4 w-4" />
                               )}
                             </button>
                             <button
                               onClick={() => handleDeleteCourse(course.id)}
                               className="p-2 bg-destructive/10 hover:bg-destructive/20 text-destructive rounded-lg transition-colors"
-                              title="Xóa khóa học"
+                              title="Delete Course"
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -633,11 +650,11 @@ export default function CourseDashboard() {
             {!loading && filteredCourses.length === 0 && (
               <div className="text-center py-12">
                 <BookOpen className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-700 mb-1">
-                  Không tìm thấy khóa học
+                <h3 className="text-lg font-medium text-muted-foreground mb-1">
+                  No courses found
                 </h3>
-                <p className="text-gray-500">
-                  Thử thay đổi bộ lọc hoặc tìm kiếm với từ khóa khác
+                <p className="text-muted-foreground">
+                  Try changing filters or search with different keywords
                 </p>
               </div>
             )}
@@ -665,21 +682,21 @@ function StatCard({ icon, title, value, trend, color, loading }) {
         bg: "bg-primary/10",
         iconBg: "bg-primary/20",
         text: "text-primary",
-        trendUp: "text-green-600 bg-green-100",
+        trendUp: "text-[hsl(var(--chart-2))] bg-[hsl(var(--chart-2))/20]",
         trendDown: "text-destructive bg-destructive/10",
       },
       purple: {
         bg: "bg-[hsl(var(--chart-4))/10]",
         iconBg: "bg-[hsl(var(--chart-4))/20]",
         text: "text-[hsl(var(--chart-4))]",
-        trendUp: "text-green-600 bg-green-100",
+        trendUp: "text-[hsl(var(--chart-2))] bg-[hsl(var(--chart-2))/20]",
         trendDown: "text-destructive bg-destructive/10",
       },
       amber: {
         bg: "bg-[hsl(var(--chart-1))/10]",
         iconBg: "bg-[hsl(var(--chart-1))/20]",
         text: "text-[hsl(var(--chart-1))]",
-        trendUp: "text-green-600 bg-green-100",
+        trendUp: "text-[hsl(var(--chart-2))] bg-[hsl(var(--chart-2))/20]",
         trendDown: "text-destructive bg-destructive/10",
       },
     };
@@ -690,15 +707,17 @@ function StatCard({ icon, title, value, trend, color, loading }) {
 
   return (
     <div
-      className={`rounded-xl shadow-sm border border-gray-200 ${colorClasses.bg} p-6 transition-transform hover:shadow-md hover:-translate-y-1`}
+      className={`bg-card rounded-xl shadow-sm border border-border ${colorClasses.bg} p-6 transition-transform hover:shadow-md hover:-translate-y-1`}
     >
       <div className="flex justify-between items-start">
         <div>
-          <p className="text-sm font-medium text-gray-500 mb-1">{title}</p>
+          <p className="text-sm font-medium text-muted-foreground mb-1">
+            {title}
+          </p>
           {loading ? (
             <div className="h-8 w-24 bg-gray-200 animate-pulse rounded"></div>
           ) : (
-            <h3 className="text-3xl font-bold text-gray-800">{value}</h3>
+            <h3 className="text-3xl font-bold text-foreground">{value}</h3>
           )}
           {trend && !loading && (
             <div
@@ -729,11 +748,11 @@ function StatCard({ icon, title, value, trend, color, loading }) {
 function CourseCard({ course, onEdit, onToggleVisibility, onDelete }) {
   const getTagColor = (tag) => {
     const colors = {
-      "Phổ biến": "bg-primary",
+      Popular: "bg-primary",
       Bestseller: "bg-[hsl(var(--chart-2))]",
       Premium: "bg-[hsl(var(--chart-4))]",
-      Mới: "bg-[hsl(var(--chart-3))]",
-      "Đề xuất": "bg-[hsl(var(--chart-1))]",
+      New: "bg-[hsl(var(--chart-3))]",
+      Recommended: "bg-[hsl(var(--chart-1))]",
       VIP: "bg-[hsl(var(--chart-5))]",
     };
     return colors[tag] || "bg-muted-foreground";
@@ -767,7 +786,7 @@ function CourseCard({ course, onEdit, onToggleVisibility, onDelete }) {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-all">
+    <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden hover:shadow-md transition-all animate-scaleIn">
       <div
         className={`relative h-32 ${getColorClass(
           course.color,
@@ -801,7 +820,7 @@ function CourseCard({ course, onEdit, onToggleVisibility, onDelete }) {
         {/* Status */}
         {!course.enabled && (
           <div className="absolute bottom-3 right-3 bg-destructive px-2 py-1 rounded-lg text-xs font-medium text-destructive-foreground">
-            Ẩn
+            Hidden
           </div>
         )}
 
@@ -816,8 +835,10 @@ function CourseCard({ course, onEdit, onToggleVisibility, onDelete }) {
       </div>
 
       <div className="p-5">
-        <h3 className="font-bold text-lg text-gray-800 mb-1">{course.title}</h3>
-        <p className="text-sm text-gray-500 mb-4 line-clamp-2">
+        <h3 className="font-bold text-lg text-foreground mb-1">
+          {course.title}
+        </h3>
+        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
           {course.description}
         </p>
 
@@ -829,7 +850,7 @@ function CourseCard({ course, onEdit, onToggleVisibility, onDelete }) {
             </div>
             <div className="flex items-center">
               <CalendarIcon className="h-4 w-4 mr-2 text-gray-400" />
-              <span>{course.startDate || "Chưa có lịch"}</span>
+              <span>{course.duration || "No schedule"}</span>
             </div>
           </div>
 
@@ -841,36 +862,35 @@ function CourseCard({ course, onEdit, onToggleVisibility, onDelete }) {
             <div className="flex items-center">
               <Users className="h-4 w-4 mr-2 text-gray-400" />
               <span>
-                {course.students ? course.students.toLocaleString() : 0} học
-                viên
+                {course.students ? course.students.toLocaleString() : 0}{" "}
+                students
               </span>
             </div>
           </div>
 
-          <div className="flex items-center text-sm text-gray-600">
+          <div className="flex items-center text-sm text-muted-foreground">
             <DollarSign className="h-4 w-4 mr-2 text-gray-400" />
             <span className="font-medium">
-              {course.price.toLocaleString("vi-VI")} VND
+              {Number(course.price).toLocaleString("vi-VI")} VND
             </span>
           </div>
         </div>
 
-        {/* Features */}
         <div className="mb-4">
-          <p className="text-xs font-medium text-gray-500 mb-2">
-            Tính năng nổi bật:
+          <p className="text-xs font-medium text-muted-foreground mb-2">
+            Key features:
           </p>
           <ul className="space-y-1">
             {course.features &&
               course.features.map((feature, index) => (
                 <li key={index} className="flex items-start text-sm">
-                  <CheckCircle className="h-4 w-4 mr-2 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span className="text-gray-600">{feature}</span>
+                  <CheckCircle className="h-4 w-4 mr-2 text-[hsl(var(--chart-2))] mt-0.5 flex-shrink-0" />
+                  <span className="text-muted-foreground">{feature}</span>
                 </li>
               ))}
             {(!course.features || course.features.length === 0) && (
-              <li className="text-sm text-gray-500">
-                Chưa có tính năng nổi bật
+              <li className="text-sm text-muted-foreground">
+                No key features available
               </li>
             )}
           </ul>
@@ -887,27 +907,27 @@ function CourseCard({ course, onEdit, onToggleVisibility, onDelete }) {
               "text"
             )} rounded-lg font-medium text-sm transition-colors flex items-center`}
           >
-            <Edit className="h-4 w-4 mr-1.5" /> Sửa
+            <Edit className="h-4 w-4 mr-1.5" /> Edit
           </button>
           <div className="flex gap-2">
             <button
               onClick={onToggleVisibility}
-              className="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-lg font-medium text-sm transition-colors flex items-center"
+              className="px-4 py-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-lg font-medium text-sm transition-colors flex items-center"
             >
               {course.enabled ? (
                 <>
-                  <EyeOff className="h-4 w-4 mr-1.5" /> Ẩn
+                  <EyeOff className="h-4 w-4 mr-1.5" /> Hide
                 </>
               ) : (
                 <>
-                  <Eye className="h-4 w-4 mr-1.5" /> Hiện
+                  <Eye className="h-4 w-4 mr-1.5" /> Show
                 </>
               )}
             </button>
             <button
               onClick={onDelete}
               className="p-2 bg-destructive/10 hover:bg-destructive/20 text-destructive rounded-lg transition-colors"
-              title="Xóa khóa học"
+              title="Delete course"
             >
               <Trash2 className="h-4 w-4" />
             </button>
@@ -918,7 +938,6 @@ function CourseCard({ course, onEdit, onToggleVisibility, onDelete }) {
   );
 }
 
-// get color class
 function getColorClass(color, type) {
   const classes = {
     blue: {

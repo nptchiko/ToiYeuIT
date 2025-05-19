@@ -2,7 +2,8 @@
 
 import Logo from "../logo/LogoApp";
 import ProfileMini from "./profile-mini";
-import { Bell, ChevronDown, Menu, Moon, Sun, CircleUser } from "lucide-react";
+import NotificationDropdown from "./ui/notification_dropdown";
+import { ChevronDown, Menu, Moon, Sun } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -207,10 +208,10 @@ ${
                   <Moon className="h-5 w-5" />
                 )}
               </button>
-              <button className="p-2 rounded-full hover:bg-secondary/10 dark:hover:bg-secondary/20 text-foreground relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full"></span>
-              </button>
+
+              {/* Replace the Bell button with NotificationDropdown component */}
+              <NotificationDropdown />
+
               <div className="relative" ref={profileRef}>
                 <button
                   className="flex items-center gap-2 hover:bg-secondary/10 dark:hover:bg-secondary/20 px-3 py-1 rounded text-foreground"

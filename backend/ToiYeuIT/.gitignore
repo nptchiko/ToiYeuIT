@@ -33,7 +33,7 @@ build/
 .vscode/
 /src/main/resources/certs/
 
-src/main/resources/local.env.properties
-.settings/
 
+.settings/
+/src/main/resources/local.env.properties
 **/local.env.properties
