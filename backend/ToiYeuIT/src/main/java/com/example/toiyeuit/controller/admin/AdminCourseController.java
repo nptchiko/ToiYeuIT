@@ -29,7 +29,6 @@ public class AdminCourseController {
             @RequestParam(defaultValue = "3") int size){
         Pageable pageable = PageRequest.of(page-1, size);
         Page<Course> course = courseService.getAll(pageable);
-
         return ApiResponse.<List<Course>>builder()
                 .code(200)
                 .message("All available course")

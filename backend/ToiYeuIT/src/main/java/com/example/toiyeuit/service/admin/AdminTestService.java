@@ -3,7 +3,7 @@ package com.example.toiyeuit.service.admin;
 
 import com.example.toiyeuit.dto.admin.AdminTestResponse;
 import com.example.toiyeuit.dto.admin.test.TestCreationRequest;
-import com.example.toiyeuit.dto.admin.TestSetCreationRequest;
+import com.example.toiyeuit.dto.admin.test.TestSetCreationRequest;
 import com.example.toiyeuit.dto.admin.UpdateTestRequest;
 import com.example.toiyeuit.dto.response.TestResponse;
 import com.example.toiyeuit.dto.response.TestSetResponse;

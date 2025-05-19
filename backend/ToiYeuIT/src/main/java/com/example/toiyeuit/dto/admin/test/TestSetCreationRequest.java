@@ -1,4 +1,4 @@
-package com.example.toiyeuit.dto.admin;
+package com.example.toiyeuit.dto.admin.test;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;

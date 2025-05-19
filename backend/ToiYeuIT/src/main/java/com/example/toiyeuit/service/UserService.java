@@ -1,6 +1,7 @@
 package com.example.toiyeuit.service;
 
-import com.example.toiyeuit.dto.request.UserCreationRequest;
+import com.example.toiyeuit.dto.request.user.UpdateUserRequest;
+import com.example.toiyeuit.dto.request.user.UserCreationRequest;
 import com.example.toiyeuit.dto.response.OverviewResponse;
 import com.example.toiyeuit.dto.response.TestResponse;
 import com.example.toiyeuit.dto.response.UserResponse;
@@ -14,18 +15,14 @@ import com.example.toiyeuit.exception.UserAlreadyExistsException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
 import com.example.toiyeuit.mapper.UserMapper;
 import com.example.toiyeuit.repository.CourseRepository;
-import com.example.toiyeuit.repository.RoleRepository;
 import com.example.toiyeuit.repository.TestRepository;
 import com.example.toiyeuit.repository.UserRepository;
-import com.example.toiyeuit.service.test.TestService;
 import com.example.toiyeuit.utils.SecurityUtils;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +30,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -49,17 +45,16 @@ public class UserService {
     CourseRepository courseRepository;
 
     public List<UserResponse> getAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable).stream()
-                .map(userMapper::toUserResponse)
-                .collect(Collectors.toList());
+        return userRepository.findAll(pageable)
+                .stream().map(userMapper::toUserResponse)
+                .toList();
     }
 
-    public UserResponse getUserById(long id){
-        return userMapper.toUserResponse(
+    public User getUserById(long id){
+        return
                 userRepository.findById(id).orElseThrow(
                         () -> new AppException(ErrorCode.USER_NOT_FOUND)
-                )
-        );
+                );
     }
 
     public UserResponse getInfo(){
@@ -102,26 +97,30 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse createUser(UserCreationRequest userCreationRequest) throws UserAlreadyExistsException {
+    public UserResponse createUser(UserCreationRequest userRequest) throws UserAlreadyExistsException {
 
-        if (userRepository.existsByEmail(userCreationRequest.getEmail().toLowerCase()))
+        if (userRepository.existsByEmail(userRequest.getEmail().toLowerCase()))
             throw new AppException(ErrorCode.USER_EMAIL_EXISTED);
-//        if (userRepository.existsUserByPhone(userCreationRequest.getPhone()))
-//            throw new AppException(ErrorCode.USER_PHONE_EXISTED);
 
-        // get role from roleName, default to USER if not found
-      //  PredefinedRole userRole = roleRepository.findByName(userCreationRequest.getRoleName())
-        //        .orElseGet(() -> roleRepository.findByName("USER")
-        //                .orElseThrow(() -> new ResourceNotFoundException("Default role not found")));
         Role userRole = roleService.findRoleByName(PredefinedRole.USER);
 
-        User user = userMapper.toUser(userCreationRequest);
+        User user = userMapper.toUser(userRequest);
         user.setRole(userRole);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        //user.setEmail(user.getEmail().toLowerCase());
+
         log.info("[service.UserService]: email: " + user.getEmail());
 
         return userMapper.toUserResponse(userRepository.save(user));
+    }
+
+
+    @Transactional
+    public void updateUser(long id, UpdateUserRequest request){
+
+        var _user = getUserById(id);
+        userMapper.updateUser(_user, request);
+
+        userRepository.save(_user);
     }
 
     @Transactional
