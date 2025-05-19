@@ -34,7 +34,7 @@ INSERT INTO ToiYeuIT.course (title, description, level, price, enabled, duration
 
 
 INSERT INTO lesson (lesson_id, course_id, title, description, is_submitted, order_index, video_url, materials_url) VALUES
-(1, 1, 'Introduction to Nouns', 'Understanding common and proper nouns.', FALSE, 1, 'https://www.youtube.com/embed/gleyKDvZ3x0', 'https://hocmai.vn/kho-tai-lieu/documents/1590396216/page-1.png'),
+(1, 1, 'Introduction to Nouns', 'Understanding common and proper nouns.', TRUE, 1, 'https://www.youtube.com/embed/gleyKDvZ3x0', 'https://hocmai.vn/kho-tai-lieu/documents/1590396216/page-1.png'),
 (2, 1, 'Verbs: The Action Words', 'Basics of verbs and their types.', FALSE, 2, 'https://www.youtube.com/embed/gleyKDvZ3x0', 'https://hocmai.vn/kho-tai-lieu/documents/1590396216/page-1.png'),
 (3, 1, 'Present Simple Tense', 'Forming and using the present simple tense.', FALSE, 3, 'https://www.youtube.com/embed/gleyKDvZ3x0', 'https://hocmai.vn/kho-tai-lieu/documents/1590396216/page-1.png'),
 (4, 2, 'Past Simple vs. Present Perfect', 'Distinguishing between past simple and present perfect usage.', FALSE, 1, 'https://www.youtube.com/embed/gleyKDvZ3x0', 'https://hocmai.vn/kho-tai-lieu/documents/1590396216/page-1.png'),
