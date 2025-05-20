@@ -16,11 +16,11 @@ axiosClient.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  },
+  }
 );
 axiosClient.interceptors.response.use(
   (response) => response.data,
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 export const getLessonDetail = async (index_1, index_2) => {
   const res = await axiosClient.get(`/api/lessons/${index_1}/${index_2}`);
@@ -30,7 +30,7 @@ export const submitAnswer = async (
   courseId,
   lessonId,
   questionId,
-  optionId,
+  optionId
 ) => {
   const payload = {
     quizId: questionId,
@@ -38,7 +38,7 @@ export const submitAnswer = async (
   };
   const response = await axiosClient.post(
     `/api/lessons/${courseId}/${lessonId}/submit-answer`,
-    payload,
+    payload
   );
   return response;
 };
