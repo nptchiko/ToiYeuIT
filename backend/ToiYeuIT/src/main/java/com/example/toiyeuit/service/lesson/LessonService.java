@@ -2,7 +2,9 @@ package com.example.toiyeuit.service.lesson;
 
 import com.example.toiyeuit.dto.request.QuizUserSubmissionRequest;
 import com.example.toiyeuit.dto.response.lesson.GrammarDTO;
+import com.example.toiyeuit.dto.response.lesson.LessonDTO;
 import com.example.toiyeuit.entity.User;
+import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.entity.lesson.*;
 import com.example.toiyeuit.exception.LessonServiceLogicException;
 import com.example.toiyeuit.exception.ResourceNotFoundException;
@@ -23,6 +25,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -35,21 +38,28 @@ public class LessonService {
     private final UserRepository userRepository;
     private final GrammarQuizRepository grammarQuizRepository;
     private final QuizOptionRepository quizOptionRepository;
+    private final UserLessonProgressRepository userLessonProgressRepository;
 
     // Map to store user-lesson specific locks to handle concurrent submissions
     private final Map<String, Lock> userLessonLocks = new ConcurrentHashMap<>();
 
-    public List<Lesson> findAllLessonByCourseId(Integer courseId) {
-        return lessonRepository.findAllByCourseId(courseId);
+  public List<LessonDTO> findAllLessonByCourseId(Integer courseId) throws ResourceNotFoundException {
+      Course course = courseRepository.findById(courseId).orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+        return lessonRepository.findAllByCourseId(courseId).stream()
+                .map(lesson -> LessonDTO.fromEntity(lesson, userLessonProgressRepository, course))
+                .collect(Collectors.toList());
     }
 
     public GrammarDTO findGrammarByLessonId(Integer courseId, Long lessonId) throws ResourceNotFoundException {
         validateCourseAndLesson(courseId, lessonId);
 
+        Course course = courseRepository.findById(courseId).orElseThrow(()
+                -> new ResourceNotFoundException("Course not found"));
+
         Grammar grammar = grammarRespository.findByLessonId(lessonId)
                 .orElseThrow(() -> new ResourceNotFoundException("Grammar for lesson with id " + lessonId + " not found"));
 
-        return GrammarDTO.fromEntity(grammar);
+        return GrammarDTO.fromEntity(grammar, userLessonProgressRepository, course);
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
@@ -93,7 +103,6 @@ public class LessonService {
         try {
             QuizUserSubmission submission = findOrCreateSubmission(user, request);
 
-//            quizUserSubmissionRepository.flush();
             checkAndUpdateLessonCompletion(lesson, user);
 
             return submission;
@@ -109,10 +118,6 @@ public class LessonService {
             Lesson freshLesson = lessonRepository.findById(lesson.getId()).orElse(null);
             if (freshLesson == null) return;
 
-            if (freshLesson.getIsSubmitted()) {
-                return;
-            }
-
             Optional<Grammar> grammarOptional = grammarRespository.findByLessonId(freshLesson.getId());
             if (!grammarOptional.isPresent()) return;
 
@@ -120,6 +125,14 @@ public class LessonService {
             List<GrammarQuiz> allQuizzes = grammarQuizRepository.findAllByGrammarId(grammar.getId());
 
             log.debug("Checking completion for lesson {}. Total quizzes: {}", lesson.getId(), allQuizzes.size());
+
+            UserLessonProgress userProgress = userLessonProgressRepository
+                    .findByUserIdAndLessonId(user.getId(), freshLesson.getId())
+                    .orElse(UserLessonProgress.builder()
+                            .user(user)
+                            .lesson(lesson)
+                            .isSubmitted(false)
+                            .build());
 
             // Check each quiz submission
             boolean allCompleted = true;
@@ -133,9 +146,10 @@ public class LessonService {
             }
 
             if (allCompleted) {
-                log.info("All quizzes completed for lesson {}. Marking as submitted.", lesson.getId());
-                freshLesson.setIsSubmitted(true);
-                lessonRepository.saveAndFlush(freshLesson);
+                log.info("All quizzes completed for lesson {}. Marking as submitted for user {}",
+                        lesson.getId(), user.getId());
+                userProgress.setIsSubmitted(true);
+                userLessonProgressRepository.save(userProgress);
             }
         } catch (Exception e) {
             log.error("Error checking lesson completion: {}", e.getMessage());

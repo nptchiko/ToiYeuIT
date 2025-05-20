@@ -1,6 +1,5 @@
 package com.example.toiyeuit.entity.lesson;
-
-import com.example.toiyeuit.entity.course.Course;
+import com.example.toiyeuit.entity.User;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,26 +14,28 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "lesson")
-public class Lesson {
+@Table(name = "user_lesson_progress")
+@ToString
+public class UserLessonProgress {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "lesson_id")
+    @Column(name = "progress_id")
     Long id;
 
-    @Column(nullable = false)
-    String title;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
+    User user;
 
-    String description;
+    @ManyToOne
+    @JoinColumn(name = "lesson_id", nullable = false)
+    Lesson lesson;
 
-    @Column(name = "order_index", nullable = false)
-    Integer orderIndex;
+    @Column(name = "is_submitted")
+    Boolean isSubmitted = false;
 
-    @Column(name = "video_url")
-    String videoUrl;
-
-    @Column(name = "materials_url")
-    String materialsUrl;
+    @Column(name = "last_accessed")
+    LocalDateTime lastAccessed;
 
     @Column(name = "created_at")
     LocalDateTime createdAt;
@@ -42,18 +43,11 @@ public class Lesson {
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "course_id", nullable = false)
-    Course course;
-
-    @OneToOne(mappedBy = "lesson", cascade = CascadeType.ALL)
-    @JsonBackReference
-    Grammar grammar;
-
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        lastAccessed = LocalDateTime.now();
     }
 
     @PreUpdate
