@@ -3,6 +3,7 @@ package com.example.toiyeuit.controller.lesson;
 import com.example.toiyeuit.dto.request.QuizUserSubmissionRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.dto.response.lesson.GrammarDTO;
+import com.example.toiyeuit.dto.response.lesson.LessonDTO;
 import com.example.toiyeuit.entity.lesson.Grammar;
 import com.example.toiyeuit.entity.lesson.Lesson;
 import com.example.toiyeuit.entity.lesson.QuizUserSubmission;
@@ -24,10 +25,10 @@ public class LessonController {
     private final LessonService lessonService;
 
     @GetMapping("/{courseId}")
-    public ApiResponse<List<Lesson>> findAllLessonByCourseId(@PathVariable Integer courseId) {
+    public ApiResponse<List<LessonDTO>> findAllLessonByCourseId(@PathVariable Integer courseId) {
 
-        List<Lesson> lessons = lessonService.findAllLessonByCourseId(courseId);
-        return ApiResponse.<List<Lesson>>builder()
+        List<LessonDTO> lessons = lessonService.findAllLessonByCourseId(courseId);
+        return ApiResponse.<List<LessonDTO>>builder()
                 .message("Successfully retrieved all lessons")
                 .code(200)
                 .body(lessons)
