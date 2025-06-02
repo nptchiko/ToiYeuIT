@@ -150,7 +150,7 @@ export default function TestListening() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(50 * 60);
+  const [timeLeft, setTimeLeft] = useState(30 * 60);
   const [activePart, setActivePart] = useState(1);
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
   const [showResults, setShowResults] = useState(false);
@@ -449,7 +449,7 @@ export default function TestListening() {
     setQuestions(questions.map((q) => ({ ...q, userAnswer: undefined })));
     setShowResults(false);
     setActivePart(1);
-    setTimeLeft(50 * 60);
+    setTimeLeft(30 * 60);
     setIsAnswersSaved(false);
 
     localStorage.removeItem("toeicAnswers");
