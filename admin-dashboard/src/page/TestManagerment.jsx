@@ -39,8 +39,8 @@ export default function TestManagement() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [currentPage] = useState(1);
+  const [pageSize] = useState(10);
 
   const [newTest, setNewTest] = useState({
     name: "",
@@ -58,8 +58,6 @@ export default function TestManagement() {
   const modalRef = useRef(null);
   const addToast = useToast();
   const [userCount, setUserCount] = useState(0);
-
-  // const [percentChange, setPercentChange] = useState(11.01);
 
   // Calculate stats from tests data
   const activeTestsCount =
@@ -100,9 +98,10 @@ export default function TestManagement() {
     const fetchUser = async () => {
       try {
         const response = await userService.getUsers(currentPage, pageSize);
-        if (response.body) {
-          const users = Array.isArray(response.body);
-          setUserCount(users.length);
+        console.log("heheh", response);
+        if (response) {
+          const users = response.pagination.totalItems;
+          setUserCount(users);
         }
         setIsLoading(false);
       } catch (error) {
@@ -122,7 +121,7 @@ export default function TestManagement() {
       try {
         // Make sure to pass the required page and size parameters
         const response = await TestAPI.getAllTests();
-        console.log(response.body);
+        // console.log(response.body);
 
         if (response && response.body) {
           const testsData = Array.isArray(response.body) ? response.body : [];

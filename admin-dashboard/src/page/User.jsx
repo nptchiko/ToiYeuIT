@@ -150,8 +150,8 @@ export default function UsersPage() {
       setDisplayedUsers(mockUsers);
 
       // Mock pagination data
-      setTotalItems(100); // Assume 100 total users
-      setTotalPages(10); // Assume 10 pages (100/10)
+      setTotalItems(100);
+      setTotalPages(10);
 
       // Create stats from sample data
       const statsData = {
@@ -230,8 +230,8 @@ export default function UsersPage() {
         role: user.role,
         status: user.status,
         phone: user.phone,
-        gender: user.gender, // Use display gender for UI
-        rawGender: rawGender, // Keep raw gender for API
+        gender: user.gender, // for UI
+        rawGender: rawGender, //  for API
       });
     }
   };
