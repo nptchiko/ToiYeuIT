@@ -9,7 +9,8 @@ const api = axios.create({
   },
   withCredentials: true,
 });
-//  interceptor để tự động thêm token vào header của mỗi request
+
+// Interceptor để tự động thêm token vào header của mỗi request
 api.interceptors.request.use(
   (config) => {
     const token = TokenService.getToken();
@@ -42,17 +43,6 @@ export const courseService = {
       return [];
     }
   },
-
-  // // Get course by ID
-  // getCourseById: async (id) => {
-  //   try {
-  //     const response = await api.get(`/api/admin/courses/${id}`);
-  //     return response.data.body;
-  //   } catch (error) {
-  //     console.error(`Error fetching course with id ${id}:`, error);
-  //     throw error;
-  //   }
-  // },
 
   // Create new course
   createCourse: async (courseData) => {
@@ -105,16 +95,16 @@ export const courseService = {
       // Add more specific error handling
       if (error.response) {
         if (error.response.status === 404) {
-          throw new Error("Không tìm thấy khóa học với ID đã cung cấp");
+          throw new Error("Course not found with the provided ID");
         } else if (error.response.status === 400) {
           throw new Error(
-            "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại thông tin khóa học"
+            "Invalid data. Please check the course information again"
           );
         } else if (error.response.status === 403) {
-          throw new Error("Không có quyền cập nhật khóa học này");
+          throw new Error("No permission to update this course");
         }
       }
-      throw new Error("Lỗi khi cập nhật khóa học. Vui lòng thử lại sau");
+      throw new Error("Error updating course. Please try again later");
     }
   },
 
@@ -126,6 +116,43 @@ export const courseService = {
     } catch (error) {
       console.error(`Error deleting course with id ${id}:`, error);
       throw error;
+    }
+  },
+
+  // Get revenue - Fixed endpoint URL
+  revenueCourse: async () => {
+    try {
+      // Fixed the endpoint URL - added missing slash at the beginning
+      const response = await api.get("/api/admin/courses/revenue");
+      console.log("Revenue API response:", response.data);
+      return response;
+    } catch (error) {
+      console.error("Error getting revenue:", error);
+
+      // Handle specific error cases
+      if (error.response) {
+        const status = error.response.status;
+        const message = error.response.data?.message;
+
+        if (status === 400) {
+          console.error("Revenue API Error 400:", message || "Bad Request");
+          throw new Error("Invalid request when fetching revenue data");
+        } else if (status === 401) {
+          console.error("Revenue API Error 401:", message || "Unauthorized");
+          throw new Error("Session expired. Please login again");
+        } else if (status === 403) {
+          console.error("Revenue API Error 403:", message || "Forbidden");
+          throw new Error("No permission to access revenue data");
+        } else if (status === 404) {
+          console.error("Revenue API Error 404:", message || "Not Found");
+          throw new Error("Revenue endpoint not found");
+        } else if (status >= 500) {
+          console.error("Revenue API Error 5xx:", message || "Server Error");
+          throw new Error("Server error when fetching revenue data");
+        }
+      }
+
+      throw new Error("Unable to connect to fetch revenue data");
     }
   },
 
@@ -142,11 +169,11 @@ export const courseService = {
       );
       // Add more specific error handling
       if (error.response && error.response.status === 404) {
-        throw new Error("Không tìm thấy khóa học");
+        throw new Error("Course not found");
       } else if (error.response && error.response.status === 403) {
-        throw new Error("Không có quyền thực hiện thao tác này");
+        throw new Error("No permission to perform this action");
       } else {
-        throw new Error("Lỗi khi cập nhật trạng thái khóa học");
+        throw new Error("Error updating course status");
       }
     }
   },

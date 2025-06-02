@@ -42,7 +42,7 @@ export default function AddUserModal({
             <div className="space-y-2">
               <label
                 htmlFor="add-username"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"
+                className=" text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"
               >
                 <User className="h-4 w-4 mr-2 text-blue-500" />
                 Full Name <span className="text-red-500 ml-1">*</span>
@@ -64,7 +64,7 @@ export default function AddUserModal({
             <div className="space-y-2">
               <label
                 htmlFor="add-email"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"
               >
                 <Mail className="h-4 w-4 mr-2 text-blue-500" />
                 Email <span className="text-red-500 ml-1">*</span>
@@ -87,7 +87,7 @@ export default function AddUserModal({
             <div className="space-y-2">
               <label
                 htmlFor="add-password"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"
               >
                 <Lock className="h-4 w-4 mr-2 text-blue-500" />
                 Password <span className="text-red-500 ml-1">*</span>
@@ -120,7 +120,7 @@ export default function AddUserModal({
             <div className="space-y-2">
               <label
                 htmlFor="add-phone"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"
               >
                 <Phone className="h-4 w-4 mr-2 text-blue-500" />
                 Phone
@@ -145,7 +145,7 @@ export default function AddUserModal({
             <div className="space-y-2">
               <label
                 htmlFor="add-gender"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"
+                className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center"
               >
                 <UserCircle className="h-4 w-4 mr-2 text-blue-500" />
                 Gender

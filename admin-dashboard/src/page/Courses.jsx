@@ -53,6 +53,7 @@ export default function CourseDashboard() {
       try {
         setLoading(true);
         const data = await courseService.getAllCourses();
+        console.log("egeg", data);
         if (Array.isArray(data)) {
           // Ensure numeric fields are properly formatted
           const formattedData = data.map((course) => ({
