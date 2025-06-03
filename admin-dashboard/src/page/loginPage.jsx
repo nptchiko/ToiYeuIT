@@ -57,7 +57,7 @@ export default function LoginPage() {
   const [isResetSubmitting, setIsResetSubmitting] = useState(false);
   //login
 
-  // Thêm các state mới cho quy trình quên mật khẩu
+  // Các state mới cho quy trình quên mật khẩu
   const [showVerificationCodeModal, setShowVerificationCodeModal] =
     useState(false);
   const [showNewPasswordModal, setShowNewPasswordModal] = useState(false);
@@ -496,12 +496,12 @@ export default function LoginPage() {
           >
             Đăng nhập
           </button>
-          <button
+          {/* <button
             onClick={openRegisterModal}
             className="w-full py-3 px-4 border border-gray-300 bg-white rounded-lg hover:bg-gray-50 transition-all duration-300 font-medium hover:border-gray-400 flex items-center justify-center hover:-translate-y-0.5"
           >
             Đăng ký
-          </button>
+          </button> */}
         </div>
       </div>
 

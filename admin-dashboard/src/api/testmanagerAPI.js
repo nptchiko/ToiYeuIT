@@ -28,7 +28,7 @@ api.interceptors.request.use(
 // Tests API service
 const TestAPI = {
   // Get all tests with pagination
-  getAllTests: async (page = 1, size = 50) => {
+  getAllTests: async (page = 1, size = 20) => {
     try {
       const response = await api.get(`/admin/tests?page=${page}&size=${size}`);
       return response.data;

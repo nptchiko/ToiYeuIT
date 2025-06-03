@@ -43,6 +43,7 @@ const Listening = () => {
         const role = response.data.body.role;
         setHasPurchased(role === "STUDENT" || role === "ADMIN");
         setData(res.body);
+        console.log(res);
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu đề thi:", error);
       } finally {

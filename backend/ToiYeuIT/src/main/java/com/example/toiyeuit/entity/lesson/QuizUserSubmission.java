@@ -15,11 +15,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "user_answer")
+@Table(name = "quiz_user_submission")
+@ToString
 public class QuizUserSubmission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "answer_id")
+    @Column(name = "submission_id")
     Long id;
 
     @Column(name = "created_at")

@@ -38,6 +38,10 @@ export default function TestManagement() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
+
+  const [currentPage] = useState(1);
+  const [pageSize] = useState(10);
+
   const [newTest, setNewTest] = useState({
     name: "",
     status: "Active",
@@ -54,8 +58,6 @@ export default function TestManagement() {
   const modalRef = useRef(null);
   const addToast = useToast();
   const [userCount, setUserCount] = useState(0);
-
-  // const [percentChange, setPercentChange] = useState(11.01);
 
   // Calculate stats from tests data
   const activeTestsCount =
@@ -95,12 +97,11 @@ export default function TestManagement() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await userService.getUsers();
-        if (response && response.data) {
-          const users = Array.isArray(response.data)
-            ? response.data
-            : response.data.data;
-          setUserCount(users.length);
+        const response = await userService.getUsers(currentPage, pageSize);
+        console.log("heheh", response);
+        if (response) {
+          const users = response.pagination.totalItems;
+          setUserCount(users);
         }
         setIsLoading(false);
       } catch (error) {
@@ -110,7 +111,7 @@ export default function TestManagement() {
       }
     };
     fetchUser();
-  }, []);
+  }, [currentPage, pageSize]);
 
   useEffect(() => {
     // Fetch tests from API
@@ -120,7 +121,7 @@ export default function TestManagement() {
       try {
         // Make sure to pass the required page and size parameters
         const response = await TestAPI.getAllTests();
-        console.log(response.body);
+        // console.log(response.body);
 
         if (response && response.body) {
           const testsData = Array.isArray(response.body) ? response.body : [];
@@ -371,33 +372,35 @@ export default function TestManagement() {
       // Send to API
       console.log("hehehe", testToAdd);
       const createdTest = await TestAPI.createTest(testToAdd);
-
-      if (createdTest && createdTest.body) {
+      if (
+        createdTest &&
+        (createdTest.code === 200 || createdTest.message === "Successfully")
+      ) {
         // Format the created test to match the expected structure
         const newTestData = {
-          testId: createdTest.body.id,
-          id: createdTest.body.id,
-          name: createdTest.body.title,
+          testId: createdTest.body?.id || createdTest.id,
+          id: createdTest.body?.id || createdTest.id,
+          name: createdTest.body?.title || newTest.name,
           testSet: newTest.testSet,
           testSetId: testSetId,
-          status: createdTest.body.status,
-          duration: createdTest.body.duration,
+          status: createdTest.body?.status || newTest.status,
+          duration: createdTest.body?.duration || newTest.duration,
           questions: newTest.questions || 0,
         };
 
         // Add to tests array
-        setTests([...tests, newTestData]);
-
+        setTests((prevTests) => [...prevTests, newTestData]);
         // Close modal and reset form
         closeModal();
 
         // Show success message
-        addToast("Test added successfully!", "success");
+        addToast.addToast("Test added successfully!", "success");
       } else {
         throw new Error("Invalid response format from API");
       }
     } catch (error) {
       console.error("Error creating test:", error);
+      // console.log("dehehehehehe");
       setError("Failed to create test. Please try again.");
       addToast.addToast("Failed to create test. Please try again.", "error");
     } finally {
@@ -893,8 +896,8 @@ export default function TestManagement() {
                               <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                 Status
                               </th>
-                              <th className="px-6 py-3.5 bg-muted/50"></th>
-                              <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+
+                              <th className="px-6 py-3.5 bg-muted/50 flex justify-center text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                                 Actions
                               </th>
                             </tr>
@@ -1315,7 +1318,7 @@ export default function TestManagement() {
                   />
                 </div>
 
-                {/* Test Set - Kept as is */}
+                {/* Test Set*/}
                 <div className="space-y-2">
                   <label
                     htmlFor="edit-testSet"
@@ -1360,7 +1363,6 @@ export default function TestManagement() {
                       }}
                     >
                       <option value="45">45 minutes</option>
-                      <option value="60">60 minutes</option>
                     </select>
                     <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   </div>
@@ -1390,7 +1392,6 @@ export default function TestManagement() {
                     }}
                   >
                     <option value="Active">Active</option>
-                    <option value="Draft">Draft</option>
                     <option value="Inactive">Inactive</option>
                   </select>
                 </div>
