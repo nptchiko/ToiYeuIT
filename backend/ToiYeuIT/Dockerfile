@@ -1,15 +1,32 @@
-#sd Use a base image containing Java runtime
-FROM eclipse-temurin:21-alpine
 
-# Set the working directory inside the container
+#FROM eclipse-temurin:21-alpine
+#
+#WORKDIR /app
+#
+#COPY .mvn/ .mvn
+#
+#COPY mvnw pom.xml ./
+#
+#RUN ./mvnw dependency:go-offline
+#
+#COPY src ./src
+#
+#CMD ["./mvnw", "spring-boot:run"]
+
+FROM maven:3.9.9-eclipse-temurin-21-alpine AS build
+
 WORKDIR /app
 
-# Copy the Spring Boot jar file into the
+COPY pom.xml .
 
-COPY target/ToiYeuIt.jar /app/ToiYeuIt.jar
+COPY src ./src
 
-# Expose the port that the Spring Boot application runs on
-EXPOSE 8081
+RUN mvn clean package -DskipTests
 
-# Run the Spring Boot application
-ENTRYPOINT ["java", "-jar", "/app/ToiYeuIt.jar"]
+FROM eclipse-temurin:21.0.7_6-jre-jammy
+
+WORKDIR /app
+
+COPY --from=build /app/target/ToiYeuIt.jar .
+
+CMD ["java", "-jar", "ToiYeuIt.jar"]

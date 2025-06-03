@@ -3,16 +3,6 @@ INSERT INTO ToiYeuIT.skill (name) VALUES ('READING');
 INSERT INTO ToiYeuIT.skill (name) VALUES ('WRITING');
 INSERT INTO ToiYeuIT.skill (name) VALUES ('SPEAKING');
 
-INSERT INTO ToiYeuIT.user (username, password, email, gender, phone, role_id, enabled) VALUES ('miku', '24234234', 'erter', 'm', '56857567', 2, null);
-INSERT INTO ToiYeuIT.user (username, password, email, gender, phone, role_id, enabled) VALUES ('qweqrasdf', '$2a$10$bgKPeJprms4x8e2tqMxayesx.T/MVfTZJqxfyWLhHH3LxBex9vQyO', 'hello@gamil.com', 'm', '1234', 1, null);
-INSERT INTO ToiYeuIT.user (username, password, email, gender, phone, role_id, enabled) VALUES ('mikudeptrai', '$2a$10$DHT60EcVYu.SoAjk9u.k8exU2N/muG0NNc.9GbUa2/CCGOKzBjTPW', 'letthewindtellyou@gmail.com', 'm', '0857832902', 1, null);
-INSERT INTO ToiYeuIT.user (username, password, email, gender, phone, role_id, enabled) VALUES ('string', '$2a$10$3lJvlt3FG0d.rN2NJH33JeRtLn0yuVfTivCgClMaorYxZF6xVAF2a', 'string', 'f', 'string', 1, null);
-INSERT INTO ToiYeuIT.user (username, password, email, gender, phone, role_id, enabled) VALUES ('Unknown', '$2a$10$Ygd//H9E2yJeG.n7Zkwid.zxGdUJXbLuFaGEH9LDzYXaTNE93YkTe', 'letthewind@gmail.com', 'm', null, 1, null);
-INSERT INTO ToiYeuIT.user (username, password, email, gender, phone, role_id, enabled) VALUES ('gayyy', '$2a$10$IVKJbWpPYyqC8pKg/GOYtOlPyC3l5Na40iUHncqvZ4qJnBB1N70VG', 'letthe@gmail.com', 'm', null, 1, null);
-INSERT INTO ToiYeuIT.user (username, password, email, gender, phone, role_id, enabled) VALUES ('Unknown', '$2a$10$TMIoHmHlwon9cpXDAVGmD.X9IB5VqqhEFwAjaOeZRjfcwrZOoItx6', 'minh2508tv@gmail.com', 'm', null, 1, null);
-INSERT INTO ToiYeuIT.user (username, password, email, gender, phone, role_id, enabled) VALUES ('Unknown', '$2a$10$NT9IuYBJS8e5K.Z4aDjvEOwQjk/E3qW.VbULTJ8jRZCT3kF2cFX2K', 'nguyenconluoi2004@gmail.com', 'm', null, 1, null);
-INSERT INTO ToiYeuIT.user (username, password, email, gender, phone, role_id, enabled) VALUES ('Unknown', '$2a$10$3DaYnq27IFcWEIDepVCnu.T6F1eKkLf4ZGTjp1SKuM371EFW.teyG', 'n22dccn052@student.ptithcm.edu.vn', 'm', null, 1, null);
-
 INSERT INTO ToiYeuIT.course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 450+ Cơ Bản', 'Nền tảng từ vựng, ngữ pháp và kỹ năng làm bài cơ bản.', 'BASIC', 1200000, 1, 6, 'Phổ biến', 'LR');
 INSERT INTO ToiYeuIT.course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', '123', 'INTERMEDIATE', 1800000, 1, 8, 'VIP', 'LR');
 INSERT INTO ToiYeuIT.course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 800+ Nâng Cao', 'Tăng tốc luyện đề và kỹ năng phản xạ đề thi thực tế.', 'ADVANCED', 2400000, 1, 10, 'Premium', 'LR');
