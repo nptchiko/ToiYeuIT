@@ -1,0 +1,33 @@
+services:
+    database:
+      image: mysql:9
+      hostname: mysqldb
+      container_name: database
+   #   ports: 
+   #     - "3306:3306"
+      volumes:
+        - db_data:/var/lib/mysql
+        - .:/test-app
+      environment:
+        MYSQL_ROOT_PASSWORD: 17071134
+        MYSQL_DATABASE: ToiYeuIT 
+      networks:
+           - ToiYeuIT 
+
+    backend:
+      build: 
+          context: ./backend/ToiYeuIT/
+      container_name: backend
+      environment:
+        SPRING_PROFILES_ACTIVE: dev
+        SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/ToiYeuIT?createDatabaseIfNotExist=true"
+      ports:
+        - "8082:8081"
+      networks: 
+        - ToiYeuIT
+
+volumes:
+    db_data:
+networks:
+    ToiYeuIT: 
+        name: ToiYeuIT

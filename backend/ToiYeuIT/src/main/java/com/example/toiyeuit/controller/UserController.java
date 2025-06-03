@@ -1,19 +1,17 @@
 package com.example.toiyeuit.controller;
 
-import com.example.toiyeuit.dto.request.UserCreationRequest;
+import com.example.toiyeuit.dto.request.user.UpdateUserRequest;
+import com.example.toiyeuit.dto.request.user.UserCreationRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.dto.response.OverviewResponse;
 import com.example.toiyeuit.dto.response.UserResponse;
 import com.example.toiyeuit.repository.UserRepository;
 import com.example.toiyeuit.service.UserService;
-import jakarta.validation.Valid;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -25,39 +23,29 @@ public class UserController {
     public UserController(UserService userService, UserRepository userRepository) {
         this.userService = userService;
     }
-///  ADMIN ///
-    @DeleteMapping("/{id}")
-    public ApiResponse<?> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ApiResponse.builder()
-                .code(HttpStatus.OK.value())
-                .build();
-    }
-    @GetMapping("/{id}")
-    public UserResponse getUserByID(@PathVariable("id") Long id){
-        var info = userService.getUserById(id);
-
-        return info;
-    }
-
-    @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
-    }
-/// ADMIN ///
 
 
 
 
 /// USER ///
     @PostMapping("/create-user")
-    public ApiResponse<UserResponse> createUser(@RequestBody UserCreationRequest userCreationRequest) {
-        var userResponse = userService.createUser(userCreationRequest);
+    public ApiResponse<UserResponse> createUser(@RequestBody UserCreationRequest userRequest) {
+        var userResponse = userService.createUser(userRequest);
 
         return ApiResponse.<UserResponse>builder()
                 .code(HttpStatus.CREATED.value())
                 .message("Created successfully")
                 .body(userResponse)
+                .build();
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<Void> updateUser(@PathVariable("id") Long id, @RequestBody UpdateUserRequest request){
+        userService.updateUser(id, request);
+
+        return ApiResponse.<Void>builder()
+                .code(200)
+                .message("Update user successful")
                 .build();
     }
 

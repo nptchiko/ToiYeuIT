@@ -44,14 +44,18 @@ public class SecurityConfig {
 
     private final CorsConfiguration corsConfiguration;
 
-    public SecurityConfig(RsaKeyProperties jwtConfigProperties, JwtTokenFilter tokenFilter, CorsConfiguration corsConfiguration){
+    private final OAuth2SuccessHandler handler;
+
+    public SecurityConfig(RsaKeyProperties jwtConfigProperties, JwtTokenFilter tokenFilter, CorsConfiguration corsConfiguration, OAuth2SuccessHandler handler){
         this.jwtConfigProperties = jwtConfigProperties;
         this.tokenFilter = tokenFilter;
         this.corsConfiguration = corsConfiguration;
+        this.handler = handler;
     }
 
 
     public static final String[] PUBLIC_ENDPOINT = {
+            "/login/**", "/oauth2/**",
         "/api/auth/**",
         "/api/users/create-user",
         "/api/courses/**",
@@ -60,11 +64,6 @@ public class SecurityConfig {
         "/swagger-ui/**",
         "/v3/api-docs/**"
     };
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
 
     @Bean
@@ -84,6 +83,9 @@ public class SecurityConfig {
                     //ex.accessDeniedHandler(new BearerTokenAccessDeniedHandler());
                     //  CustomAuthenticationEntryPoint
                     //  CustomAccessHandler
+                })
+                .oauth2Login(auth -> {
+                    auth.successHandler(handler);
                 })
                 .addFilterAfter(tokenFilter, BasicAuthenticationFilter.class)
         .build();

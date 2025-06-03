@@ -27,16 +27,16 @@ import java.util.Map;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionalHandler {
-    @ExceptionHandler(value = Exception.class)
-    ResponseEntity<?> handlingGeneralException(Exception ex){
-        log.error(ex.getMessage());
-        return ResponseEntity.badRequest().body(ex.getMessage());
-    }
 
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(value = RuntimeException.class)
-    ResponseEntity<?> handlingRuntime(RuntimeException e){
-        log.error(e.getMessage());
-        return ResponseEntity.badRequest().body(e.getMessage());
+    ApiResponse<?> handlingRuntime(RuntimeException e){
+        log.error("Message from runtime: " + e.getMessage());
+        log.error("Where it from: " + e);
+        return ApiResponse.builder()
+                .code(500)
+                .message("Internal Server Error")
+                .build();
     }
 
     @ExceptionHandler(value = AppException.class)

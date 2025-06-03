@@ -16,7 +16,7 @@ create table user
     gender   varchar(32) default 'MALE' null,
     phone    varchar(255)               null,
     role_id  int                        null,
-    enabled  bit                        null,
+    status  bit                        null,
     constraint email
         unique (email),
     constraint user_ibfk_1

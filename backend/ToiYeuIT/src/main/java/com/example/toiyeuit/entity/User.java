@@ -43,14 +43,17 @@ public class User {
     @JoinColumn(name = "role_id")
     private Role role;
 
-
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     Set<Enrollment> enrollments;
 
     @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL)
     Set<FlashcardDeck> flashcardDeck;
 
-    @Column(name = "enabled")
-    private Boolean enabled = false;
+    @Column(name = "status")
+    private Boolean status;
+
+    @PrePersist
+    void setStatus(){
+        this.status = true;
+    }
 }

@@ -1,7 +1,6 @@
-package com.example.toiyeuit.dto.request;
+package com.example.toiyeuit.dto.request.user;
 
 import com.example.toiyeuit.enums.Gender;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserCreationRequest {
-    private String username = "Unknown";
+    private String username;
     private String email;
     private String password;
     private Gender gender = Gender.m; // xai primary

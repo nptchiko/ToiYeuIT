@@ -25,4 +25,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
                     "WHERE u.user_id = :userId"
     )
     int updateRole(long userId, int roleId);
+
+    Object getUserByEmail(String email);
 }
