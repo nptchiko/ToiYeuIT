@@ -8,16 +8,27 @@ For building and running the application you need:
 
 - [JDK 21](https://www.oracle.com/java/technologies/downloads/#java21)
 - [Maven 3.9.9](https://maven.apache.org)
-- [Docker](https://www.docker.com/) (Optional)
+- [Docker](https://www.docker.com/) (Recommend)
 
 ## Prequisite
 Generate RSA key for JWT authentication:
-- Visit: [https://cryptotools.net/rsagen](https://cryptotools.net/rsagen)
-- Generate new private key and public key.
+
+**Linux:**
+  - Run this:
+     ```shell
+     chmod +x gen_cert.sh
+     ./gen_cert.sh
+     ```
+  - Check `certs` directory to ensure script worked
+
+**Windows:**
+- Visit: [RSA generator](https://emn178.github.io/online-tools/rsa/key-generator/)
+- **Note**: choose PKCS#8 format
 - Copy and paste keys:
   + Move to directory `certs`:
    ```shell
-   cd backend/src/resources/certs
+   mkdir backend/src/main/resources/certs
+   cd backend/src/main/resources/certs
    ```
   + Copy private key to `private.pem`
   + Copy public key to `public.pem`
@@ -48,6 +59,3 @@ Running MySQL service with host `localhost:3306`
   mvn clean package
   java -jar target/ToiYeuIt.jar
   ```
-## Copyright
-
-Released under the Apache License 2.0. See the [LICENSE](https://github.com/codecentric/springboot-sample-app/blob/master/LICENSE) file.
