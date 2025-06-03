@@ -1,7 +1,6 @@
 
 
 # EngHub - TOEIC online test preparation system 
-Backend service for EngHub
 ## Requirements
 
 For building and running the application you need:
