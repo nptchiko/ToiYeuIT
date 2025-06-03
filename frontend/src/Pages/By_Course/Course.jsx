@@ -1,17 +1,16 @@
 import React from "react";
-import Gift from "../../assets/By_Course/gift_box.png";
-import arrow from "../../assets/By_Course/arrow.png";
 import volume from "../../assets/By_Course/Lovepik.png";
 import { useState } from "react";
 import { AiFillWarning } from "react-icons/ai";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 const Course = () => {
-  const [hasText, setHasText] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [phone, setPhone] = useState("");
   const [fullName, setFullName] = useState("");
   const [address, setAddress] = useState("");
   const [email, setEmail] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("vnpay");
   const [errors, setErrors] = useState({
     phone: "",
     fullName: "",
@@ -22,13 +21,12 @@ const Course = () => {
   localStorage.setItem("phone_course", phone);
   localStorage.setItem("full_course", fullName);
   const { title, price, id } = location.state || {};
-  const [coupon, setCoupon] = useState(price);
-  const [errorCoupon, setErrorCoupon] = useState("");
-  const [couponInput, setCouponInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   localStorage.setItem("course_id", id);
   localStorage.setItem("course_price", price);
+  localStorage.setItem("payment_method", paymentMethod);
+
   // Validate phone number
   const handlePhoneChange = (e) => {
     const value = e.target.value;
@@ -81,22 +79,9 @@ const Course = () => {
     }
   };
 
-  // Handle coupon application
-  const handleCouponChange = () => {
-    if (couponInput === "hau") {
-      setCoupon((coupon) => (coupon *= 0.3)); // Giảm 30%
-      setErrorCoupon("Đã áp dụng mã giảm giá 30%");
-      setCouponInput("");
-    } else {
-      setErrorCoupon("Áp dụng Coupon không thành công");
-    }
-  };
-
-  // Handle coupon input change
-  const handleInputChange = (e) => {
-    const value = e.target.value.trim();
-    setCouponInput(value);
-    setHasText(value !== "");
+  // Handle payment method change
+  const handlePaymentMethodChange = (method) => {
+    setPaymentMethod(method);
   };
 
   // Submit form
@@ -133,13 +118,19 @@ const Course = () => {
       !errors.email
     );
   };
-
   return (
     <div className="bg-gray-100 min-h-screen">
-      <div className="bg-white h-14 w-full py-2 flex justify-center items-center">
-        <div className="font-sent text-xl font-[750] flex">
-          Bước 1<div className="opacity-30">/2</div> - Checkout
+      <div className="bg-white h-14 w-full py-2 flex items-center justify-between px-4 shadow-sm">
+        <button
+          onClick={() => navigate("/")}
+          className="flex items-center px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+        >
+          <ArrowLeft size={25} className="mr-1" />
+        </button>
+        <div className="font-sent text-xl font-[750] text-gray-800">
+          Bước 1<span className="opacity-40">/2</span> - Checkout
         </div>
+        <div className="w-[110px]" />
       </div>
       {/* content */}
       <div className="mx-10 mt-5 lg:flex lg:gap-10">
@@ -166,83 +157,30 @@ const Course = () => {
               <div>VND</div>
             </div>
           </div>
-          <div className="bg-green-50 py-4 px-3 text-sm rounded-lg space-y-2">
-            <div>Khuyến mãi:</div>
-            <div className="relative">
-              <div className="bg-orange-100 py-2 px-5 relative z-20">
-                <div className="flex justify-between">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={Gift}
-                      className="h-[30px] opacity-85"
-                      alt="Gift icon"
-                    />
-                    <div className="text-orange-500">Mã khuyến mãi của bạn</div>
-                  </div>
-                  <button
-                    onClick={() => setIsOpen(!isOpen)}
-                    className="rounded-xl px-2 py-2 bg-white font-medium flex gap-2 items-center"
-                  >
-                    Chọn
-                    <img
-                      src={arrow}
-                      className={`h-[10px] duration-200 ${
-                        isOpen ? "rotate-180" : ""
-                      }`}
-                      alt="Arrow"
-                    />
-                  </button>
+
+          {/* Payment Methods Section */}
+          <div className="bg-blue-50 py-4 px-3 text-sm rounded-lg space-y-3">
+            <div className="font-semibold text-blue-800">
+              Phương thức thanh toán:
+            </div>
+            <div className="flex py-5 gap-3">
+              <div className="text-xl">💳</div>
+              <div className="flex-1">
+                <div className="font-medium text-gray-800">VNPay</div>
+                <div className="text-xs text-gray-600">
+                  Thanh toán qua VNPay
                 </div>
               </div>
-              {isOpen && (
-                <div className="bg-white absolute w-[504px] h-[360px] border-gray-200 rounded-lg border px-3 -left-3 -top-2 z-10">
-                  <div className="border-gray-200 border-b-2 pt-16"></div>
-                  <div className="mt-4 text-sm font-medium">
-                    Chọn một khuyến mãi
-                  </div>
-                </div>
-              )}
             </div>
-            <div>Mã Coupon:</div>
-            <div className="relative w-full">
-              <input
-                type="text"
-                placeholder="Nhập mã Coupon"
-                className="w-full px-4 py-3 pr-20 border border-gray-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-700"
-                onChange={handleInputChange}
-                value={couponInput}
-              />
-              <button
-                onClick={handleCouponChange}
-                className={`absolute top-1/2 right-2 -translate-y-1/2 px-4 py-2 text-white font-medium rounded-lg transition ${
-                  hasText
-                    ? "bg-blue-500 hover:bg-blue-600"
-                    : "bg-gray-500 cursor-not-allowed"
-                }`}
-                disabled={!hasText}
-              >
-                Áp dụng
-              </button>
-            </div>
-            {errorCoupon && (
-              <p
-                className={`text-sm mt-2 ${
-                  errorCoupon.includes("thành công")
-                    ? "text-red-500"
-                    : "text-green-500"
-                }`}
-              >
-                {errorCoupon}
-              </p>
-            )}
           </div>
+
           <div className="flex justify-between">
             <div className="flex items-center gap-2">
-              <div className="text-sm font-[700]">Giá bán sau khuyến mãi</div>
+              <div className="text-sm font-[700]">Tổng thanh toán</div>
             </div>
             <div className="flex items-center gap-1 text-blue-600">
               <div className="font-bold text-lg">
-                {coupon.toLocaleString("vi-VN")}
+                {price.toLocaleString("vi-VN")}
               </div>
               <div className="text-lg">VND</div>
             </div>
@@ -250,7 +188,7 @@ const Course = () => {
           <div className="bg-orange-100/80 px-2 rounded-lg flex items-center gap-2">
             <img src={volume} className="h-full w-[50px]" alt="Volume" />
             <div className="text-xs text-orange-500">
-              Hơn 12.567 học viên của Prep đã sử dụng lộ trình này!
+              Hơn 12.567 học viên của ET đã sử dụng lộ trình này!
             </div>
           </div>
         </div>

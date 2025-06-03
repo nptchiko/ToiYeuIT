@@ -17,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CheckInputReadingApi from "../../api/CheckInputReadingApi";
 import { useNavigate, useLocation } from "react-router-dom";
 const checkInputReading = () => {
-  const [timeLeft, setTimeLeft] = useState(60 * 60);
+  const [timeLeft, setTimeLeft] = useState(30 * 60);
   const [showResults, setShowResults] = useState(false);
   const [isAnswersSaved, setIsAnswersSaved] = useState(false);
   const [showSubmitDialog, setShowSubmitDialog] = useState(false);
@@ -325,13 +325,15 @@ const checkInputReading = () => {
       }
     });
     setQuestions(resetQuestions);
-    setTimeLeft(60 * 60);
+    setTimeLeft(30 * 60);
     setShowResults(false);
     setIsAnswersSaved(false);
     setActivePart(5);
   };
 
-  const completeTest = () => {};
+  const completeTest = () => {
+    navigate("/kiem-tra");
+  };
 
   // Count answered questions per part
   const getAnsweredCount = (part) => {
@@ -431,17 +433,6 @@ const checkInputReading = () => {
         <div className="flex items-center gap-2">
           {!showResults ? (
             <>
-              <Button
-                variant="outline"
-                className={`${
-                  isAnswersSaved
-                    ? "text-green-600 bg-green-50 border-green-100"
-                    : "bg-blue-50 text-blue-600 border-blue-100"
-                }`}
-                onClick={() => setIsAnswersSaved(true)}
-              >
-                {isAnswersSaved ? "Đã lưu" : "Lưu nháp"}
-              </Button>
               <Button
                 onClick={() => setShowSubmitDialog(true)}
                 className="bg-blue-600 text-white hover:bg-blue-700"

@@ -9,276 +9,156 @@ import {
   List,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-
-const data = [
-  {
-    id: 1,
-    videoUrl: "https://www.youtube.com/embed/vouvf8RMaWo?si=MigZ4WFVuxZjrrcX",
-    materials: "https://hocmai.vn/kho-tai-lieu/documents/1590396216/page-1.png",
-    grammar: {
-      title: "Grammar Focus: Cấu trúc câu cơ bản",
-      content:
-        "Trong tiếng Anh, một câu đơn giản thường có cấu trúc chủ ngữ (Subject) + động từ (Verb) + tân ngữ (Object). Ví dụ: 'I (S) study (V) English (O)'.",
-      quiz: [
-        {
-          question: "Đâu là cấu trúc câu cơ bản trong tiếng Anh?",
-          options: [
-            "Verb + Subject + Object",
-            "Object + Subject + Verb",
-            "Subject + Verb + Object",
-            "Subject + Object + Verb",
-          ],
-          answer: "Subject + Verb + Object",
-          userAnswer: null,
-        },
-        {
-          question:
-            "Trong câu 'They play soccer every weekend', đâu là chủ ngữ (Subject)?",
-          options: ["play", "They", "soccer", "weekend"],
-          answer: "They",
-          userAnswer: null,
-        },
-        {
-          question: "Trong câu 'She reads books', từ nào là động từ (Verb)?",
-          options: ["She", "reads", "books", "She reads"],
-          answer: "reads",
-          userAnswer: null,
-        },
-        {
-          question: "Câu nào sau đây có cấu trúc đúng?",
-          options: [
-            "Football play I",
-            "Play I football",
-            "I play football",
-            "Football I play",
-          ],
-          answer: "I play football",
-          userAnswer: null,
-        },
-      ],
-    },
-  },
-  {
-    id: 2,
-    videoUrl: "https://www.youtube.com/embed/uTezoyEM_sE?si=1X9AHo2yDkZs6VJE",
-    materials: "https://hocmai.vn/kho-tai-lieu/documents/1590396216/page-1.png",
-    grammar: {
-      title: "Grammar Focus: Tính từ mô tả",
-      content:
-        "Tính từ mô tả được sử dụng để diễn tả đặc điểm của người, vật. Trong tiếng Anh, tính từ thường đứng trước danh từ. Ví dụ: 'a tall man', 'beautiful flowers'.",
-      quiz: [
-        {
-          question: "Vị trí của tính từ thường là ở đâu trong tiếng Anh?",
-          options: ["Sau danh từ", "Trước danh từ", "Cuối câu", "Đầu câu"],
-          answer: "Trước danh từ",
-          userAnswer: null,
-        },
-        {
-          question: "Trong cụm từ 'big blue house', từ nào là tính từ mô tả?",
-          options: ["house", "big", "blue", "Cả big và blue"],
-          answer: "Cả big và blue",
-          userAnswer: null,
-        },
-        {
-          question: "Câu nào sau đây sử dụng tính từ đúng cách?",
-          options: [
-            "She is a woman beautiful",
-            "Car the is red",
-            "The red car is new",
-            "House big the",
-          ],
-          answer: "The red car is new",
-          userAnswer: null,
-        },
-        {
-          question: "Cụm từ nào sử dụng tính từ không đúng vị trí?",
-          options: [
-            "a cold day",
-            "flowers beautiful",
-            "delicious food",
-            "heavy rain",
-          ],
-          answer: "flowers beautiful",
-          userAnswer: null,
-        },
-      ],
-    },
-  },
-  {
-    id: 3,
-    videoUrl: "https://www.youtube.com/embed/uTezoyEM_sE?si=1X9AHo2yDkZs6VJE",
-    materials: "https://hocmai.vn/kho-tai-lieu/documents/1590396216/page-1.png",
-    grammar: {
-      title: "Grammar Focus: Các loại từ trong tiếng Anh",
-      content:
-        "Tiếng Anh có 8 loại từ chính: danh từ (nouns), động từ (verbs), tính từ (adjectives), trạng từ (adverbs), đại từ (pronouns), giới từ (prepositions), liên từ (conjunctions), và thán từ (interjections).",
-      quiz: [
-        {
-          question: "Tiếng Anh có bao nhiêu loại từ chính?",
-          options: ["6 loại", "7 loại", "8 loại", "9 loại"],
-          answer: "8 loại",
-          userAnswer: null,
-        },
-        {
-          question:
-            "Trong câu 'She quickly ran to the store', từ 'quickly' thuộc loại từ nào?",
-          options: [
-            "Danh từ (noun)",
-            "Động từ (verb)",
-            "Tính từ (adjective)",
-            "Trạng từ (adverb)",
-          ],
-          answer: "Trạng từ (adverb)",
-          userAnswer: null,
-        },
-        {
-          question:
-            "Từ nào trong câu 'The cat jumped over the fence' là giới từ?",
-          options: ["cat", "jumped", "over", "fence"],
-          answer: "over",
-          userAnswer: null,
-        },
-        {
-          question: "Loại từ nào biểu thị cảm xúc đột ngột?",
-          options: [
-            "Danh từ (noun)",
-            "Đại từ (pronoun)",
-            "Liên từ (conjunction)",
-            "Thán từ (interjection)",
-          ],
-          answer: "Thán từ (interjection)",
-          userAnswer: null,
-        },
-      ],
-    },
-  },
-];
+import LessonDetailApi from "../../../api/LessonDetailApi";
 
 const LessonDetail = () => {
   const location = useLocation();
+  const { id_i, id_ii } = location.state;
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("video");
-  const { id, title, sections, description, submitted } = location.state || {};
-  const [localSubmitted, setLocalSubmitted] = useState(submitted || false);
-  const [lesson, setLesson] = useState(null);
+  const [lessonDetail, setLessonDetail] = useState(null);
   const [userAnswers, setUserAnswers] = useState({});
+  const [localSubmitted, setLocalSubmitted] = useState(false);
 
-  // Khởi tạo dữ liệu bài học và trạng thái của đáp án
   useEffect(() => {
-    if (id) {
-      const foundLesson = data.find((item) => item.id === id);
-      if (foundLesson) {
-        // Tạo bản sao sâu của bài học để không ảnh hưởng đến dữ liệu gốc
-        const lessonCopy = JSON.parse(JSON.stringify(foundLesson));
+    async function fetchLessonDetail() {
+      try {
+        const req = await LessonDetailApi.getLessonDetail(id_ii, id_i);
+        setLessonDetail(req.body);
 
-        // Nếu đã submitted, khôi phục userAnswer từ data
-        // Nếu chưa submitted, đặt tất cả userAnswer về null
-        if (!localSubmitted) {
-          lessonCopy.grammar.quiz.forEach((q) => (q.userAnswer = null));
+        // Initialize user answers
+        if (req.body && req.body.quizQuestions) {
+          const initialAnswers = {};
+          req.body.quizQuestions.forEach((q) => {
+            // Check if there are user submissions
+            if (q.userSubmissions && q.userSubmissions.length > 0) {
+              initialAnswers[q.id] = q.userSubmissions[0].id;
+            }
+          });
+          setUserAnswers(initialAnswers);
         }
 
-        setLesson(lessonCopy);
-
-        // Khởi tạo userAnswers từ đáp án người dùng trong data
-        const initialAnswers = {};
-        lessonCopy.grammar.quiz.forEach((q, index) => {
-          if (q.userAnswer !== null) {
-            initialAnswers[index] = q.userAnswer;
-          }
-        });
-        setUserAnswers(initialAnswers);
+        // Initialize submitted state from the lesson
+        if (req.body && req.body.lesson) {
+          setLocalSubmitted(req.body.lesson.isSubmitted || false);
+        }
+      } catch (error) {
+        console.error("Error when loading lesson detail:", error);
       }
     }
-  }, [id, localSubmitted]);
 
-  if (!lesson) {
-    return <div>Lesson not found</div>;
+    fetchLessonDetail();
+  }, [id_i, id_ii]);
+  const handleClickLesson = (id_ii) => {
+    navigate("/lesson-list", {
+      state: {
+        id: id_ii,
+      },
+    });
+  };
+  if (!lessonDetail) {
+    return (
+      <div className="max-w-4xl mx-auto p-4 font-sans">Loading lesson...</div>
+    );
   }
 
-  const handleAnswerSelect = (questionIndex, option) => {
-    if (localSubmitted) return; // Nếu đã nộp bài thì không cho chọn nữa
+  const handleAnswerSelect = (questionId, optionId) => {
+    if (localSubmitted) return; // If already submitted, don't allow selection
 
     setUserAnswers({
       ...userAnswers,
-      [questionIndex]: option,
-    });
-
-    // Cập nhật giá trị userAnswer trong lesson
-    const updatedQuiz = [...lesson.grammar.quiz];
-    updatedQuiz[questionIndex] = {
-      ...updatedQuiz[questionIndex],
-      userAnswer: option,
-    };
-
-    setLesson({
-      ...lesson,
-      grammar: {
-        ...lesson.grammar,
-        quiz: updatedQuiz,
-      },
+      [questionId]: optionId,
     });
   };
 
-  const handleSubmitQuiz = () => {
-    setLocalSubmitted(true);
+  const handleSubmitQuiz = async () => {
+    try {
+      const courseId = id_ii;
+      const lessonId = id_i;
+
+      // Submit each answer sequentially
+      const submissionPromises = Object.entries(userAnswers).map(
+        ([questionId, optionId]) =>
+          LessonDetailApi.submitAnswer(courseId, lessonId, questionId, optionId)
+      );
+
+      await Promise.all(submissionPromises);
+
+      setLocalSubmitted(true);
+
+      setLessonDetail({
+        ...lessonDetail,
+        lesson: {
+          ...lessonDetail.lesson,
+          isSubmitted: true,
+        },
+      });
+
+      alert("Bài trắc nghiệm đã được nộp thành công!");
+    } catch (error) {
+      console.error("Error submitting quiz answers:", error);
+      alert("Có lỗi xảy ra khi nộp bài. Vui lòng thử lại sau!");
+    }
   };
 
   const handleRetakeQuiz = () => {
-    // Reset lại trạng thái
+    // Reset the state
     setLocalSubmitted(false);
-
-    // Reset các đáp án người dùng
-    const resetQuiz = lesson.grammar.quiz.map((q) => ({
-      ...q,
-      userAnswer: null,
-    }));
-
-    setLesson({
-      ...lesson,
-      grammar: {
-        ...lesson.grammar,
-        quiz: resetQuiz,
-      },
-    });
-
     setUserAnswers({});
   };
 
   const calculateScore = () => {
-    if (!lesson.grammar.quiz) return 0;
+    if (!lessonDetail.quizQuestions) return 0;
 
     let correct = 0;
-    lesson.grammar.quiz.forEach((question, index) => {
-      if (question.userAnswer === question.answer) {
-        correct++;
+    lessonDetail.quizQuestions.forEach((question) => {
+      const selectedOptionId = userAnswers[question.id];
+      if (selectedOptionId) {
+        const selectedOption = question.options.find(
+          (opt) => opt.id === selectedOptionId
+        );
+        if (selectedOption && selectedOption.isCorrect) {
+          correct++;
+        }
       }
     });
 
     return correct;
   };
 
-  const isOptionCorrect = (question, option) => {
-    return option === question.answer;
+  const isOptionCorrect = (question, optionId) => {
+    const option = question.options.find((opt) => opt.id === optionId);
+    return option && option.isCorrect;
   };
 
-  const getOptionClassName = (question, option) => {
+  const getOptionClassName = (question, optionId) => {
+    const isSelected = userAnswers[question.id] === optionId;
+
     if (!localSubmitted) {
-      return question.userAnswer === option
+      return isSelected
         ? "bg-blue-50 border border-blue-300"
         : "bg-gray-50 border border-gray-200";
     }
 
-    // Khi đã nộp bài
-    if (option === question.answer) {
-      // Đáp án đúng
+    // When quiz is submitted
+    const option = question.options.find((opt) => opt.id === optionId);
+
+    if (option && option.isCorrect) {
+      // Correct answer
       return "bg-green-100 border border-green-300";
-    } else if (option === question.userAnswer) {
-      // Đáp án người dùng chọn và sai
+    } else if (isSelected) {
+      // User selected this option and it's wrong
       return "bg-red-100 border border-red-300";
     } else {
-      // Các lựa chọn khác
+      // Other options
       return "bg-gray-50 border border-gray-200";
     }
+  };
+
+  // Get the correct answer text for a question
+  const getCorrectAnswerText = (question) => {
+    const correctOption = question.options.find((opt) => opt.isCorrect);
+    return correctOption ? correctOption.optionText : "No correct answer found";
   };
 
   return (
@@ -286,13 +166,13 @@ const LessonDetail = () => {
       <div className="flex items-center mb-6">
         <button
           className="flex items-center text-gray-600 hover:text-blue-600 mr-4"
-          onClick={() => navigate("/Lesson")}
+          onClick={() => handleClickLesson(id_ii)}
         >
           <ChevronLeft size={20} />
           <span>Quay lại danh sách</span>
         </button>
         <h1 className="text-xl font-bold text-gray-800">
-          Bài {lesson.id}: {title}
+          Bài {lessonDetail.lesson.orderIndex}: {lessonDetail.lesson.title}
         </h1>
       </div>
       <div className="bg-gray-100 p-4 rounded-lg mb-6">
@@ -346,109 +226,125 @@ const LessonDetail = () => {
           <div>
             <div className="relative pt-[56.25%] bg-black rounded-lg overflow-hidden mb-4">
               <iframe
-                src={lesson.videoUrl}
+                src={lessonDetail.lesson.videoUrl}
                 title="YouTube video player"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 className="absolute inset-0 w-full h-full"
               />
             </div>
-            <h2 className="text-lg font-medium mb-2">{title}</h2>
-            <p className="text-gray-600">{description}</p>
+            <h2 className="text-lg font-medium mb-2">
+              {lessonDetail.lesson.title}
+            </h2>
+            <p className="text-gray-600">{lessonDetail.lesson.description}</p>
           </div>
         )}
         {activeTab === "materials" && (
           <div>
             <h2 className="text-lg font-medium mb-4">Tài liệu học tập</h2>
-            <img src={lesson.materials} alt="Tài liệu học tập" />
+            <img
+              src={lessonDetail.lesson.materialsUrl}
+              alt="Tài liệu học tập"
+            />
           </div>
         )}
         {activeTab === "grammar" && (
           <div>
-            <h2 className="text-lg font-medium mb-4">{lesson.grammar.title}</h2>
+            <h2 className="text-lg font-medium mb-4">{lessonDetail.title}</h2>
             <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg">
-              <p className="text-gray-700">{lesson.grammar.content}</p>
+              <p className="text-gray-700">{lessonDetail.content}</p>
             </div>
 
-            {/* Phần trắc nghiệm */}
-            {lesson.grammar.quiz && (
-              <div className="mt-6">
-                <h3 className="text-md font-medium mb-2">
-                  Bài trắc nghiệm ngữ pháp
-                </h3>
-                <div className="p-4 border border-gray-200 rounded-lg">
-                  {/* Kết quả khi đã nộp bài */}
-                  {localSubmitted && (
-                    <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-                      <p className="font-medium text-blue-700">
-                        Kết quả: {calculateScore()}/{lesson.grammar.quiz.length}{" "}
-                        câu đúng
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Danh sách câu hỏi */}
-                  <div>
-                    {lesson.grammar.quiz.map((quizItem, qIndex) => (
-                      <div key={qIndex} className="mb-6 border-b pb-4">
-                        <p className="mb-3 font-medium">
-                          {qIndex + 1}. {quizItem.question}
+            {/* Quiz section */}
+            {lessonDetail.quizQuestions &&
+              lessonDetail.quizQuestions.length > 0 && (
+                <div className="mt-6">
+                  <h3 className="text-md font-medium mb-2">
+                    Bài trắc nghiệm ngữ pháp
+                  </h3>
+                  <div className="p-4 border border-gray-200 rounded-lg">
+                    {/* Results when quiz is submitted */}
+                    {localSubmitted && (
+                      <div className="mb-4 p-3 bg-blue-50 rounded-lg">
+                        <p className="font-medium text-blue-700">
+                          Kết quả: {calculateScore()}/
+                          {lessonDetail.quizQuestions.length} câu đúng
                         </p>
-                        <div className="ml-4 space-y-2">
-                          {quizItem.options.map((option, oIndex) => (
-                            <div
-                              key={oIndex}
-                              className={`p-2 rounded cursor-pointer hover:bg-gray-100 ${getOptionClassName(
-                                quizItem,
-                                option
-                              )}`}
-                              onClick={() => handleAnswerSelect(qIndex, option)}
-                            >
-                              <label className="flex items-center cursor-pointer">
-                                <input
-                                  type="radio"
-                                  name={`question-${qIndex}`}
-                                  checked={quizItem.userAnswer === option}
-                                  onChange={() => {}}
-                                  disabled={localSubmitted}
-                                  className="mr-2"
-                                />
-                                <span>{option}</span>
-                              </label>
-                            </div>
-                          ))}
-                        </div>
-                        {/* Hiển thị đáp án đúng nếu người dùng chọn sai và đã nộp bài */}
-                        {localSubmitted &&
-                          quizItem.userAnswer !== null &&
-                          quizItem.userAnswer !== quizItem.answer && (
-                            <p className="text-red-600 mt-2 ml-4">
-                              Đáp án đúng là: {quizItem.answer}
-                            </p>
-                          )}
                       </div>
-                    ))}
-                  </div>
+                    )}
 
-                  {/* Nút hành động */}
-                  {localSubmitted ? (
-                    <button
-                      onClick={handleRetakeQuiz}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                      Làm lại bài
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleSubmitQuiz}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                    >
-                      Nộp bài
-                    </button>
-                  )}
+                    {/* Questions list */}
+                    <div>
+                      {lessonDetail.quizQuestions
+                        .sort((a, b) => a.orderIndex - b.orderIndex)
+                        .map((question) => (
+                          <div key={question.id} className="mb-6 border-b pb-4">
+                            <p className="mb-3 font-medium">
+                              {question.orderIndex}. {question.questionText}
+                            </p>
+                            <div className="ml-4 space-y-2">
+                              {question.options.map((option) => (
+                                <div
+                                  key={option.id}
+                                  className={`p-2 rounded cursor-pointer hover:bg-gray-100 ${getOptionClassName(
+                                    question,
+                                    option.id
+                                  )}`}
+                                  onClick={() =>
+                                    handleAnswerSelect(question.id, option.id)
+                                  }
+                                >
+                                  <label className="flex items-center cursor-pointer">
+                                    <input
+                                      type="radio"
+                                      name={`question-${question.id}`}
+                                      checked={
+                                        userAnswers[question.id] === option.id
+                                      }
+                                      onChange={() => {}}
+                                      disabled={localSubmitted}
+                                      className="mr-2"
+                                    />
+                                    <span>{option.optionText}</span>
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                            {/* Show correct answer if user selected wrong and quiz is submitted */}
+                            {localSubmitted &&
+                              userAnswers[question.id] &&
+                              !isOptionCorrect(
+                                question,
+                                userAnswers[question.id]
+                              ) && (
+                                <p className="text-red-600 mt-2 ml-4">
+                                  Đáp án đúng là:{" "}
+                                  {getCorrectAnswerText(question)}
+                                </p>
+                              )}
+                          </div>
+                        ))}
+                    </div>
+
+                    {/* Action buttons */}
+                    {localSubmitted ? (
+                      <button
+                        onClick={handleRetakeQuiz}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      >
+                        Làm lại bài
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleSubmitQuiz}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      >
+                        Nộp bài
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         )}
       </div>
