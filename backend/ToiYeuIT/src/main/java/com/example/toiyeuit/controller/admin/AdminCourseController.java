@@ -35,6 +35,7 @@ public class AdminCourseController {
                 .body(course.getContent())
                 .build();
     }
+
    @PostMapping
     public ApiResponse<Course> addCourse(@RequestBody CrudCourseRequest request){
         return ApiResponse.<Course>builder()

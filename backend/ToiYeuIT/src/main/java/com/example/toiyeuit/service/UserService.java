@@ -3,8 +3,10 @@ package com.example.toiyeuit.service;
 import com.example.toiyeuit.dto.request.user.UpdateUserRequest;
 import com.example.toiyeuit.dto.request.user.UserCreationRequest;
 import com.example.toiyeuit.dto.response.OverviewResponse;
+import com.example.toiyeuit.dto.response.PaginationResponse;
 import com.example.toiyeuit.dto.response.TestResponse;
 import com.example.toiyeuit.dto.response.UserResponse;
+import com.example.toiyeuit.dto.response.admin.AdminUsersResponse;
 import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.entity.Role;
 import com.example.toiyeuit.entity.User;
@@ -44,10 +46,23 @@ public class UserService {
     TestRepository testRepository;
     CourseRepository courseRepository;
 
-    public List<UserResponse> getAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable)
-                .stream().map(userMapper::toUserResponse)
-                .toList();
+    public AdminUsersResponse getAllUsers(Pageable pageable) {
+
+        var pageOfUsers = userRepository.findAll(pageable);
+
+        var pagination = PaginationResponse.builder()
+                .totalPages(pageOfUsers.getTotalPages())
+                .totalItems((int) pageOfUsers.getTotalElements())
+                .build();
+
+        return AdminUsersResponse.builder()
+                .users(
+                        pageOfUsers.getContent().stream()
+                                .map(userMapper::toUserResponse)
+                                .toList()
+                )
+                .pagination(pagination)
+                .build();
     }
 
     public User getUserById(long id){

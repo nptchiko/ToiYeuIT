@@ -4,6 +4,7 @@ import com.example.toiyeuit.dto.request.user.UpdateUserRequest;
 import com.example.toiyeuit.dto.request.user.UserCreationRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.dto.response.UserResponse;
+import com.example.toiyeuit.dto.response.admin.AdminUsersResponse;
 import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.mapper.UserMapper;
 import com.example.toiyeuit.service.UserService;
@@ -68,7 +69,7 @@ public class AdminUserController {
             "    size={{int)}}&\n" +
             "    sortBy={{int}}&\n" +
             "    sortDir={{int}}")
-    public ApiResponse<List<UserResponse>> getAllCourses(
+    public ApiResponse<AdminUsersResponse> getAllUsers(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "3") int size,
             @RequestParam(required = false, defaultValue = "id") String sortBy,
@@ -79,11 +80,9 @@ public class AdminUserController {
 
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-        //List<UserResponse> user = userService.getAllUsers(pageable);
-
-        return ApiResponse.<List<UserResponse>>builder()
+        return ApiResponse.<AdminUsersResponse>builder()
                 .code(200)
-                .message("All available course")
+                .message("All available users")
                 .body(userService.getAllUsers(pageable))
                 .build();
     }

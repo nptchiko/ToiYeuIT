@@ -46,8 +46,8 @@ public class TestCollectionService {
     public List<TestSetResponse> getTestSetBasedOnSkill(String skill){
         String skillName = skill.toUpperCase();
 
-        //var user = userService.getUserByEmail(SecurityUtils.getCurrentUserLogin());
-        var user = userService.getUserByEmail("mikudeptrai@gmail.com");
+        var user = userService.getUserByEmail(SecurityUtils.getCurrentUserLogin());
+
         var _skill = skillRepository.findByName(skillName).orElseThrow(
                 () -> new AppException(ErrorCode.SKILL_NOT_FOUND));
 

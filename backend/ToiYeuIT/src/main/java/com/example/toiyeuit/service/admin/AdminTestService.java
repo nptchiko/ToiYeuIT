@@ -142,9 +142,9 @@ public class AdminTestService {
         boolean status = true;
         if( request.getStatus() != null &&
             "Active".equalsIgnoreCase(request.getStatus()) ||
-            "Not active".equalsIgnoreCase(request.getStatus())
+            "Inactive".equalsIgnoreCase(request.getStatus())
         ){
-            status = !"Not active".equalsIgnoreCase(request.getStatus());
+            status = !"Inactive".equalsIgnoreCase(request.getStatus());
         }
 
         String title = request.getName() !=  null ? request.getName() : test.getTitle();

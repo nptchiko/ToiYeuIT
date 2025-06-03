@@ -32,6 +32,7 @@ public class GlobalExceptionalHandler {
     @ExceptionHandler(value = RuntimeException.class)
     ApiResponse<?> handlingRuntime(RuntimeException e){
         log.error("Message from runtime: " + e.getMessage());
+        log.error("Where it from: " + e);
         return ApiResponse.builder()
                 .code(500)
                 .message("Internal Server Error")
