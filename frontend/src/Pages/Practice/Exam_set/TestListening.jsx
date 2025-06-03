@@ -686,17 +686,6 @@ export default function TestListening() {
           {!showResults ? (
             <>
               <Button
-                variant="outline"
-                className={`${
-                  isAnswersSaved
-                    ? "bg-green-50 text-green-600 border-green-100"
-                    : "bg-blue-50 text-blue-600 border-blue-100"
-                }`}
-                onClick={saveProgress}
-              >
-                {isAnswersSaved ? "Đã lưu" : "Lưu nhập"}
-              </Button>
-              <Button
                 className="bg-blue-600 hover:bg-blue-700"
                 onClick={() => setShowSubmitDialog(true)}
               >
