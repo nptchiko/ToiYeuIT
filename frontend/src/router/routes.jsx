@@ -1,10 +1,16 @@
 import Course from "../Pages/By_Course/Course";
+import Failure from "../Pages/By_Course/Failure";
+import HistoryOrder from "../Pages/By_Course/HistoryOrder";
+import Successfull from "../Pages/By_Course/Successfull";
+import Vnpay from "../Pages/By_Course/Vnpay";
 import LoginPage from "../Pages/Login/Login_Page";
 import ProtectedRoute from "../Pages/Login/protected-route";
 import Commitment from "../Pages/Output_commitment/Output_commitment";
 import AllSkill from "../Pages/Practice/All_skill";
 import TestListening from "../Pages/Practice/Exam_set/TestListening";
 import TestReading from "../Pages/Practice/Exam_set/TestReading";
+import HistoryInputListening from "../Pages/Practice/History_test/HistoryInputListening";
+import HistoryInputReading from "../Pages/Practice/History_test/HistoryInputRreading";
 import HistoryListening from "../Pages/Practice/History_test/HistoryListening";
 import HistoryReading from "../Pages/Practice/History_test/HistoryReaing";
 import Listening from "../Pages/Practice/Listening";
@@ -18,22 +24,18 @@ import CheckInputListening from "../Pages/test/checkInputListening";
 import CheckInputReading from "../Pages/test/checkInputReading";
 import UseProfileData from "../Pages/useProfileData/useProfileData";
 import Flashcard from "../Pages/user/Flashcard";
+import LessonDetail from "../Pages/user/LessonList/LessonDetail";
+import LessonsList from "../Pages/user/LessonList/LessonsList";
 import MyCourses from "../Pages/user/MyCourses";
 import Overview from "../Pages/user/Overview";
 import TestPractice from "../Pages/user/TestPractice";
 import Sidebar from "../components/Sidebar";
 import RouterPrivate from "./RouterPrivate";
 import RouterPublic from "./RouterPublic";
+import GoogleCallbackHandler from "@/components/login/google-callback-handler";
 import { useAuth } from "@/hooks/auth-context";
 import { Routes, Route, Navigate } from "react-router-dom";
-import HistoryInputListening from "../Pages/Practice/History_test/HistoryInputListening";
-import HistoryInputReading from "../Pages/Practice/History_test/HistoryInputRreading";
-import Vnpay from "../Pages/By_Course/Vnpay";
-import Successfull from "../Pages/By_Course/Successfull";
-import Failure from "../Pages/By_Course/Failure";
-import LessonDetail from "../Pages/user/LessonList/LessonDetail";
-import HistoryOrder from "../Pages/By_Course/HistoryOrder";
-import LessonsList from "../Pages/user/LessonList/LessonsList";
+
 const RoutersConfig = () => {
   const { user, loading } = useAuth();
 
@@ -49,7 +51,7 @@ const RoutersConfig = () => {
     <Routes>
       {/* Route đăng nhập - có thể truy cập mà không cần xác thực */}
       <Route path="/login" element={<LoginPage />} />
-
+      <Route path="/auth/callback" element={<GoogleCallbackHandler />} />
       {/* Route mặc định - chuyển hướng đến trang đăng nhập */}
       <Route
         path="/"

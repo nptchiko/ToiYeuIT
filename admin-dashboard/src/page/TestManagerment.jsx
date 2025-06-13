@@ -98,7 +98,7 @@ export default function TestManagement() {
     const fetchUser = async () => {
       try {
         const response = await userService.getUsers(currentPage, pageSize);
-        console.log("heheh", response);
+        // console.log("heheh", response);
         if (response) {
           const users = response.pagination.totalItems;
           setUserCount(users);
@@ -370,7 +370,7 @@ export default function TestManagement() {
       };
 
       // Send to API
-      console.log("hehehe", testToAdd);
+      // console.log("hehehe", testToAdd);
       const createdTest = await TestAPI.createTest(testToAdd);
       if (
         createdTest &&
@@ -489,7 +489,7 @@ export default function TestManagement() {
     // Make sure we're using a consistent structure for editing
     const testForEditing = {
       id: test.testId,
-      testId: test.testId, // Add this line to ensure both id and testId are available
+      testId: test.testId,
       name: test.name,
       status: test.status,
       duration: test.duration,

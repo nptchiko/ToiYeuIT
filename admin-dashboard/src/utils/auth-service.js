@@ -126,8 +126,155 @@ api.interceptors.response.use(
   }
 );
 
+// Google OAuth Service
+// const GoogleOAuthService = {
+//   // Xử lý callback từ Google OAuth
+//   handleCallback: async () => {
+//     const urlParams = new URLSearchParams(window.location.search);
+//     const code = urlParams.get("code");
+//     const error = urlParams.get("error");
+
+//     if (window.location.pathname === "/auth/callback") {
+//       if (error) {
+//         // If this is in a popup, notify parent and close popup
+//         if (window.opener) {
+//           window.opener.postMessage(
+//             {
+//               type: "LOGIN_ERROR",
+//               error: error,
+//             },
+//             window.location.origin
+//           );
+//           window.close();
+//         }
+//         throw new Error(`Google OAuth error: ${error}`);
+//       }
+
+//       if (code) {
+//         try {
+//           const response = await axios.post(
+//             `${BACKEND_URL}/auth/outbound/authentication?code=${code}`,
+//             null,
+//             {
+//               withCredentials: true,
+//               headers: {
+//                 Accept: "application/json",
+//               },
+//             }
+//           );
+
+//           const userData = response.data;
+
+//           // Lưu token nếu có
+//           if (userData.token) {
+//             TokenService.setToken(userData.token);
+//           }
+
+//           // If this is in a popup, notify parent and close popup
+//           if (window.opener) {
+//             window.opener.postMessage(
+//               {
+//                 type: "LOGIN_SUCCESS",
+//                 user: userData,
+//               },
+//               window.location.origin
+//             );
+//             // Đóng popup sau khi gửi thông báo thành công
+//             setTimeout(() => {
+//               window.close();
+//             }, 100);
+//           } else {
+//             // Clean up URL if not in popup
+//             window.history.replaceState(
+//               {},
+//               document.title,
+//               window.location.pathname
+//             );
+//           }
+
+//           return userData;
+//         } catch (error) {
+//           console.error("Google OAuth authentication error:", error);
+
+//           if (window.opener) {
+//             window.opener.postMessage(
+//               {
+//                 type: "LOGIN_ERROR",
+//                 error: error.message,
+//               },
+//               window.location.origin
+//             );
+//             // Đóng popup ngay cả khi có lỗi
+//             setTimeout(() => {
+//               window.close();
+//             }, 100);
+//           }
+
+//           throw error;
+//         }
+//       }
+//     }
+
+//     return null;
+//   },
+
+//   initiateLogin: () => {
+//     return new Promise((resolve, reject) => {
+//       const popup = window.open(
+//         `${BACKEND_URL}/oauth2/authorization/google`,
+//         "googleLogin",
+//         "width=500,height=600,scrollbars=yes,resizable=yes"
+//       );
+
+//       // Kiểm tra nếu popup bị block
+//       if (!popup) {
+//         reject(
+//           new Error(
+//             "Popup bị chặn bởi trình duyệt. Vui lòng cho phép popup và thử lại."
+//           )
+//         );
+//         return;
+//       }
+
+//       // Listen for messages from the popup
+//       const messageListener = (event) => {
+//         // Ensure the message is from the expected origin
+//         if (event.origin !== window.location.origin) {
+//           return;
+//         }
+
+//         if (event.data.type === "LOGIN_SUCCESS") {
+//           // Đóng popup ngay lập tức
+//           if (popup && !popup.closed) {
+//             popup.close();
+//           }
+//           window.removeEventListener("message", messageListener);
+//           resolve(event.data.user);
+//         } else if (event.data.type === "LOGIN_ERROR") {
+//           // Đóng popup khi có lỗi
+//           if (popup && !popup.closed) {
+//             popup.close();
+//           }
+//           window.removeEventListener("message", messageListener);
+//           reject(new Error(event.data.error || "Google login failed"));
+//         }
+//       };
+
+//       window.addEventListener("message", messageListener);
+
+//       // Check if popup was closed manually
+//       const checkClosed = setInterval(() => {
+//         if (popup.closed) {
+//           clearInterval(checkClosed);
+//           window.removeEventListener("message", messageListener);
+//           reject(new Error("Đăng nhập bị hủy bởi người dùng"));
+//         }
+//       }, 1000);
+//     });
+//   },
+// };
+
 const AuthService = {
-  // Đăng nhập
   login: async (email, password) => {
     try {
       const response = await axios.post(
@@ -154,24 +301,43 @@ const AuthService = {
     }
   },
 
-  // Đăng ký
-  register: async (email, password) => {
-    try {
-      const response = await api.post("/users/create-user", {
-        email,
-        password,
-      });
-      const { token, role } = response.data.body;
+  // loginWithGoogle: async () => {
+  //   try {
+  //     const userData = await GoogleOAuthService.initiateLogin();
+  //     console.log("Google login successful:", userData);
+  //     return userData;
+  //   } catch (error) {
+  //     console.error("Google login error:", error);
+  //     throw error;
+  //   }
+  // },
 
-      // Lưu token vào cookies
-      TokenService.setToken(token);
+  // handleGoogleCallback: async () => {
+  //   try {
+  //     return await GoogleOAuthService.handleCallback();
+  //   } catch (error) {
+  //     console.error("Google callback error:", error);
+  //     throw error;
+  //   }
+  // },
 
-      return role;
-    } catch (error) {
-      console.error("Register error:", error);
-      throw error;
-    }
-  },
+  // register: async (email, password) => {
+  //   try {
+  //     const response = await api.post("/users/create-user", {
+  //       email,
+  //       password,
+  //     });
+  //     const { token, role } = response.data.body;
+
+  //     // Lưu token vào cookies
+  //     TokenService.setToken(token);
+
+  //     return role;
+  //   } catch (error) {
+  //     console.error("Register error:", error);
+  //     throw error;
+  //   }
+  // },
 
   logout: () => {
     try {

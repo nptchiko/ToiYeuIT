@@ -1,9 +1,10 @@
 "use client";
 
+// Client component
 import { useAuth } from "../../hooks/auth-context";
 import { useToast } from "../../hooks/toast-context";
-import { TokenService } from "../../utils/auth-service";
 import PasswordStrength from "./password-strength";
+import GoogleLoginButton from "@/components/login/google-login-button";
 import {
   X,
   ChevronLeft,
@@ -12,8 +13,6 @@ import {
   Eye,
   EyeOff,
   AlertTriangle,
-  Check,
-  ArrowRight,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -23,6 +22,7 @@ export default function LoginPage() {
   const { addToast } = useToast();
   const { login, register, resetPassword, verifyResetCode, setNewPassword } =
     useAuth();
+
   // Modal state
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
@@ -44,7 +44,7 @@ export default function LoginPage() {
   const [loginPassword, setLoginPassword] = useState("");
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); // confirm dùng cho đăng kí
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [resetEmail, setResetEmail] = useState("");
 
   // Form validation
@@ -54,9 +54,8 @@ export default function LoginPage() {
   const [isLoginSubmitting, setIsLoginSubmitting] = useState(false);
   const [isRegisterSubmitting, setIsRegisterSubmitting] = useState(false);
   const [isResetSubmitting, setIsResetSubmitting] = useState(false);
-  //login
 
-  // Thêm các state mới cho quy trình quên mật khẩu
+  // States for password reset flow
   const [showVerificationCodeModal, setShowVerificationCodeModal] =
     useState(false);
   const [showNewPasswordModal, setShowNewPasswordModal] = useState(false);
@@ -74,6 +73,24 @@ export default function LoginPage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
 
+  // Track Google login state
+  const [isGoogleLoginInProgress, setIsGoogleLoginInProgress] = useState(false);
+
+  // Google Login handlers
+  const handleGoogleSuccess = (userData) => {
+    console.log("Google login successful:", userData);
+    setIsGoogleLoginInProgress(false);
+    closeModals();
+    addToast("Đăng nhập Google thành công!", "success");
+    navigate("/xay-dung");
+  };
+
+  const handleGoogleError = (error) => {
+    console.error("Google login error:", error);
+    setIsGoogleLoginInProgress(false);
+    addToast("Đăng nhập Google không thành công. Vui lòng thử lại.", "error");
+  };
+
   // Modal handling functions
   const openLoginModal = () => {
     setIsModalTransitioning(true);
@@ -81,6 +98,8 @@ export default function LoginPage() {
     setShowRegisterModal(false);
     setShowForgotPasswordModal(false);
     setShowResetConfirmation(false);
+    setShowVerificationCodeModal(false);
+    setShowNewPasswordModal(false);
     resetFormErrors();
   };
 
@@ -90,10 +109,11 @@ export default function LoginPage() {
     setShowLoginModal(false);
     setShowForgotPasswordModal(false);
     setShowResetConfirmation(false);
+    setShowVerificationCodeModal(false);
+    setShowNewPasswordModal(false);
     resetFormErrors();
   };
 
-  // Cập nhật hàm openForgotPasswordModal
   const openForgotPasswordModal = () => {
     setIsModalTransitioning(true);
     setShowForgotPasswordModal(true);
@@ -105,19 +125,20 @@ export default function LoginPage() {
     resetFormErrors();
   };
 
-  // Thêm hàm mở modal nhập mã xác nhận
   const openVerificationCodeModal = () => {
     setIsModalTransitioning(true);
-    setShowVerificationCodeModal(true);
-    setShowForgotPasswordModal(false);
-    setShowLoginModal(false);
-    setShowRegisterModal(false);
-    setShowResetConfirmation(false);
-    setShowNewPasswordModal(false);
-    resetFormErrors();
+    setTimeout(() => {
+      setShowVerificationCodeModal(true);
+      setShowForgotPasswordModal(false);
+      setShowLoginModal(false);
+      setShowRegisterModal(false);
+      setShowResetConfirmation(false);
+      setShowNewPasswordModal(false);
+      setIsModalTransitioning(false);
+      resetFormErrors();
+    }, 300);
   };
 
-  // Thêm hàm mở modal đặt mật khẩu mới
   const openNewPasswordModal = () => {
     setIsModalTransitioning(true);
     setShowNewPasswordModal(true);
@@ -129,7 +150,6 @@ export default function LoginPage() {
     resetFormErrors();
   };
 
-  // Cập nhật hàm closeModals
   const closeModals = () => {
     setIsModalTransitioning(true);
     setTimeout(() => {
@@ -144,7 +164,6 @@ export default function LoginPage() {
     }, 300);
   };
 
-  // Cập nhật hàm resetFormErrors để xóa lỗi của các form mới
   const resetFormErrors = () => {
     setLoginErrors({});
     setRegisterErrors({});
@@ -168,22 +187,18 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoginSubmitting(true);
 
-    // Reset errors
     const errors = {};
 
-    // Validate email
     if (!loginEmail) {
       errors.email = "Email là bắt buộc";
     } else if (!validateEmail(loginEmail)) {
       errors.email = "Email không hợp lệ";
     }
 
-    // Validate password
     if (!loginPassword) {
       errors.password = "Mật khẩu là bắt buộc";
     }
 
-    // If there are errors, display them
     if (Object.keys(errors).length > 0) {
       setLoginErrors(errors);
       setIsLoginSubmitting(false);
@@ -209,31 +224,26 @@ export default function LoginPage() {
     e.preventDefault();
     setIsRegisterSubmitting(true);
 
-    // Reset errors
     const errors = {};
 
-    // Validate email
     if (!registerEmail) {
       errors.email = "Email là bắt buộc";
     } else if (!validateEmail(registerEmail)) {
       errors.email = "Email không hợp lệ";
     }
 
-    // Validate password
     if (!registerPassword) {
       errors.password = "Mật khẩu là bắt buộc";
     } else if (!validatePassword(registerPassword)) {
       errors.password = "Mật khẩu phải có ít nhất 8 ký tự";
     }
 
-    // Validate confirm password
     if (!confirmPassword) {
       errors.confirmPassword = "Xác nhận mật khẩu là bắt buộc";
     } else if (confirmPassword !== registerPassword) {
       errors.confirmPassword = "Mật khẩu không khớp";
     }
 
-    // If there are errors, display them
     if (Object.keys(errors).length > 0) {
       setRegisterErrors(errors);
       setIsRegisterSubmitting(false);
@@ -252,22 +262,19 @@ export default function LoginPage() {
     }
   };
 
-  // Cập nhật hàm xử lý gửi email đặt lại mật khẩu
+  // Sửa hàm handleResetPasswordSubmit để xử lý kết quả đúng cách
   const handleResetPasswordSubmit = async (e) => {
     e.preventDefault();
     setIsResetSubmitting(true);
 
-    // Reset errors
     const errors = {};
 
-    // Validate email
     if (!resetEmail) {
       errors.email = "Email là bắt buộc";
     } else if (!validateEmail(resetEmail)) {
       errors.email = "Email không hợp lệ";
     }
 
-    // If there are errors, display them
     if (Object.keys(errors).length > 0) {
       setResetErrors(errors);
       setIsResetSubmitting(false);
@@ -275,10 +282,19 @@ export default function LoginPage() {
     }
 
     try {
-      // Thay vì hiển thị modal xác nhận, chuyển sang modal nhập mã xác nhận
-      await resetPassword(resetEmail);
-      addToast("Mã xác nhận đã được gửi đến email của bạn", "success");
+      const res = await resetPassword(resetEmail);
+      console.log("Kết quả gửi mã xác nhận:", res);
+
+      // Chỉ mở modal nhập mã xác nhận nếu API trả về thành công
+
       openVerificationCodeModal();
+      if (res.code) {
+        console.log(res.code);
+
+        addToast("Mã xác nhận đã được gửi đến email của bạn", "success");
+      } else {
+        addToast("Không thể gửi mã xác nhận. Vui lòng thử lại.", "error");
+      }
     } catch (error) {
       console.error("Password reset failed:", error);
       addToast(
@@ -290,22 +306,18 @@ export default function LoginPage() {
     }
   };
 
-  // Cập nhật phần xử lý mã xác nhận và đặt mật khẩu mới
   const handleVerificationCodeSubmit = async (e) => {
     e.preventDefault();
     setIsVerificationSubmitting(true);
 
-    // Reset errors
     const errors = {};
 
-    // Validate verification code
     if (!verificationCode) {
       errors.code = "Mã xác nhận là bắt buộc";
     } else if (verificationCode.length < 6) {
       errors.code = "Mã xác nhận phải có ít nhất 6 ký tự";
     }
 
-    // If there are errors, display them
     if (Object.keys(errors).length > 0) {
       setVerificationCodeErrors(errors);
       setIsVerificationSubmitting(false);
@@ -313,40 +325,39 @@ export default function LoginPage() {
     }
 
     try {
-      // Gọi API để xác minh mã code
-      await verifyResetCode(resetEmail, verificationCode);
-      openNewPasswordModal();
+      const response = await verifyResetCode(resetEmail, verificationCode);
+      // console.log("maxacnhan", response);
+      if (response === true) {
+        openNewPasswordModal();
+      } else {
+        addToast("Mã xác nhận không đúng. Vui lòng thử lại.", "error");
+      }
     } catch (error) {
       console.error("Verification failed:", error);
-      // Toast thông báo đã được xử lý trong auth-provider
+      addToast("Xác minh mã không thành công. Vui lòng thử lại.", "error");
     } finally {
       setIsVerificationSubmitting(false);
     }
   };
 
-  // Cập nhật phần xử lý đặt mật khẩu mới
   const handleNewPasswordSubmit = async (e) => {
     e.preventDefault();
     setIsNewPasswordSubmitting(true);
 
-    // Reset errors
     const errors = {};
 
-    // Validate new password
     if (!newPassword) {
       errors.password = "Mật khẩu mới là bắt buộc";
     } else if (!validatePassword(newPassword)) {
       errors.password = "Mật khẩu phải có ít nhất 8 ký tự";
     }
 
-    // Validate confirm password
     if (!confirmNewPassword) {
       errors.confirmPassword = "Xác nhận mật khẩu là bắt buộc";
     } else if (confirmNewPassword !== newPassword) {
       errors.confirmPassword = "Mật khẩu không khớp";
     }
 
-    // If there are errors, display them
     if (Object.keys(errors).length > 0) {
       setNewPasswordErrors(errors);
       setIsNewPasswordSubmitting(false);
@@ -354,20 +365,20 @@ export default function LoginPage() {
     }
 
     try {
-      // Gọi API để đặt mật khẩu mới
       await setNewPassword(resetEmail, newPassword, confirmNewPassword);
-
+      addToast("Đặt lại mật khẩu thành công!", "success");
       closeModals();
       openLoginModal();
     } catch (error) {
       console.error("Password reset failed:", error);
+      addToast("Đặt lại mật khẩu không thành công. Vui lòng thử lại.", "error");
     } finally {
       setIsNewPasswordSubmitting(false);
     }
   };
 
-  // Cập nhật useEffect để xử lý các modal mới
   useEffect(() => {
+    // console.log("hehehehe", showVerificationCodeModal);
     if (
       showLoginModal ||
       showRegisterModal ||
@@ -392,29 +403,6 @@ export default function LoginPage() {
     showResetConfirmation,
     showVerificationCodeModal,
     showNewPasswordModal,
-  ]);
-
-  useEffect(() => {
-    if (
-      showLoginModal ||
-      showRegisterModal ||
-      showForgotPasswordModal ||
-      showResetConfirmation
-    ) {
-      document.body.classList.add("overflow-hidden");
-      setTimeout(() => setIsModalTransitioning(false), 50);
-    } else {
-      document.body.classList.remove("overflow-hidden");
-    }
-
-    return () => {
-      document.body.classList.remove("overflow-hidden");
-    };
-  }, [
-    showLoginModal,
-    showRegisterModal,
-    showForgotPasswordModal,
-    showResetConfirmation,
   ]);
 
   // Helper component for error message
@@ -455,17 +443,6 @@ export default function LoginPage() {
         <h2 className="text-lg text-[#0071f9] font-medium mb-4">
           Nền tảng học và luyện thi thông minh. Tốt nhất hiện nay
         </h2>
-        {/* <p className="text-sm text-gray-600 mt-4">
-          Bằng cách tham gia, chúng tôi xác nhận bạn đã đọc và đồng ý với{" "}
-          <a href="#" className="text-[#0071f9] hover:underline transition-all">
-            Điều kiện & Điều khoản
-          </a>{" "}
-          cùng{" "}
-          <a href="#" className="text-[#0071f9] hover:underline transition-all">
-            Chính sách bảo mật
-          </a>{" "}
-          của Enghub
-        </p> */}
 
         <div className="flex flex-col w-full max-w-xs mx-auto gap-3 mt-8">
           <button
@@ -661,37 +638,13 @@ export default function LoginPage() {
                   </span>
                 </div>
 
-                <button
-                  type="button"
-                  className="w-full py-3 border border-gray-300 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition-all duration-300 hover:border-gray-400 hover:-translate-y-0.5"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
-                      <path
-                        fill="#4285F4"
-                        d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z"
-                      />
-                      <path
-                        fill="#34A853"
-                        d="M -14.754 63.239 C -11.514 63.239 -8.804 62.159 -6.824 60.329 L -10.684 57.329 C -11.764 58.049 -13.134 58.489 -14.754 58.489 C -17.884 58.489 -20.534 56.379 -21.484 53.529 L -25.464 53.529 L -25.464 56.619 C -23.494 60.539 -19.444 63.239 -14.754 63.239 Z"
-                      />
-                      <path
-                        fill="#FBBC05"
-                        d="M -21.484 53.529 C -21.734 52.809 -21.864 52.039 -21.864 51.239 C -21.864 50.439 -21.724 49.669 -21.484 48.949 L -21.484 45.859 L -25.464 45.859 C -26.284 47.479 -26.754 49.299 -26.754 51.239 C -26.754 53.179 -26.284 54.999 -25.464 56.619 L -21.484 53.529 Z"
-                      />
-                      <path
-                        fill="#EA4335"
-                        d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z"
-                      />
-                    </g>
-                  </svg>
-                  Đăng nhập với Google
-                </button>
+                {/* Google Login Button */}
+                <GoogleLoginButton
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  className=""
+                  disabled={isGoogleLoginInProgress}
+                />
 
                 <div className="text-center text-sm mt-4">
                   <span className="text-gray-600">Chưa có tài khoản? </span>
@@ -748,7 +701,7 @@ export default function LoginPage() {
                 <div className="space-y-1">
                   <label
                     htmlFor="register-email"
-                    className="block text-sm font-medium text-gray-700 "
+                    className="block text-sm font-medium text-gray-700"
                   >
                     Email
                   </label>
@@ -892,44 +845,20 @@ export default function LoginPage() {
                   </span>
                 </div>
 
-                <button
-                  type="button"
-                  className="w-full py-3 border border-gray-300 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition-all duration-300 hover:border-gray-400 hover:-translate-y-0.5"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="24"
-                    height="24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
-                      <path
-                        fill="#4285F4"
-                        d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z"
-                      />
-                      <path
-                        fill="#34A853"
-                        d="M -14.754 63.239 C -11.514 63.239 -8.804 62.159 -6.824 60.329 L -10.684 57.329 C -11.764 58.049 -13.134 58.489 -14.754 58.489 C -17.884 58.489 -20.534 56.379 -21.484 53.529 L -25.464 53.529 L -25.464 56.619 C -23.494 60.539 -19.444 63.239 -14.754 63.239 Z"
-                      />
-                      <path
-                        fill="#FBBC05"
-                        d="M -21.484 53.529 C -21.734 52.809 -21.864 52.039 -21.864 51.239 C -21.864 50.439 -21.724 49.669 -21.484 48.949 L -21.484 45.859 L -25.464 45.859 C -26.284 47.479 -26.754 49.299 -26.754 51.239 C -26.754 53.179 -26.284 54.999 -25.464 56.619 L -21.484 53.529 Z"
-                      />
-                      <path
-                        fill="#EA4335"
-                        d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z"
-                      />
-                    </g>
-                  </svg>
-                  Đăng ký với Google
-                </button>
+                {/* Google Login Button for Register */}
+                <GoogleLoginButton
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  className=""
+                  disabled={isGoogleLoginInProgress}
+                />
 
                 <div className="text-center text-sm mt-4">
                   <span className="text-gray-600">Đã có tài khoản? </span>
                   <button
                     type="button"
                     onClick={openLoginModal}
-                    className="text-[#0071f9]  hover:underline font-medium"
+                    className="text-[#0071f9] hover:underline font-medium"
                   >
                     Đăng nhập
                   </button>
@@ -1066,69 +995,6 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Reset Confirmation Modal */}
-      {showResetConfirmation && (
-        <div
-          className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm ${
-            isModalTransitioning ? "opacity-0" : "opacity-100"
-          } transition-opacity duration-300`}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) closeModals();
-          }}
-        >
-          <div
-            className={`bg-white rounded-2xl w-full max-w-md relative overflow-hidden shadow-2xl ${
-              isModalTransitioning ? "scale-95" : "scale-100"
-            } transition-all duration-300`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between p-4 border-b">
-              <div className="w-8"></div> {/* Empty div for spacing */}
-              <h2 className="text-xl font-semibold text-center flex-1 text-[#152946]">
-                Kiểm tra email của bạn
-              </h2>
-              <button
-                onClick={closeModals}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="p-6 text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Check size={32} className="text-green-500" />
-              </div>
-
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Hướng dẫn đã được gửi!
-              </h3>
-
-              <p className="text-gray-600 mb-6">
-                Chúng tôi đã gửi hướng dẫn đặt lại mật khẩu đến{" "}
-                <span className="font-medium text-gray-900">{resetEmail}</span>.
-                Vui lòng kiểm tra hộp thư đến của bạn và làm theo hướng dẫn.
-              </p>
-
-              <div className="bg-blue-50 p-4 rounded-lg text-left mb-6">
-                <p className="text-sm text-blue-800">
-                  <span className="font-medium">Không nhận được email?</span>{" "}
-                  Kiểm tra thư mục spam hoặc thử lại sau vài phút.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={openLoginModal}
-                className="w-full py-3 bg-[#0071f9] text-white rounded-lg hover:bg-blue-600 transition-all duration-300 font-medium shadow-md hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center"
-              >
-                <span className="mr-2">Quay lại đăng nhập</span>
-                <ArrowRight size={18} />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       {/* Verification Code Modal */}
       {showVerificationCodeModal && (
         <div

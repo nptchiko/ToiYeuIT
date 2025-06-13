@@ -13,7 +13,7 @@ export default function ViewUserModal({ user, onClose }) {
   const displayGender = (gender) => {
     if (gender === "m") return "Nam";
     if (gender === "f") return "Nữ";
-    return gender; // Return original if not m or f
+    return gender;
   };
 
   return (

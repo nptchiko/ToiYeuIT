@@ -27,7 +27,7 @@ export function AreaChart() {
         labels: currentData.labels,
         datasets: [
           {
-            label: "Upper area",
+            label: "Laptop and PC",
             data: currentData.upperData,
             borderColor: "#465fff",
             backgroundColor: "rgba(69, 92, 241, 0.1)",
@@ -39,7 +39,7 @@ export function AreaChart() {
             fill: true,
           },
           {
-            label: "Lower area",
+            label: "Mobile",
             data: currentData.lowerData,
             borderColor: "#9cb9ff",
             backgroundColor: "rgba(69, 92, 241, 0.1)",
