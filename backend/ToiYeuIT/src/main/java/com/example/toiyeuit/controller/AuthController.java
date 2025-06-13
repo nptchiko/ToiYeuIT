@@ -41,6 +41,18 @@ public class AuthController {
     EmailService emailService;
     ChangePasswordService changePasswordService;
 
+
+    // LOGIN WITH OAUTH2
+/*
+    @PostMapping("/login/google")
+    public ApiResponse<AuthTokenResponse> googleAuthenticate(@RequestParam("code") String code){
+        var result = authService.authenticate(code, response);
+
+        return null;
+    }
+*/
+
+
     @PostMapping("/login")
     public ApiResponse<AuthTokenResponse> login(@RequestBody LoginRequest request, HttpServletResponse response){
         var result = authService.authenticate(request, response);
@@ -51,6 +63,20 @@ public class AuthController {
                 .message("Authenticated successfully")
                 .build();
     }
+
+    @PostMapping("/login/{provider}")
+    public ApiResponse<AuthTokenResponse> outboundLogin(@RequestParam("code") String code,
+                                                        @PathVariable("provider") String provider,
+                                                        HttpServletResponse response){
+        var result = authService.outboundAuthentication(provider, code, response);
+
+        return ApiResponse.<AuthTokenResponse>builder()
+                .code(HttpStatus.CREATED.value())
+                .body(result)
+                .message("Authenticated successfully")
+                .build();
+    }
+
     @PostMapping("/logout")
     public ApiResponse<?> logout(@Valid @RequestBody LogoutRequest logoutRequest) throws ParseException, JOSEException {
        var result = authService.logout(logoutRequest);

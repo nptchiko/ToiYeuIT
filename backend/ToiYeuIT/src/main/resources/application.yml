@@ -39,13 +39,24 @@ spring:
     oauth2:
       client:
         registration:
-              google:
-                client-id: 621389070737-fg51k2vn7mhnu3v9frfbhbbuk2iv242v.apps.googleusercontent.com
-                client-secret: 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
-                scope:
-                  - email
-                  - profile
+          google:
+            client-id: 621389070737-fg51k2vn7mhnu3v9frfbhbbuk2iv242v.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - email
+              - profile
+            redirect-uri: http://localhost:3001/auth/callback
+          #  redirect-uri: http://localhost:8081/login/oauth2/code/google
 
+          #facebook:
+          #  client-id:
+          #  client-secret:
+        provider:
+          google:
+            # default authorization-uri: http://localhost:8081/oauth2/authorization/google
+            #   authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
 server:
   port: 8081
   servlet:

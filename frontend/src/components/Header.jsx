@@ -1,16 +1,10 @@
 import { AuthService, api } from "@/utils/auth-service";
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, Menu, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
-import {
-  FaHome,
-  FaProjectDiagram,
-  FaBookOpen,
-  FaRegCommentDots,
-  FaUserCircle,
-} from "react-icons/fa";
+import { FaUserCircle } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-
+import Chatbot from "../Pages/Chat_ai/Chatbot";
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("TOEIC");
@@ -18,7 +12,7 @@ const Header = () => {
   const [show, setShow] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [showChat, setShowChat] = useState(false);
   const [profileData, setProfileData] = useState({
     name: "",
   });
@@ -126,7 +120,7 @@ const Header = () => {
           className="md:hidden block text-indigo-900 text-2xl"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
-          ☰
+          <Menu />
         </button>
 
         {isMobileMenuOpen && (
@@ -243,11 +237,10 @@ const Header = () => {
           </NavLink>
         </div>
       </div>
-      <NavLink to="/sidebar">
-        <div className="bg-indigo-700 hover:bg-indigo-600 px-3 py-2 text-white rounded-full ml-[350px]">
-          Bắt đầu làm bài
-        </div>
-      </NavLink>
+
+      <div className="bg-indigo-700 hover:bg-indigo-600 px-3 py-2 text-white rounded-full ml-[350px]">
+        <NavLink to="/sidebar">Bắt đầu làm bài</NavLink>
+      </div>
       <div
         className="flex items-center ml-auto text-blue-700 relative"
         onMouseEnter={() => setShow(true)}
@@ -285,6 +278,33 @@ const Header = () => {
           </div>
         )}
       </div>
+      {/* Icon Chat nổi ở góc phải */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={() => setShowChat(!showChat)}
+          className="bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition"
+        >
+          <MessageCircle className="w-6 h-6" />
+        </button>
+      </div>
+      {/* Khung chat nổi */}
+      {showChat && (
+        <div className="fixed bottom-20 right-6 w-[360px] z-50">
+          <div className="bg-white shadow-xl rounded-lg border border-gray-200">
+            {/* Nút đóng chat */}
+            <div className="flex justify-between items-center px-4 py-2 border-b">
+              <span className="font-semibold text-gray-700">ET Chatbot</span>
+              <button
+                onClick={() => setShowChat(false)}
+                className="text-red-500 font-bold text-xl hover:text-red-600"
+              >
+                &times;
+              </button>
+            </div>
+            <Chatbot />
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

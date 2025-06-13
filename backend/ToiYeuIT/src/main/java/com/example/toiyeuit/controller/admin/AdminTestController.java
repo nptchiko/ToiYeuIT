@@ -3,7 +3,7 @@ package com.example.toiyeuit.controller.admin;
 
 import com.example.toiyeuit.dto.admin.AdminTestResponse;
 import com.example.toiyeuit.dto.admin.test.TestCreationRequest;
-import com.example.toiyeuit.dto.admin.TestSetCreationRequest;
+import com.example.toiyeuit.dto.admin.test.TestSetCreationRequest;
 import com.example.toiyeuit.dto.admin.UpdateTestRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.dto.response.TestResponse;
@@ -30,7 +30,7 @@ public class AdminTestController {
     private final TestCollectionService testCollectionService;
 
     @GetMapping
-    public ApiResponse<java.util.List<AdminTestResponse>> getAllTest(
+    public ApiResponse<java.util.List<AdminTestResponse>> getAllTests(
             @RequestParam("page") int page,
             @RequestParam("size") int size
     ){
@@ -43,6 +43,23 @@ public class AdminTestController {
                 .body(tests.getContent())
                 .build();
     }
+    @PostMapping
+    public ApiResponse<TestSetResponse> addNewTestSet(@RequestBody TestSetCreationRequest request){
+        return ApiResponse.<TestSetResponse>builder()
+                .message("Add new test set okay!")
+                .code(200)
+                .body(adminTestService.saveTestSet(request))
+                .build();
+    }
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> deleteTestSet(@PathVariable("id") long id){
+        adminTestService.deleteTestSet(id);
+        return ApiResponse.<Void>builder()
+                .code(200)
+                .message("Delete test set okay!")
+                .build();
+    }
+
     @PostMapping("/test")
     public ApiResponse<TestResponse> addTest(@RequestBody TestCreationRequest request){
         adminTestService.saveTest(request);
@@ -70,22 +87,6 @@ public class AdminTestController {
         return ApiResponse.<Void>builder()
                 .code(200)
                 .message("Update done")
-                .build();
-    }
-    @DeleteMapping("/{id}")
-    public ApiResponse<Void> deleteTestSet(@PathVariable("id") long id){
-        adminTestService.deleteTestSet(id);
-        return ApiResponse.<Void>builder()
-                .code(200)
-                .message("Delete test set okay!")
-                .build();
-    }
-    @PostMapping
-    public ApiResponse<TestSetResponse> addNewTestSet(@RequestBody TestSetCreationRequest request){
-        return ApiResponse.<TestSetResponse>builder()
-                .message("Add new test set okay!")
-                .code(200)
-                .body(adminTestService.saveTestSet(request))
                 .build();
     }
 }

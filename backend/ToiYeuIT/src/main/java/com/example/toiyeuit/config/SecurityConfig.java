@@ -30,6 +30,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.header.writers.CrossOriginOpenerPolicyHeaderWriter;
+import org.springframework.security.web.server.header.CrossOriginOpenerPolicyServerHttpHeadersWriter;
 
 // basic spring security config
 @Configuration
@@ -44,14 +46,18 @@ public class SecurityConfig {
 
     private final CorsConfiguration corsConfiguration;
 
-    public SecurityConfig(RsaKeyProperties jwtConfigProperties, JwtTokenFilter tokenFilter, CorsConfiguration corsConfiguration){
+    private final OAuth2SuccessHandler handler;
+
+    public SecurityConfig(RsaKeyProperties jwtConfigProperties, JwtTokenFilter tokenFilter, CorsConfiguration corsConfiguration, OAuth2SuccessHandler handler){
         this.jwtConfigProperties = jwtConfigProperties;
         this.tokenFilter = tokenFilter;
         this.corsConfiguration = corsConfiguration;
+        this.handler = handler;
     }
 
 
     public static final String[] PUBLIC_ENDPOINT = {
+            "/login/**", "/oauth2/**",
         "/api/auth/**",
         "/api/users/create-user",
         "/api/courses/**",
@@ -60,11 +66,6 @@ public class SecurityConfig {
         "/swagger-ui/**",
         "/v3/api-docs/**"
     };
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
 
     @Bean
@@ -77,6 +78,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
+                // allow popup in frontend
+                .headers(headers -> headers
+                        .crossOriginOpenerPolicy(cop -> cop
+                                .policy(CrossOriginOpenerPolicyHeaderWriter.CrossOriginOpenerPolicy.SAME_ORIGIN)
+                        )
+                )
                 .sessionManagement(session
                         -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> {
@@ -84,6 +91,9 @@ public class SecurityConfig {
                     //ex.accessDeniedHandler(new BearerTokenAccessDeniedHandler());
                     //  CustomAuthenticationEntryPoint
                     //  CustomAccessHandler
+                })
+                .oauth2Login(auth -> {
+                    auth.successHandler(handler);
                 })
                 .addFilterAfter(tokenFilter, BasicAuthenticationFilter.class)
         .build();

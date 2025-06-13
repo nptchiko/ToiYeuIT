@@ -62,6 +62,13 @@ function MyCourses() {
     return allCourses;
   };
   const findCourse = getCurrentCourses();
+  const handleClickLesson = (course) => {
+    navigate("/lesson-list", {
+      state: {
+        id: course.id,
+      },
+    });
+  };
   return (
     <div className="p-10 ">
       <div className="flex justify-between">
@@ -220,7 +227,10 @@ function MyCourses() {
                   </div>
                 </div>
                 <div className="p-4 bg-gradient-to-r from-indigo-50 to-blue-50 border-t border-indigo-100">
-                  <button className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-medium px-6 py-3 rounded-xl text-sm transition-all shadow-md hover:shadow-lg">
+                  <button
+                    onClick={() => handleClickLesson(course)}
+                    className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-medium px-6 py-3 rounded-xl text-sm transition-all shadow-md hover:shadow-lg"
+                  >
                     Thông tin khóa học
                   </button>
                 </div>

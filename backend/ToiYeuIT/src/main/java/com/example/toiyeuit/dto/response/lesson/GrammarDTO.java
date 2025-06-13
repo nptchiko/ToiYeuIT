@@ -3,9 +3,11 @@ package com.example.toiyeuit.dto.response.lesson;
 import java.time.LocalDateTime;
 
 import com.example.toiyeuit.entity.User;
+import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.entity.lesson.Grammar;
 import com.example.toiyeuit.entity.lesson.GrammarQuiz;
 import com.example.toiyeuit.entity.lesson.QuizUserSubmission;
+import com.example.toiyeuit.repository.lesson.UserLessonProgressRepository;
 import com.example.toiyeuit.utils.SecurityUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +27,7 @@ public class GrammarDTO {
     private LessonDTO lesson;
     private Set<GrammarQuizDTO> quizQuestions;
 
-    public static GrammarDTO fromEntity(Grammar grammar) {
+    public static GrammarDTO fromEntity(Grammar grammar, UserLessonProgressRepository userLessonProgressRepository, Course course) {
         GrammarDTO dto = new GrammarDTO();
         dto.setId(grammar.getId());
         dto.setTitle(grammar.getTitle());
@@ -35,7 +37,7 @@ public class GrammarDTO {
 
         // Convert lesson if exists
         if (grammar.getLesson() != null) {
-            dto.setLesson(LessonDTO.fromEntity(grammar.getLesson()));
+            dto.setLesson(LessonDTO.fromEntity(grammar.getLesson(), userLessonProgressRepository, course));
         }
 
         // Convert quiz questions if exist, filtering user submissions
@@ -48,7 +50,7 @@ public class GrammarDTO {
         return dto;
     }
 
-    @Data
+/*    @Data
     public static class LessonDTO {
         private Long id;
         private String title;
@@ -69,7 +71,7 @@ public class GrammarDTO {
             dto.setMaterialsUrl(lesson.getMaterialsUrl());
             return dto;
         }
-    }
+    }*/
 
     @Data
     public static class GrammarQuizDTO {

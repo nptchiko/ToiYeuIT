@@ -332,7 +332,9 @@ const checkInputReading = () => {
     setActivePart(5);
   };
 
-  const completeTest = () => {};
+  const completeTest = () => {
+    navigate("/luyen-de/reading");
+  };
 
   // Count answered questions per part
   const getAnsweredCount = (part) => {
@@ -432,17 +434,6 @@ const checkInputReading = () => {
         <div className="flex items-center gap-2">
           {!showResults ? (
             <>
-              <Button
-                variant="outline"
-                className={`${
-                  isAnswersSaved
-                    ? "text-green-600 bg-green-50 border-green-100"
-                    : "bg-blue-50 text-blue-600 border-blue-100"
-                }`}
-                onClick={() => setIsAnswersSaved(true)}
-              >
-                {isAnswersSaved ? "Đã lưu" : "Lưu nháp"}
-              </Button>
               <Button
                 onClick={() => setShowSubmitDialog(true)}
                 className="bg-blue-600 text-white hover:bg-blue-700"

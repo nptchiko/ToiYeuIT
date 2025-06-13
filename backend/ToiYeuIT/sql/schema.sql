@@ -1,5 +1,6 @@
 CREATE DATABASE IF NOT EXISTS ToiYeuIT;
-USE ToiYeuIT;
+
+use ToiYeuIT;
 
 CREATE TABLE `role` (
   `role_id` int PRIMARY KEY AUTO_INCREMENT,
@@ -16,7 +17,7 @@ create table user
     gender   varchar(32) default 'MALE' null,
     phone    varchar(255)               null,
     role_id  int                        null,
-    enabled  bit                        null,
+    status  bit                        null,
     constraint email
         unique (email),
     constraint user_ibfk_1
@@ -32,27 +33,20 @@ CREATE TABLE `skill` (
   `name` varchar(255)
 );
 
-CREATE TABLE `course` (
-                          `course_id` int PRIMARY KEY AUTO_INCREMENT,
-                          `title` varchar(255) NOT NULL,
-                          `description` text NOT NULL ,
-                          `level`       enum ('BASIC', 'INTERMEDIATE', 'ADVANCED') not null,
-                          `price` decimal(10,2) NOT NULL,
-                          `enabled` boolean,
-                          `duration` int,
-                          `tag` varchar(50)
-);
--- CREATE TABLE `lessons` (
---                            `lesson_id` int PRIMARY KEY AUTO_INCREMENT,
---                            `course_id` int,
---                            `title` varchar(255),
---                            `video_url` varchar(255),
---                            `image_url` varchar(255),
---                            `description` text,
---                            `skill_id` int,
---                            FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`),
---                            FOREIGN KEY (`skill_id`) REFERENCES `skill` (`id`)
--- );
+create table course
+(
+    course_id   int auto_increment
+        primary key,
+    title       varchar(100)                                                          null,
+    description varchar(255)                                                          null,
+    level       enum ('BASIC', 'INTERMEDIATE', 'ADVANCED') collate utf8mb4_unicode_ci not null,
+    price       double                                                                null,
+    enabled     tinyint(1)                                                            null,
+    duration    int                                                                   null,
+    tag         varchar(255)                                                          null,
+    type        enum ('LR', 'SW')                                                     null
+) collate = utf8mb4_vietnamese_ci;
+
 
 -- Lesson table to store lesson information
 CREATE TABLE lesson (
@@ -60,7 +54,6 @@ CREATE TABLE lesson (
     course_id INT NOT NULL,
     title VARCHAR(100) NOT NULL,
     description VARCHAR(255),
-    is_submitted BOOLEAN DEFAULT FALSE,
     order_index INT NOT NULL, -- To maintain order of lessons within a course
     video_url VARCHAR(255), -- URL for the lesson video
     materials_url VARCHAR(255), -- URL for PDF or image materials
@@ -68,6 +61,21 @@ CREATE TABLE lesson (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (course_id) REFERENCES course(course_id) ON DELETE CASCADE
 );
+
+CREATE TABLE user_lesson_progress (
+    progress_id BIGINT NOT NULL AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    lesson_id BIGINT NOT NULL,
+    is_submitted TINYINT(1) DEFAULT 0,
+    last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (progress_id),
+    UNIQUE KEY uk_user_lesson (user_id, lesson_id),
+    FOREIGN KEY (user_id) REFERENCES user(user_id),
+    FOREIGN KEY (lesson_id) REFERENCES lesson(lesson_id)
+);
+
 
 -- Grammar content for lessons (required for each lesson)
 create table test_collection
@@ -177,6 +185,8 @@ CREATE TABLE quiz_user_submission
     CONSTRAINT fk_submission_question FOREIGN KEY (question_id) REFERENCES grammar_quiz (grammar_quiz_id) ON DELETE CASCADE,
     CONSTRAINT fk_submission_option FOREIGN KEY (selected_option_id) REFERENCES quiz_option (option_id) ON DELETE CASCADE
 );
+
+
 create table test_detail
 (
     id int auto_increment,

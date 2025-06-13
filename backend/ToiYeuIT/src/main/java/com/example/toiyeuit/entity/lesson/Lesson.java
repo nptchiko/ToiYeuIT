@@ -27,9 +27,6 @@ public class Lesson {
 
     String description;
 
-    @Column(name = "is_submitted")
-    Boolean isSubmitted = false;
-
     @Column(name = "order_index", nullable = false)
     Integer orderIndex;
 

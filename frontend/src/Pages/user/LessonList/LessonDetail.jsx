@@ -23,7 +23,7 @@ const LessonDetail = () => {
   useEffect(() => {
     async function fetchLessonDetail() {
       try {
-        const req = await LessonDetailApi.getLessonDetail(id_i, id_ii);
+        const req = await LessonDetailApi.getLessonDetail(id_ii, id_i);
         setLessonDetail(req.body);
 
         // Initialize user answers
@@ -79,12 +79,7 @@ const LessonDetail = () => {
       // Submit each answer sequentially
       const submissionPromises = Object.entries(userAnswers).map(
         ([questionId, optionId]) =>
-          LessonDetailApi.submitAnswer(
-            courseId,
-            lessonId,
-            questionId,
-            optionId,
-          ),
+          LessonDetailApi.submitAnswer(courseId, lessonId, questionId, optionId)
       );
 
       await Promise.all(submissionPromises);
@@ -120,7 +115,7 @@ const LessonDetail = () => {
       const selectedOptionId = userAnswers[question.id];
       if (selectedOptionId) {
         const selectedOption = question.options.find(
-          (opt) => opt.id === selectedOptionId,
+          (opt) => opt.id === selectedOptionId
         );
         if (selectedOption && selectedOption.isCorrect) {
           correct++;
@@ -293,7 +288,7 @@ const LessonDetail = () => {
                                   key={option.id}
                                   className={`p-2 rounded cursor-pointer hover:bg-gray-100 ${getOptionClassName(
                                     question,
-                                    option.id,
+                                    option.id
                                   )}`}
                                   onClick={() =>
                                     handleAnswerSelect(question.id, option.id)
@@ -320,7 +315,7 @@ const LessonDetail = () => {
                               userAnswers[question.id] &&
                               !isOptionCorrect(
                                 question,
-                                userAnswers[question.id],
+                                userAnswers[question.id]
                               ) && (
                                 <p className="text-red-600 mt-2 ml-4">
                                   Đáp án đúng là:{" "}

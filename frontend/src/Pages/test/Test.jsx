@@ -32,7 +32,7 @@ const Test = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState("/check-input-listening");
   const [pageHistory, setPageHistory] = useState(
-    "/test-input-history-listeing"
+    "/test-input-history-listening"
   );
   useEffect(() => {
     async function fetchTest() {
@@ -53,7 +53,7 @@ const Test = () => {
     setOpent(id);
     setPage(id === 9 ? "/check-input-reading" : "/check-input-listening");
     setPageHistory(
-      id === 9 ? "/test-input-history-reading" : "/test-input-history-listeing"
+      id === 9 ? "/test-input-history-reading" : "/test-input-history-listening"
     );
   };
   const handleOnClick = (test) => {
@@ -98,7 +98,7 @@ const Test = () => {
               </p>
             )}
           </div>
-          {item.submitted === 1 && (
+          {item.submitted === 1 && opent === item.id && (
             <div
               onClick={() => handleOnClickHistory(item.id)}
               className={`absolute flex gap-2 right-10 font-bold ${
