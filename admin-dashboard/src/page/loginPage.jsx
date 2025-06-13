@@ -85,16 +85,16 @@ export default function LoginPage() {
     resetFormErrors();
   };
 
-  const openRegisterModal = () => {
-    setIsModalTransitioning(true);
-    setShowRegisterModal(true);
-    setShowLoginModal(false);
-    setShowForgotPasswordModal(false);
-    setShowResetConfirmation(false);
-    resetFormErrors();
-  };
+  // const openRegisterModal = () => {
+  //   setIsModalTransitioning(true);
+  //   setShowRegisterModal(true);
+  //   setShowLoginModal(false);
+  //   setShowForgotPasswordModal(false);
+  //   setShowResetConfirmation(false);
+  //   resetFormErrors();
+  // };
 
-  // Cập nhật hàm openForgotPasswordModal
+  // hàm openForgotPasswordModal
   const openForgotPasswordModal = () => {
     setIsModalTransitioning(true);
     setShowForgotPasswordModal(true);
@@ -194,7 +194,7 @@ export default function LoginPage() {
 
     try {
       const userRole = await login(loginEmail, loginPassword);
-      console.log("user role : ", userRole);
+      // console.log("user role : ", userRole);
       if (userRole === "ADMIN") {
         closeModals();
         navigate("/dashboard");
@@ -283,10 +283,12 @@ export default function LoginPage() {
     }
 
     try {
-      // Thay vì hiển thị modal xác nhận, chuyển sang modal nhập mã xác nhận
-      await resetPassword(resetEmail);
-      addToast("Mã xác nhận đã được gửi đến email của bạn", "success");
-      openVerificationCodeModal();
+      const res = await resetPassword(resetEmail);
+      // console.log("mã xác nhận ", res);
+      if (res === true) {
+        addToast("Mã xác nhận đã được gửi đến email của bạn", "success");
+        openVerificationCodeModal();
+      }
     } catch (error) {
       console.error("Password reset failed:", error);
       addToast(
@@ -323,7 +325,7 @@ export default function LoginPage() {
     try {
       // Gọi API để xác minh mã code
       const response = await verifyResetCode(resetEmail, verificationCode);
-      console.log("hehehe", response);
+      // console.log("duma bug", response);
       // Nếu xác minh thành công, mở modal newPassword
       if (response === true) {
         openNewPasswordModal();
@@ -683,7 +685,8 @@ export default function LoginPage() {
                   </span>
                 </div>
 
-                <button
+                {/* <GoogleLoginComponent /> */}
+                {/* <button
                   type="button"
                   className="w-full py-3 border border-gray-300 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition-all duration-300 hover:border-gray-400 hover:-translate-y-0.5"
                 >
@@ -713,9 +716,9 @@ export default function LoginPage() {
                     </g>
                   </svg>
                   Đăng nhập với Google
-                </button>
+                </button> */}
 
-                <div className="text-center text-sm mt-4">
+                {/* <div className="text-center text-sm mt-4">
                   <span className="text-gray-600">Chưa có tài khoản? </span>
                   <button
                     type="button"
@@ -724,7 +727,7 @@ export default function LoginPage() {
                   >
                     Đăng ký ngay
                   </button>
-                </div>
+                </div> */}
               </form>
             </div>
           </div>

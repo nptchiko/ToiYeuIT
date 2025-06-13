@@ -252,11 +252,11 @@ export default function Home() {
                   <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
                 ) : (
                   formatRevenue(revenue)
-                )}
+                )}{" "}
               </div>
               <div className="flex items-center gap-1 rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700">
-                <span>+</span>
-                <span>12.5%</span>
+                {/* <span>+</span>
+                <span>12.5%</span> */}
               </div>
             </div>
           </CardContent>

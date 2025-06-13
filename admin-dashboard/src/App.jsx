@@ -1,3 +1,5 @@
+
+import GoogleCallbackHandler from "../../frontend/src/components/login/google-callback-handler";
 import Layout from "./components/Layout.jsx";
 import { AdminProtectedRoute } from "./components/protected-route";
 import { ToastProvider } from "./components/toast-provider";
@@ -31,7 +33,9 @@ function App() {
         <Router>
           <Routes>
             {/* Route đăng nhập - có thể truy cập mà không cần xác thực */}
+
             <Route path="/login" element={<LoginPage />} />
+            {/* <Route path="/auth/callback" element={<GoogleCallbackHandler />} /> */}
 
             {/* Route mặc định - chuyển hướng đến trang chủ */}
             <Route
