@@ -1,4 +1,4 @@
-import Layout from "./components/layout";
+import Layout from "./components/Layout.jsx";
 import { AdminProtectedRoute } from "./components/protected-route";
 import { ToastProvider } from "./components/toast-provider";
 import { useAuth } from "./hooks/auth-context";

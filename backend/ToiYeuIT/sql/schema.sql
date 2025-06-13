@@ -1,5 +1,6 @@
 CREATE DATABASE IF NOT EXISTS ToiYeuIT;
-USE ToiYeuIT;
+
+use ToiYeuIT;
 
 CREATE TABLE `role` (
   `role_id` int PRIMARY KEY AUTO_INCREMENT,
@@ -32,16 +33,19 @@ CREATE TABLE `skill` (
   `name` varchar(255)
 );
 
-CREATE TABLE `course` (
-                          `course_id` int PRIMARY KEY AUTO_INCREMENT,
-                          `title` varchar(255) NOT NULL,
-                          `description` text NOT NULL ,
-                          `level`       enum ('BASIC', 'INTERMEDIATE', 'ADVANCED') not null,
-                          `price` decimal(10,2) NOT NULL,
-                          `enabled` boolean,
-                          `duration` int,
-                          `tag` varchar(50)
-);
+create table course
+(
+    course_id   int auto_increment
+        primary key,
+    title       varchar(100)                                                          null,
+    description varchar(255)                                                          null,
+    level       enum ('BASIC', 'INTERMEDIATE', 'ADVANCED') collate utf8mb4_unicode_ci not null,
+    price       double                                                                null,
+    enabled     tinyint(1)                                                            null,
+    duration    int                                                                   null,
+    tag         varchar(255)                                                          null,
+    type        enum ('LR', 'SW')                                                     null
+) collate = utf8mb4_vietnamese_ci;
 
 
 -- Lesson table to store lesson information
