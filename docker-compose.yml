@@ -1,33 +1,84 @@
 services:
-    database:
-      image: mysql:9
-      hostname: mysqldb
-      container_name: database
-   #   ports: 
-   #     - "3306:3306"
-      volumes:
-        - db_data:/var/lib/mysql
-        - .:/test-app
-      environment:
-        MYSQL_ROOT_PASSWORD: 17071134
-        MYSQL_DATABASE: ToiYeuIT 
-      networks:
-           - ToiYeuIT 
+  database:
+    image: mysql:9
+    hostname: mysqldb
+    container_name: database
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./backend/ToiYeuIT/sql/schema.sql:/docker-entrypoint-initdb.d/00-schema.sql
+      - ./backend/ToiYeuIT/sql/data.sql:/docker-entrypoint-initdb.d/01-data.sql
+    expose:
+      - 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: 17071134
+      #MYSQL_DATABASE: ToiYeuIT
+    networks:
+      - toiyeuit-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p$$MYSQL_ROOT_PASSWORD",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
-    backend:
-      build: 
-          context: ./backend/ToiYeuIT/
-      container_name: backend
-      environment:
-        SPRING_PROFILES_ACTIVE: dev
-        SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/ToiYeuIT?createDatabaseIfNotExist=true"
-      ports:
-        - "8082:8081"
-      networks: 
-        - ToiYeuIT
+  backend:
+    image: chiko1707/toiyeuit-backend:latest
+    build:
+      context: ./backend/ToiYeuIT/
+    container_name: backend
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/ToiYeuIT?createDatabaseIfNotExist=true"
+      FRONTEND_PORT: bien moi truong tu docker compose
+      # DB_USER:
+      # DB_PASSWORD:
+      # DB_DATABASE:
+      # FRONTEND_PORT:
+      # ADMIN_EMAIL:
+      # ADMIN_PASSWORD:
+    ports:
+      - "8082:8081"
+    networks:
+      - toiyeuit-network
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: on-failure
+
+  frontend:
+    image: chiko1707/toiyeuit-frontend:latest
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "3001:3001"
+    networks:
+      - toiyeuit-network
+
+  admin-dashboard:
+    image: chiko1707/toiyeuit-admin-dashboard:latest
+    build:
+      context: ./admin-dashboard
+    container_name: admin-dashboard
+    ports:
+      - "3000:3000"
+    networks:
+      - toiyeuit-network
 
 volumes:
-    db_data:
+  db_data:
 networks:
-    ToiYeuIT: 
-        name: ToiYeuIT
+  toiyeuit-network:
+    name: toiyeuit-network
