@@ -99,9 +99,10 @@ export function AuthProvider({ children }) {
   const resetPassword = async (email) => {
     setLoading(true);
     try {
-      await AuthService.resetPassword(email);
+      const res = AuthService.resetPassword(email);
+      // console.log("hehea", res);
       addToast("Hướng dẫn đặt lại mật khẩu đã được gửi!", "success");
-      return true;
+      return res;
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||
@@ -117,7 +118,7 @@ export function AuthProvider({ children }) {
   const verifyResetCode = async (email, code) => {
     setLoading(true);
     try {
-      await AuthService.verifyResetCode(email, code);
+      AuthService.verifyResetCode(email, code);
       addToast("Mã xác nhận hợp lệ", "success");
       return true;
     } catch (error) {
