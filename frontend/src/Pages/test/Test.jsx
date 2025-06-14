@@ -4,12 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { Clock } from "lucide-react";
 import { TokenService } from "../../utils/auth-service";
 import axios from "axios";
+
 const axiosClient = axios.create({
   baseURL: "http://localhost:8081",
   headers: {
     "Content-Type": "application/json",
   },
 });
+
 axiosClient.interceptors.request.use(
   (config) => {
     const token = TokenService.getToken();
@@ -22,10 +24,12 @@ axiosClient.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
 axiosClient.interceptors.response.use(
   (response) => response.data,
   (error) => Promise.reject(error)
 );
+
 const Test = () => {
   const [data, setData] = useState([]);
   const [opent, setOpent] = useState(null);
@@ -34,6 +38,7 @@ const Test = () => {
   const [pageHistory, setPageHistory] = useState(
     "/test-input-history-listening"
   );
+
   useEffect(() => {
     async function fetchTest() {
       try {
@@ -49,13 +54,23 @@ const Test = () => {
     fetchTest();
   }, []);
 
-  const handlselection = (id) => {
-    setOpent(id);
-    setPage(id === 9 ? "/check-input-reading" : "/check-input-listening");
-    setPageHistory(
-      id === 9 ? "/test-input-history-reading" : "/test-input-history-listening"
-    );
+  // Helper function to check if test is reading based on title
+  const isReadingTest = (title) => {
+    return title && title.toLowerCase().includes("reading");
   };
+
+  const handlselection = (id, title) => {
+    setOpent(id);
+    // Use title to determine the page routes
+    if (isReadingTest(title)) {
+      setPage("/check-input-reading");
+      setPageHistory("/test-input-history-reading");
+    } else {
+      setPage("/check-input-listening");
+      setPageHistory("/test-input-history-listening");
+    }
+  };
+
   const handleOnClick = (test) => {
     navigate(page, {
       state: {
@@ -63,6 +78,7 @@ const Test = () => {
       },
     });
   };
+
   const handleOnClickHistory = (test) => {
     navigate(pageHistory, {
       state: {
@@ -70,11 +86,12 @@ const Test = () => {
       },
     });
   };
+
   return (
     <div className="flex flex-col space-y-5 justify-center items-center py-[150px]">
       {data.map((item) => (
         <div
-          onClick={() => handlselection(item.id)}
+          onClick={() => handlselection(item.id, item.title)}
           key={item.id}
           className={`bg-white w-[700px] relative border-[2px] rounded-xl flex gap-3 cursor-pointer ${
             opent === item.id
@@ -85,7 +102,7 @@ const Test = () => {
           <input
             type="radio"
             checked={opent === item.id}
-            onChange={() => handlselection(item.id)}
+            onChange={() => handlselection(item.id, item.title)}
             className="w-5 h-5 "
           ></input>
           <div className="font-sent">
