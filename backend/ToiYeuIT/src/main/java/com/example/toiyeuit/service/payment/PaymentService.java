@@ -71,6 +71,7 @@ public class PaymentService {
                 .id(OrderKey.builder().user_id(user.getId()).course_id(course.getId()).build())
                 .course(course)
                 .user(user)
+                .cost(course.getPrice())
                 .paymentMethod(PaymentMethod.VNPAY)
                 .paymentStatus(PaymentStatus.fromString(orderCourseRequest.getStatus()))
                 .build());

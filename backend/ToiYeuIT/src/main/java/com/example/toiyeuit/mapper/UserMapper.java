@@ -1,27 +1,20 @@
 package com.example.toiyeuit.mapper;
 
-import com.example.toiyeuit.dto.request.user.UpdateUserRequest;
+import com.example.toiyeuit.dto.admin.AdminUpdateUserRequest;
 import com.example.toiyeuit.dto.request.user.UserCreationRequest;
 import com.example.toiyeuit.dto.response.UserResponse;
 import com.example.toiyeuit.entity.Role;
 import com.example.toiyeuit.entity.User;
 import com.example.toiyeuit.enums.PredefinedRole;
-import com.example.toiyeuit.repository.RoleRepository;
 import com.example.toiyeuit.service.RoleService;
-import com.example.toiyeuit.service.UserService;
-import jdk.jfr.Name;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.mapstruct.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 
-@Mapper(componentModel = "spring"
+@Mapper(componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
 public abstract class UserMapper {
 
@@ -40,7 +33,7 @@ public abstract class UserMapper {
 
     @Mapping(target = "role", source = "role", qualifiedByName = "convertRole")
     @Mapping(target = "status", source = "status")
-    public abstract void updateUser(@MappingTarget User user, UpdateUserRequest request);
+    public abstract void updateUser(@MappingTarget User user, AdminUpdateUserRequest request);
 
     @Named("convertRole")
     protected Role convertRole(PredefinedRole role){

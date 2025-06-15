@@ -1,4 +1,4 @@
-package com.example.toiyeuit.dto.request.user;
+package com.example.toiyeuit.dto.admin;
 
 import com.example.toiyeuit.enums.Gender;
 import com.example.toiyeuit.enums.PredefinedRole;
@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateUserRequest {
+public class AdminUpdateUserRequest {
     private String username;
     private PredefinedRole role;
     private boolean status;

@@ -17,6 +17,7 @@ public interface CourseOrderMapper {
     @Mapping(source = "paymentMethod", target = "paymentMethod")
     @Mapping(source = "createdAt", target = "createdAt")
  // @Mapping(source = "course.imageUrl", target = "courseThumbnailUrl")
+    @Mapping(source = "cost", target = "cost")
     OrderCourseResponse toResponse(CourseOrder courseOrder);
 }
 

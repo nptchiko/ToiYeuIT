@@ -15,4 +15,5 @@ public class OrderCourseResponse {
     private String status;
     private String paymentMethod;
     private LocalDateTime createdAt;
+    private Double cost;
 }
