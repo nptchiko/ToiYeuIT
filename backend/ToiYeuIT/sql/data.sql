@@ -169,17 +169,16 @@ VALUES
     (1, 'Listening Test Collection', 'Listening Tests'),
     (2, 'Reading Test Collection', 'Reading Tests');
 
-INSERT INTO test (test_collection_id, indexx, title, enabled)
-VALUES
-    (1, 1, 'Test 1: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', 1),
-    (1, 2, 'Test 2: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', 1),
-    (1, 3, 'Test 3: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', 1),
-    (1, 4, 'Test 4: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', 1),
-    (1, 5, 'Test 5: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', 1),
-    (1, 6, 'Test 6: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', 1),
-    (2, 1, 'Test 1: Bộ Đề Thi TOEIC READING Thực Chiến Chuẩn Format 700+', 1),
-    (2, 2, 'Test 2: Bộ Đề Thi TOEIC READING Thực Chiến Chuẩn Format 700+', 1),
-    (2, 3, 'Test 3: Bộ Đề Thi TOEIC READING Thực Chiến Chuẩn Format 700+', 1);
+
+INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (1, 1, 'Test 1: Bộ Đề Thi TOEIC LISTENING Thực Ch', true);
+INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (1, 2, 'Test 2: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', true);
+INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (1, 3, 'Test 3: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', true);
+INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (1, 4, 'Test 4: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', true);
+INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (1, 5, 'Test TOEIC LISTENING đầu vào', true);
+INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (2, 1, 'Test 1: Bộ Đề Thi TOEIC READING Thực Chiến Chuẩn Format 700+', true);
+INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (2, 2, 'Test 2: Bộ Đề Thi TOEIC READING Thực Chiến Chuẩn Format 700+', true);
+INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (2, 3, 'Test TOEIC READING đầu vào', true);
+
 
 INSERT INTO question_cluster (indexes, paragraph, part, test_id)
 VALUES

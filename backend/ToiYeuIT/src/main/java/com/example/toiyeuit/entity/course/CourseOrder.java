@@ -28,6 +28,7 @@ public class CourseOrder {
     @JoinColumn(name = "user_id")
     User user;
 
+    Double cost;
 
     @ManyToOne
     @MapsId(value = "course_id")

@@ -1,11 +1,9 @@
 package com.example.toiyeuit.controller.admin;
 
-import com.example.toiyeuit.dto.request.user.UpdateUserRequest;
-import com.example.toiyeuit.dto.request.user.UserCreationRequest;
+import com.example.toiyeuit.dto.admin.AdminUpdateUserRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.dto.response.UserResponse;
 import com.example.toiyeuit.dto.response.admin.AdminUsersResponse;
-import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.mapper.UserMapper;
 import com.example.toiyeuit.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,15 +11,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -53,7 +47,7 @@ public class AdminUserController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<Void> updateUser(@PathVariable("id") Long id, @RequestBody UpdateUserRequest request){
+    public ApiResponse<Void> updateUser(@PathVariable("id") Long id, @RequestBody AdminUpdateUserRequest request){
         userService.updateUser(id, request);
 
         return ApiResponse.<Void>builder()

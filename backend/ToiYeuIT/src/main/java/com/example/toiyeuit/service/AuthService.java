@@ -139,8 +139,8 @@ public class AuthService {
                             return userRepository.save(
                                     User.builder()
                                             .role(roleService.findRoleByName(PredefinedRole.USER))
-                                            .username(userInfo.getName())
-                                            .email(userInfo.getEmail())
+                                            .username(userInfo.getName()+"")
+                                            .email(userInfo.getEmail()+"")
                                             .password(DEFAULT_PASSWORD)
                                             .build()
                             );

@@ -1,9 +1,15 @@
 package com.example.toiyeuit.service.admin;
 
 import com.example.toiyeuit.dto.admin.CrudCourseRequest;
+import com.example.toiyeuit.dto.response.OrderCourseResponse;
+import com.example.toiyeuit.dto.response.PaginationResponse;
+import com.example.toiyeuit.dto.response.admin.AdminOrderCourseResponse;
+import com.example.toiyeuit.dto.response.admin.AdminUsersResponse;
 import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.mapper.CourseMapper;
+import com.example.toiyeuit.mapper.CourseOrderMapper;
 import com.example.toiyeuit.repository.CourseRepository;
+import com.example.toiyeuit.repository.OrderCourseRepository;
 import com.example.toiyeuit.service.CourseService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,6 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -23,6 +31,8 @@ public class AdminCourseService {
     CourseRepository courseRepository;
     private final CourseService courseService;
     private final CourseMapper courseMapper;
+    private final OrderCourseRepository orderCourseRepository;
+    private final CourseOrderMapper courseOrderMapper;
 
     public long getRevenue(){
         return courseRepository.retrieveMonthlyRevenue();
@@ -50,5 +60,23 @@ public class AdminCourseService {
     @Transactional
     public void toggleVisiable(int id, boolean isEnabled){
         courseRepository.toggleVisiable(id, isEnabled ? 1 : 0);
+    }
+
+    public AdminOrderCourseResponse getOrderHistory(Pageable pageable){
+        var pageOfOrder = orderCourseRepository.findAll(pageable);
+
+        var pagination = PaginationResponse.builder()
+                .totalPages(pageOfOrder.getTotalPages())
+                .totalItems((int) pageOfOrder.getTotalElements())
+                .build();
+
+        return AdminOrderCourseResponse.builder()
+                .orders(
+                        pageOfOrder.getContent().stream()
+                                .map(courseOrderMapper::toResponse)
+                                .toList()
+                )
+                .pagination(pagination)
+                .build();
     }
 }

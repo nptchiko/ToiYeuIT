@@ -96,6 +96,7 @@ public class AuthController {
                 .message("A confirmation code is sent to email: " + email)
                 .build();
     }
+
     @Operation(
             description = "set oldPassword to null if requesting forget-password"
     )
