@@ -1,7 +1,7 @@
 "use client";
 
 import { useToast } from "../components/toast-context";
-import { AuthService, TokenService } from "../utils/auth-service";
+import { AuthService, TokenService } from "../services/auth-service";
 import { AuthContext } from "./auth-context";
 import { useState, useEffect } from "react";
 

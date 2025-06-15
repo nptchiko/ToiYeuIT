@@ -1,6 +1,6 @@
 "use client";
 
-import { AuthService } from "../../../admin-dashboard/src/utils/auth-service";
+import { AuthService } from "@/utils/auth-service";
 import { useState, useEffect } from "react";
 
 const useGoogleAuth = () => {

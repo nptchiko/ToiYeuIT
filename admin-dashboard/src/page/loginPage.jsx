@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "../hooks/auth-context";
-import { TokenService } from "../utils/auth-service";
+import { TokenService } from "../services/auth-service";
 import PasswordStrength from "@/components/password-strength";
 import { useToast } from "@/components/toast-context";
 import {
@@ -334,16 +334,6 @@ export default function LoginPage() {
       }
     } catch (error) {
       console.error("Verification failed:", error);
-
-      // Thêm state để hiển thị lỗi khi mã xác minh không đúng
-      // setVerificationCodeErrors({
-      //   code: "Mã xác nhận không chính xác hoặc đã hết hạn",
-      // });
-
-      // Không chuyển hướng đến trang login khi mã sai
-      // navigate("/login"); // Bỏ dòng này
-
-      // Toast thông báo đã được xử lý trong auth-provider
     } finally {
       setIsVerificationSubmitting(false);
     }
@@ -479,17 +469,6 @@ export default function LoginPage() {
         <h2 className="text-lg text-[#0071f9] font-medium mb-4">
           Nền tảng học và luyện thi thông minh.Tốt nhất hiện nay
         </h2>
-        {/* <p className="text-sm text-gray-600 mt-4">
-          Bằng cách tham gia, chúng tôi xác nhận bạn đã đọc và đồng ý với{" "}
-          <a href="#" className="text-[#0071f9] hover:underline transition-all">
-            Điều kiện & Điều khoản
-          </a>{" "}
-          cùng{" "}
-          <a href="#" className="text-[#0071f9] hover:underline transition-all">
-            Chính sách bảo mật
-          </a>{" "}
-          của Enghub
-        </p> */}
 
         <div className="flex flex-col w-full max-w-xs mx-auto gap-3 mt-8">
           <button
@@ -678,12 +657,12 @@ export default function LoginPage() {
                   )}
                 </button>
 
-                <div className="relative flex items-center justify-center mt-4">
+                {/* <div className="relative flex items-center justify-center mt-4">
                   <div className="border-t border-gray-300 absolute w-full"></div>
                   <span className="bg-white px-2 text-sm text-gray-500 relative">
                     hoặc
                   </span>
-                </div>
+                </div> */}
 
                 {/* <GoogleLoginComponent /> */}
                 {/* <button
@@ -910,12 +889,12 @@ export default function LoginPage() {
                   )}
                 </button>
 
-                <div className="relative flex items-center justify-center mt-4">
+                {/* <div className="relative flex items-center justify-center mt-4">
                   <div className="border-t border-gray-300 absolute w-full"></div>
                   <span className="bg-white px-2 text-sm text-gray-500 relative">
                     hoặc
                   </span>
-                </div>
+                </div> */}
 
                 <button
                   type="button"

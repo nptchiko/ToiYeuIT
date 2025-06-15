@@ -136,7 +136,7 @@ export default function LoginPage() {
       setShowNewPasswordModal(false);
       setIsModalTransitioning(false);
       resetFormErrors();
-    }, 300);
+    }, 3000);
   };
 
   const openNewPasswordModal = () => {

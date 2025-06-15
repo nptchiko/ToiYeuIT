@@ -1,6 +1,7 @@
 "use client";
 
 import courseService from "../api/courseAPI";
+import OrderHistoryPage from "../components/Course/course_oder_history/order-history-page";
 import CourseForm from "../components/courseForm";
 import {
   Search,
@@ -26,6 +27,7 @@ import {
   Trash2,
   Eye,
   CheckCircle,
+  History,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 
@@ -39,13 +41,14 @@ export default function CourseDashboard() {
   const [showLevelDropdown, setShowLevelDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
-  // New state for API integration
+  // state for API integration
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [showOderHistory, setShowOderHistory] = useState(false);
 
   // Fetch courses from API
   useEffect(() => {
@@ -197,6 +200,14 @@ export default function CourseDashboard() {
     setSelectedCourse(null);
     // Trigger a refresh to fetch updated data
     setRefreshTrigger((prev) => prev + 1);
+  };
+
+  // furction handle show History Modal
+  const handleOpenOrderHistory = () => {
+    setShowOderHistory(true);
+  };
+  const handleCloseOrderHistory = () => {
+    setShowOderHistory(false);
   };
 
   const handleToggleVisibility = async (course) => {
@@ -436,7 +447,12 @@ export default function CourseDashboard() {
                 )}
               </div>
             </div>
-
+            <button
+              onClick={handleOpenOrderHistory}
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2.5 rounded-lg font-medium shadow-sm transition-colors flex items-center gap-2 whitespace-nowrap"
+            >
+              <History className="h-4 w-4" /> Transaction History
+            </button>
             {/* Nút tạo khóa học */}
             <button
               onClick={handleAddCourse}
@@ -670,6 +686,27 @@ export default function CourseDashboard() {
           onClose={handleFormClose}
           onSave={handleFormSave}
         />
+      )}
+
+      {showOderHistory && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-card  animate-scaleInbg-white rounded-2xl shadow-2xl w-full max-w-7xl max-h-[95vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <button
+                onClick={handleCloseOrderHistory}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="h-6 w-6 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="overflow-auto max-h-[calc(95vh-120px)]">
+              <OrderHistoryPage />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

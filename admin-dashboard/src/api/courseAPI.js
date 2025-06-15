@@ -1,4 +1,4 @@
-import { TokenService } from "../utils/auth-service";
+import { TokenService } from "../services/auth-service";
 import axios from "axios";
 
 // Create axios instance with base URL

@@ -1,9 +1,10 @@
+import ReadingApi from "../../api/ReadingApi";
+import { api } from "@/utils/auth-service";
+import { BookOpen, Clock, Lock, Check, X, BookOpenCheck } from "lucide-react";
 import React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "@/utils/auth-service";
-import { BookOpen, Clock, Lock, Check, X, BookOpenCheck } from "lucide-react";
-import ReadingApi from "../../api/ReadingApi";
+
 const Reading = () => {
   const [data, setData] = useState([]);
   const [hasPurchased, setHasPurchased] = useState(false);
