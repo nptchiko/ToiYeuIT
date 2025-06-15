@@ -1,6 +1,6 @@
 "use client";
 
-import { AuthService } from "@/utils/auth-service";
+import { AuthService } from "../../../src/utils/auth-service";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 

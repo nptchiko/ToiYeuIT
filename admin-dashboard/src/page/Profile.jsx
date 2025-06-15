@@ -1,8 +1,8 @@
 "use client";
 
 import { useToast } from "../components/toast-context";
-import { api, AuthService } from "../utils/auth-service";
-import { TokenService } from "../utils/auth-service";
+import { api, AuthService } from "../services/auth-service";
+import { TokenService } from "../services/auth-service";
 import {
   ArrowLeft,
   Eye,

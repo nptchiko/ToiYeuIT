@@ -1,6 +1,6 @@
 // src/services/testAPI.js
 
-import { TokenService } from "../utils/auth-service";
+import { TokenService } from "../services/auth-service";
 import axios from "axios";
 
 // Create an axios instance with base configuration
