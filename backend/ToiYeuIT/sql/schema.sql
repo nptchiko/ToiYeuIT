@@ -14,7 +14,7 @@ create table user
     username varchar(255)               not null,
     password varchar(255)               not null,
     email    varchar(255)               not null,
-    gender   varchar(32) default 'MALE' null,
+    gender   varchar(32) default 'm' null,
     phone    varchar(255)               null,
     role_id  int                        null,
     status  bit                        null,
@@ -30,7 +30,7 @@ create index role_id
 
 CREATE TABLE `skill` (
   `id` int PRIMARY KEY AUTO_INCREMENT,
-  `name` varchar(255)
+  `name` varchar(255) null
 );
 
 create table course
@@ -45,10 +45,10 @@ create table course
     duration    int                                                                   null,
     tag         varchar(255)                                                          null,
     type        enum ('LR', 'SW')                                                     null
-) collate = utf8mb4_vietnamese_ci;
+)  CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
--- Lesson table to store lesson information
+
 CREATE TABLE lesson (
     lesson_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     course_id INT NOT NULL,
@@ -56,6 +56,7 @@ CREATE TABLE lesson (
     description VARCHAR(255),
     order_index INT NOT NULL, -- To maintain order of lessons within a course
     video_url VARCHAR(255), -- URL for the lesson video
+    is_submitted  tinyint(1) default 0                 null,
     materials_url VARCHAR(255), -- URL for PDF or image materials
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -77,7 +78,6 @@ CREATE TABLE user_lesson_progress (
 );
 
 
--- Grammar content for lessons (required for each lesson)
 create table test_collection
 (
     id          int auto_increment
@@ -102,6 +102,7 @@ create table test
     enabled            bit default b'1' null,
     constraint FK34np1jcju9km4vaswfl1oy9cp
         foreign key (test_collection_id) references test_collection (id)
+            on update cascade on delete cascade
 );
 
 create table question_cluster
@@ -114,6 +115,7 @@ create table question_cluster
     test_id   int  null,
     constraint FKkd53425gk00tlq2lije4tdyll
         foreign key (test_id) references test (id)
+            on update cascade on delete cascade
 );
 
 create table question
@@ -129,6 +131,7 @@ create table question
     question_cluster_id int                                                         null,
     constraint question_cluster__fk
         foreign key (question_cluster_id) references question_cluster (id)
+            on update cascade on delete cascade
 );
 
 create table multichoice_detail
@@ -153,39 +156,57 @@ CREATE TABLE grammar (
                          CONSTRAINT fk_grammar_lesson FOREIGN KEY (lesson_id) REFERENCES lesson(lesson_id) ON DELETE CASCADE
 );
 
--- Quiz questions for grammar sections
-CREATE TABLE grammar_quiz (
-                              grammar_quiz_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                              grammar_id BIGINT NOT NULL,
-                              question_text TEXT NOT NULL,
-                              order_index INT NOT NULL, -- To maintain order of questions
-                              CONSTRAINT fk_quiz_grammar FOREIGN KEY (grammar_id) REFERENCES grammar(grammar_id) ON DELETE CASCADE
+create table grammar_quiz
+(
+    grammar_quiz_id bigint auto_increment
+        primary key,
+    grammar_id      bigint      not null,
+    question_text   text        not null,
+    order_index     int         not null,
+    created_at      datetime(6) null,
+    updated_at      datetime(6) null,
+    constraint fk_quiz_grammar
+        foreign key (grammar_id) references grammar (grammar_id)
+            on delete cascade
 );
 
 -- Options for quiz questions
-CREATE TABLE quiz_option (
-                             option_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                             grammar_quiz_id BIGINT NOT NULL,
-                             option_text TEXT NOT NULL,
-                             is_correct BOOLEAN DEFAULT FALSE,
-                             CONSTRAINT fk_option_question FOREIGN KEY (grammar_quiz_id) REFERENCES grammar_quiz(grammar_quiz_id) ON DELETE CASCADE
-);
 
--- User answers to track progress
-CREATE TABLE quiz_user_submission
+create table quiz_option
 (
-    submission_id      BIGINT PRIMARY KEY AUTO_INCREMENT,
-    user_id            BIGINT NOT NULL,
-    question_id        BIGINT NOT NULL,
-    selected_option_id BIGINT    NOT NULL,
-    created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT uk_quiz_user_question UNIQUE (user_id, question_id),
-    CONSTRAINT fk_submission_user FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE,
-    CONSTRAINT fk_submission_question FOREIGN KEY (question_id) REFERENCES grammar_quiz (grammar_quiz_id) ON DELETE CASCADE,
-    CONSTRAINT fk_submission_option FOREIGN KEY (selected_option_id) REFERENCES quiz_option (option_id) ON DELETE CASCADE
+    option_id       bigint auto_increment
+        primary key,
+    grammar_quiz_id bigint               not null,
+    option_text     text                 not null,
+    is_correct      tinyint(1) default 0 null,
+    created_at      datetime(6)          null,
+    updated_at      datetime(6)          null,
+    constraint fk_option_question
+        foreign key (grammar_quiz_id) references grammar_quiz (grammar_quiz_id)
+            on delete cascade
 );
 
+create table quiz_user_submission
+(
+    submission_id      bigint auto_increment
+        primary key,
+    user_id            bigint                              not null,
+    question_id        bigint                              not null,
+    selected_option_id bigint                              not null,
+    created_at         timestamp default CURRENT_TIMESTAMP null,
+    updated_at         timestamp default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+    constraint uk_quiz_user_question
+        unique (user_id, question_id),
+    constraint fk_submission_option
+        foreign key (selected_option_id) references quiz_option (option_id)
+            on delete cascade,
+    constraint fk_submission_question
+        foreign key (question_id) references grammar_quiz (grammar_quiz_id)
+            on delete cascade,
+    constraint fk_submission_user
+        foreign key (user_id) references user (user_id)
+            on delete cascade
+);
 
 create table test_detail
 (
@@ -200,21 +221,29 @@ create table test_detail
             on delete cascade,
     constraint test_detail_ibfk_2
         foreign key (question_id) references question (ques_id)
+            on update cascade on delete cascade
 );
 
 create index question_id
     on test_detail (question_id);
 
-CREATE TABLE `test_submission` (
-  `submission_id` bigint auto_increment,
-  `test_id` int,
-  `last_answered_by` bigint,
-  `last_answered_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  `score` decimal,
-  PRIMARY KEY (`submission_id`),
-  FOREIGN KEY (`test_id`) REFERENCES `test` (`id`),
-  FOREIGN KEY (`last_answered_by`) REFERENCES `user` (`user_id`)
+
+create table test_submission
+(
+    submission_id    bigint auto_increment
+        primary key,
+    test_id          int                                 null,
+    last_answered_by bigint                              null,
+    last_answered_at timestamp default CURRENT_TIMESTAMP null,
+    score            float                               null,
+    constraint test_submission_ibfk_1
+        foreign key (test_id) references test (id)
+            on update cascade on delete cascade,
+    constraint test_submission_ibfk_2
+        foreign key (last_answered_by) references user (user_id)
+            on update cascade on delete cascade
 );
+
 
 create table test_result
 (
@@ -226,13 +255,11 @@ create table test_result
     submit_id   bigint       null,
     constraint FK787s15vwqnuckvarfil6r6wsk
         foreign key (question_id) references question (ques_id)
-            on update cascade,
+            on update cascade on delete cascade,
     constraint FKqw150dx9te5yl1xh95r05wa0h
         foreign key (submit_id) references test_submission (submission_id)
             on update cascade on delete cascade
 );
-
-
 
 CREATE TABLE `flashcard_decks` (
   `deck_id` int PRIMARY KEY AUTO_INCREMENT,
@@ -266,15 +293,60 @@ CREATE TABLE `flashcards` (
 #   FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`)
 # );
 #
-CREATE TABLE `order_course` (
-  `user_id` bigint,
-  `course_id` int,
-  `status` enum('PENDING', 'PAID', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
-  `payment_method` enum('VNPAY') NOT NULL DEFAULT 'VNPAY',
-  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`user_id`, `course_id`),
-  FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
-  FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`)
+
+create table order_course
+(
+    user_id        bigint                                not null,
+    course_id      int                                   not null,
+    status         varchar(32) default 'PENDING'         null,
+    payment_method varchar(32) default 'VNPAY'           not null,
+    created_at     timestamp   default CURRENT_TIMESTAMP null,
+    cost           double                                null,
+    primary key (user_id, course_id),
+    constraint order_course_ibfk_1
+        foreign key (user_id) references user (user_id),
+    constraint order_course_ibfk_2
+        foreign key (course_id) references course (course_id)
 );
+
+create table enrollment
+(
+    id          bigint auto_increment
+        primary key,
+    enrolled_at datetime(6)                              null,
+    expired_at  datetime(6)                              null,
+    status      enum ('COMPLETED', 'PENDING', 'EXPIRED') null,
+    course_id   int                                      null,
+    user_id     bigint                                   null,
+    constraint FKbhhcqkw1px6yljqg92m0sh2gt
+        foreign key (course_id) references course (course_id)
+            on update cascade on delete cascade,
+    constraint FKgpuyid9pbfpxghv9vyhb0ictd
+        foreign key (user_id) references user (user_id)
+            on update cascade on delete cascade
+);
+
+create index course_id
+    on order_course (course_id);
+
 alter table course
-    collate = utf8mb4_vietnamese_ci
+    CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+    #collate = utf8mb4_vietnamese_ci;
+
+
+
+alter table test
+    collate = utf8mb3_vietnamese_ci;
+
+alter table flashcard_decks
+    collate = utf8mb3_vietnamese_ci;
+
+alter table flashcards
+    collate = utf8mb3_vietnamese_ci;
+
+alter table test_collection
+    collate = utf8mb3_vietnamese_ci;
+
+alter table user
+    collate = utf8mb3_vietnamese_ci
+

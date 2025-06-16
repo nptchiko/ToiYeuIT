@@ -20,6 +20,8 @@ COPY --from=basenode /app/. .
 
 EXPOSE 3000
 
+RUN echo $date
+
 CMD ["npm", "run", "dev"]
 
 # ------- RUNNER ---------

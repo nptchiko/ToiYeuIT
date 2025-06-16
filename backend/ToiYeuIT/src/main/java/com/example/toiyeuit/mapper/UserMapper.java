@@ -29,6 +29,7 @@ public abstract class UserMapper {
 
     @Mapping(target = "role", source = "user.role.name")
     @Mapping(target = "id", source = "user.id")
+    @Mapping(target = "status", expression = "java(user.isStatus() ? \"ACTIVE\" : \"INACTIVE\")")
     public abstract UserResponse toUserResponse(User user);
 
     @Mapping(target = "role", source = "role", qualifiedByName = "convertRole")

@@ -179,6 +179,8 @@ public class AuthService {
        var user = userRepository.findByEmail(loginRequest.getEmail())
                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
+       if(!user.isStatus()) throw new AppException(ErrorCode.USER_ACCOUNT_IS_BLOCKED);
+
        boolean matches = passwordEncoder.matches(loginRequest.getPassword(), user.getPassword());
 
        if (!matches) throw new AppException(ErrorCode.INVALID_CREDENTIALS);
