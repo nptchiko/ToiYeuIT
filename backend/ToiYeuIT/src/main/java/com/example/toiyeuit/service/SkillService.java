@@ -18,6 +18,7 @@ public class SkillService {
     SkillRepository skillRepository;
 
     public Skill findBySkillName(String name){
+        log.info("Skill parameter: {}", name);
         return skillRepository.findByName(
                 name.toUpperCase()
         ).orElseThrow(() -> new AppException(ErrorCode.SKILL_NOT_FOUND));

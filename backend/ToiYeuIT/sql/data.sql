@@ -1,5 +1,14 @@
 use ToiYeuIT;
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 450+ Cơ Bản', 'Nền tảng từ vựng, ngữ pháp và kỹ năng làm bài cơ bản.', 'BASIC', 1200000, 1, 6, 'Phổ biến', 'LR');
+
+
+INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 450+ Cơ Bản', 'Nền tảng từ vựng, ngữ pháp và kỹ năng làm bài cơ bản.', 'BASIC', 1200000.00, 1, 6, 'Phổ biến', 'LR');
+INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.', 'INTERMEDIATE', 1800000.00, 1, 8, 'Bestseller', 'SW');
+INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 800+ Nâng Cao', 'Tăng tốc luyện đề và kỹ năng phản xạ đề thi thực tế.', 'ADVANCED', 2400000.00, 1, 10, 'Premium', 'LR');
+INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 750+ Cơ Bản', 'Nền tảng từ vựng, ngữ pháp và kỹ năng làm bài cơ bản.', 'BASIC', 1200000.00, 1, 6, 'Mới', 'SW');
+INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 850+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.', 'INTERMEDIATE', 1800000.00, 1, 8, 'Đề xuất', 'LR');
+INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 900+ Nâng Cao', 'Tăng tốc luyện đề và kỹ năng phản xạ đề thi thực tế.', 'ADVANCED', 2400000.00, 1, 10, 'VIP', 'SW');
+
+/*INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 450+ Cơ Bản', 'Nền tảng từ vựng, ngữ pháp và kỹ năng làm bài cơ bản.', 'BASIC', 1200000, 1, 6, 'Phổ biến', 'LR');
 INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', '123', 'INTERMEDIATE', 1800000, 1, 8, 'VIP', 'LR');
 INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 800+ Nâng Cao', 'Tăng tốc luyện đề và kỹ năng phản xạ đề thi thực tế.', 'ADVANCED', 2400000, 1, 10, 'Premium', 'LR');
 INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 750+ Cơ Bản', 'Nền tảng từ vựng, ngữ pháp và kỹ năng làm bài cơ bản.', 'BASIC', 1200000, 1, 6, 'Mới', 'SW');
@@ -17,6 +26,7 @@ INSERT INTO course (title, description, level, price, enabled, duration, tag, ty
 INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.', 'INTERMEDIATE', 1800000, 1, 8, 'Bestseller', 'LR');
 INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6', 'INTERMEDIATE', 1800000, 1, 8, 'Bestseller', 'LR');
 INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('string', 'string', 'BASIC', 0, 0, 0, 'string', 'LR');
+*/
 
 INSERT INTO skill (name) VALUES ('LISTENING');
 INSERT INTO skill (name) VALUES ('READING');
@@ -164,165 +174,32 @@ INSERT INTO quiz_user_submission (user_id, question_id, selected_option_id) VALU
 (3, 9, 34); -- Correct (will)
 */
 # Test data
-INSERT INTO test_collection (skill_id, description, title)
-VALUES
-    (1, 'Listening Test Collection', 'Listening Tests'),
-    (2, 'Reading Test Collection', 'Reading Tests');
+insert into test_collection (id, skill_id, description, title)
+values  (1, 1, 'Listening Test Collection', 'Listening Tests'),
+        (2, 2, 'Reading Test Collection', 'Reading Tests'),
+        (3, 1, 'Listening Input Test Collection', 'Listening Test Đầu Vào'),
+        (4, 2, 'Reading Input Test Collection', 'Reading Test Đầu Vào');
 
+# INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (1, 1, 'Test 1: Bộ Đề Thi TOEIC LISTENING Thực Ch', true);
+# INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (1, 2, 'Test 2: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', true);
+# INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (1, 3, 'Test 3: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 800+', true);
+# INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (1, 4, 'Test 4: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 900+', true);
+# INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (1, 5, 'Test TOEIC LISTENING đầu vào', true);
+# INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (2, 1, 'Test 1: Bộ Đề Thi TOEIC READING Thực Chiến Chuẩn Format 700+', true);
+# INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (2, 2, 'Test 2: Bộ Đề Thi TOEIC READING Thực Chiến Chuẩn Format 800+', true);
+# INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (2, 2, 'Test 2: Bộ Đề Thi TOEIC READING Thực Chiến Chuẩn Format 900+', true);
+# INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (2, 3, 'Test TOEIC READING đầu vào', true);
 
-INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (1, 1, 'Test 1: Bộ Đề Thi TOEIC LISTENING Thực Ch', true);
-INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (1, 2, 'Test 2: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', true);
-INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (1, 3, 'Test 3: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', true);
-INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (1, 4, 'Test 4: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', true);
-INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (1, 5, 'Test TOEIC LISTENING đầu vào', true);
-INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (2, 1, 'Test 1: Bộ Đề Thi TOEIC READING Thực Chiến Chuẩn Format 700+', true);
-INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (2, 2, 'Test 2: Bộ Đề Thi TOEIC READING Thực Chiến Chuẩn Format 700+', true);
-INSERT INTO test (test_collection_id, indexx, title, enabled) VALUES (2, 3, 'Test TOEIC READING đầu vào', true);
-
-
-INSERT INTO question_cluster (indexes, paragraph, part, test_id)
-VALUES
-    -- Listening Test 1: Part 3 (Questions 32-34), Part 4 (Questions 71-73)
-    (1, NULL, 3, 1),
-    (1, NULL, 4, 1),
-    -- Listening Test 2: Part 3 (Questions 35-37), Part 4 (Questions 74-76)
-    (2, NULL, 3, 2),
-    (2, NULL, 4, 2),
-    -- Listening Test 3: Part 3 (Questions 38-40), Part 4 (Questions 77-79)
-    (3, NULL, 3, 3),
-    (3, NULL, 4, 3),
-    -- Listening Test 4: Part 3 (Questions 41-43), Part 4 (Questions 80-82)
-    (4, NULL, 3, 4),
-    (4, NULL, 4, 4),
-    -- Listening Test 5: Part 3 (Questions 44-46), Part 4 (Questions 83-85)
-    (5, NULL, 3, 5),
-    (5, NULL, 4, 5),
-    -- Listening Test 6: Part 3 (Questions 47-49), Part 4 (Questions 86-88)
-    (6, NULL, 3, 6),
-    (6, NULL, 4, 6),
-    -- Reading Test 1: Part 6 (Questions 136-138), Part 7 (Questions 147-148)
-    (1, 'refer to the following notice. The files on the office computer server need to be backed up tonight. Unfortunately, the cause of the error is unknown. Any files that have been deleted will be backed up tonight as well.', 6, 7),
-    (1, 'refer to the following advertisement.Now Open Pedro’s Cantina \n755 Lincoln Avenue\nColumbia, South Carolina\nPhone : (571) 288-3219\nCome enjoy authentic Mexican cuisine and the best Margaritas in town!\nOn Friday and Saturday nights, we have live mariachi music from 8 P.M. until closing.\u00a0\u00a0Business Hours Tuesday - Thursday: 11:00 A.M. - 10:00 P.M.\nFriday and Saturday: 11:00 A.M. - 12:00 A.M.\nSunday: 12:00 P.M. - 9:00 P.M.\u00a0', 7, 7),
-    -- Reading Test 2: Part 6 (Questions 139-142), Part 7 (Questions 149-150)
-    (2, 'refer to the following e-mail.To: Steven Herzog (sherzog@artemis.com)From: Marie Swain (marieswain@astoriacity.org)Subject: Barton Public Park Art InitiativeDate: November 9\nDear Mr. Herzog,\n(139) ____our preliminary evaluation of your portfolio, we think you are well qualified to lead our art project. Your past work is contemporary and eye-catching, and it would definitely be a beautiful addition to the walls and buildings of Barton Public Park.\n(140) ____. It will be held at City Hall on November 20 at 3 P.M. During this time, you (141) ____ to describe your artistic vision and provide sketches of the pieces you propose to paint in the park.\nIf you''re unsuccessful on this occasion, we will consider (142) ____ for future art projects in Astoria City if a suitable assignment arises.\nIf you have any questions, please do not hesitate to e-mail me.\nRegards,\nMarie Swain\nParks and Recreation Department\nAstoria City Council', 6, 8),
-    (2, 'refer to the following text message chain.  John Tylor    John Tylor  \n1:30 PM. Did you see Mike Bunders on the talk show last night?  Mary Ammon 1:33 P.M. No, I had some overtime work to do. John Tylor  1:34 P.M. He is such a funny guy. Mary Ammon  1:36 P.M. Right! He sure is a great comedian. I wish I had watched it.  John Tylor  1:37 P.M. Oh, in that case, you can see it tomorrow! I heard they’re rebroadcastingit at 9PM. on the same channel. Mary Ammon  1:38 P.M. Really? That’s great! I should write it down somewhere, in case I forget.  Send', 7, 8),
-    -- Reading Test 3: Part 6 (Questions 143-146), Part 7 (Questions 151-153)
-    (3, 'refer to the following letter.\nPeggy Shelton\n75 St. James Boulevard\nHorton, KS 66439\nDear Ms. Shelton,\nThis letter accompanies the replacement of the malfunctioning Nexal-360 blender from Nexal Manufacturing. We’re sorry that you had trouble with the original model you bought, but we’re confident that the enclosed device will be (143) ___.\nThe Nexal-360 blender will be a useful addition to your kitchen for years to come. For safety reasons, and to prevent damaging the plastic base, you should keep the device away from heat sources (144) ___toaster ovens, stoves, and furnaces. We have also included a bonus item for you. (145) ____. It is a blade specially designed for chopping ice in your blender. For information about changing from one blade to another, please (146) ___ the manual.\nThank you for being a Nexal Manufactoring customer!\nThe Nexal Manufactoring Team', 6, 9),
-    (3, 'refer to the following letter.Hemingshire Antiques 142 St. Andrews Road, Fife, Scotland, KY16 APNDear Collectors,\nDue to an overwhelming supply of new items for sale, Hemingshire Antiques will be expanding its facilities. \u2014 [1] \u2014. The expansion will include extensive renovations to our showroom and storage space. \u2014 [2] \u2014.\nThese renovations will take about 6 weeks this fall. \u2014 [3] \u2014. As a result, the showroom will be closed from September 16th to November 1st. In the meantime, our online store will remain active to service our customers. \u2014 [4] \u2014. We encourage you to view our new inventory online at www.hemingshire.antiques.co.uk.\nStay tuned for an announcement regarding our grand re-opening sale in November.\nAlan Babcock,\nAlan Babcock\nOwner, Hemingshire Antiques\u00a0', 7, 9);
-
-INSERT INTO question (description, correct_ans, question_scope, question_type, audio_src, img_src, question_cluster_id)
-VALUES
-    -- Listening Test 1
-    -- Part 1: Question 1 (ques_id = 1)
-    (NULL, '(A)', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/20232131.mp3', 'https://estudyme.hoc102.com/legacy-data/kslearning/images/366939888-1621582686070-part1-1.png', NULL),
-    -- Part 2: Question 7 (ques_id = 2)
-    (NULL, '(A)', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/87697273.mp3', NULL, NULL),
-    -- Part 3: Questions 32-34 (Cluster 1, ques_id = 3-5)
-    ('Who is Mr. Stevens?', '(B)An online shopper', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/68330772.mp3', NULL, 1),
-    ('What is the man asked to do?', '(A)Give an invoice number', 'TEST', 'MULTICHOICE', NULL, NULL, 1),
-    ('What will the man receive?', '(B)A lighting control device', 'TEST', 'MULTICHOICE', NULL, NULL, 1),
-    -- Part 4: Questions 71-73 (Cluster 2, ques_id = 6-8)
-    ('What is this message about?', '(B)A power outage', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/98151227.mp3', NULL, 2),
-    ('When will the work probably be completed?', '(B)Tomorrow morning', 'TEST', 'MULTICHOICE', NULL, NULL, 2),
-    ('When will the announcements be updated?', '(C)Every hour', 'TEST', 'MULTICHOICE', NULL, NULL, 2),
-    -- Listening Test 2
-    -- Part 1: Question 2 (ques_id = 9)
-    (NULL, '(B)', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/47882778.mp3', 'https://estudyme.hoc102.com/legacy-data/kslearning/images/632208212-1621582700863-part1-2.png', NULL),
-    -- Part 2: Question 8 (ques_id = 10)
-    (NULL, '(A)', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/58579915.mp3', NULL, NULL),
-    -- Part 3: Questions 35-37 (Cluster 3, ques_id = 11-13)
-    ('Where does the man work?', '(D)At a library', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/37394953.mp3', NULL, 3),
-    ('What does the woman want to do?', '(A)Research modern poets', 'TEST', 'MULTICHOICE', NULL, NULL, 3),
-    ('What does the man offer to do?', '(A)Give a private tour', 'TEST', 'MULTICHOICE', NULL, NULL, 3),
-    -- Part 4: Questions 74-76 (Cluster 4, ques_id = 14-16)
-    ('What is the main purpose of the advertisement?', '(C)To mention a special sale', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/46912061.mp3', NULL, 4),
-    ('What kind of business is being advertised?', '(A)A clothing store', 'TEST', 'MULTICHOICE', NULL, NULL, 4),
-    ('What information is provided for the listeners?', '(C)Business hours', 'TEST', 'MULTICHOICE', NULL, NULL, 4),
-    -- Listening Test 3
-    -- Part 1: Question 3 (ques_id = 17)
-    (NULL, '(D)', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/13426208.mp3', 'https://estudyme.hoc102.com/legacy-data/kslearning/images/208754229-1621582715465-part1-3.png', NULL),
-    -- Part 2: Question 9 (ques_id = 18)
-    (NULL, '(B)', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/97707704.mp3', NULL, NULL),
-    -- Part 3: Questions 38-40 (Cluster 5, ques_id = 19-21)
-    ('Where is the conversation taking place?', '(B)At a fitness facility', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/36514920.mp3', NULL, 5),
-    ('What is the man preparing for?', '(C)An upcoming marathon', 'TEST', 'MULTICHOICE', NULL, NULL, 5),
-    ('What does the woman offer the man?', '(A)A class schedule', 'TEST', 'MULTICHOICE', NULL, NULL, 5),
-    -- Part 4: Questions 77-79 (Cluster 6, ques_id = 22-24)
-    ('What is the announcement mainly about?', '(A)Resurfacing a parking lot', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/74661097.mp3', NULL, 6),
-    ('How long will the project last?', '(C)Three days', 'TEST', 'MULTICHOICE', NULL, NULL, 6),
-    ('What should the employees do?', '(C)Use the alternate road', 'TEST', 'MULTICHOICE', NULL, NULL, 6),
-    -- Listening Test 4
-    -- Part 1: Question 4 (ques_id = 25)
-    (NULL, '(D)', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/56836982.mp3', 'https://estudyme.hoc102.com/legacy-data/kslearning/images/670023583-1621582778561-part1-4.png', NULL),
-    -- Part 2: Question 10 (ques_id = 26)
-    (NULL, '(A)', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/11546840.mp3', NULL, NULL),
-    -- Part 3: Questions 41-43 (Cluster 7, ques_id = 27-29)
-    ('What problem is the man calling about?', '(D)A device is out of order.', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/45418686.mp3', NULL, 7),
-    ('What does the woman say she will do?', '(B)Send a professional', 'TEST', 'MULTICHOICE', NULL, NULL, 7),
-    ('What does the woman recommend doing?', '(B)Removing items from a machine', 'TEST', 'MULTICHOICE', NULL, NULL, 7),
-    -- Part 4: Questions 80-82 (Cluster 8, ques_id = 30-32)
-    ('Why is the woman calling?', '(A)To arrange the interview time', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/25840270.mp3', NULL, 8),
-    ('What is the speaker’s occupation?', '(D)A hiring director', 'TEST', 'MULTICHOICE', NULL, NULL, 8),
-    ('What does the woman ask the man to do?', '(D)Return a telephone call', 'TEST', 'MULTICHOICE', NULL, NULL, 8),
-    -- Listening Test 5
-    -- Part 1: Question 5 (ques_id = 33)
-    (NULL, '(C)', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/92256296.mp3', 'https://estudyme.hoc102.com/legacy-data/kslearning/images/74925907-1621582797815-part1-5.png', NULL),
-    -- Part 2: Question 11 (ques_id = 34)
-    (NULL, '(A)', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/11385123.mp3', NULL, NULL),
-    -- Part 3: Questions 44-46 (Cluster 9, ques_id = 35-37)
-    ('Where will the woman make a transfer?', '(C)Birmingham', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/48601325.mp3', NULL, 9),
-    ('What most likely is the man’s job?', '(A)Train attendant', 'TEST', 'MULTICHOICE', NULL, NULL, 9),
-    ('What does the man offer to do?', '(D)Give the woman a map', 'TEST', 'MULTICHOICE', NULL, NULL, 9),
-    -- Part 4: Questions 83-85 (Cluster 10, ques_id = 38-40)
-    ('Why is this event being held?', '(D)To thank some customers', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/53037430.mp3', NULL, 10),
-    ('Who is Glenn Cross?', '(B)A musician', 'TEST', 'MULTICHOICE', NULL, NULL, 10),
-    ('What does the man mean when he says, “Once again, I would like to express my gratitude”?', '(C)The company had a successful year.', 'TEST', 'MULTICHOICE', NULL, NULL, 10),
-    -- Listening Test 6
-    -- Part 1: Question 6 (ques_id = 41)
-    (NULL, '(A)', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/9574740.mp3', 'https://estudyme.hoc102.com/legacy-data/kslearning/images/960073773-1621582820918-part1-6.png', NULL),
-    -- Part 2: Question 12 (ques_id = 42)
-    (NULL, '(C)', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/97067174.mp3', NULL, NULL),
-    -- Part 3: Questions 47-49 (Cluster 11, ques_id = 43-45)
-    ('Who most likely is the woman?', '(D)A product developer', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/90524118.mp3', NULL, 11),
-    ('What problem does the woman mention?', '(A)The machine isn’t working properly.', 'TEST', 'MULTICHOICE', NULL, NULL, 11),
-    ('What does the man suggest doing?', '(B)Consulting with more knowledgeable staff', 'TEST', 'MULTICHOICE', NULL, NULL, 11),
-    -- Part 4: Questions 86-88 (Cluster 12, ques_id = 46-48)
-    ('What is Success Makers mainly about?', '(A)Advice for business people', 'TEST', 'MULTICHOICE', 'https://storage.googleapis.com/estudyme/dev/2022/06/27/45885048.mp3', NULL, 12),
-    ('What day is the program broadcast?', '(D)Thursday', 'TEST', 'MULTICHOICE', NULL, NULL, 12),
-    ('Who is Lauri Hampner?', '(B)A restaurant manager', 'TEST', 'MULTICHOICE', NULL, NULL, 12),
-    -- Reading Test 1
-    -- Part 5: Question 101 (ques_id = 49)
-    ('Please send ________ application and portfolio to the human resources department no later than July 31.', '(A)your', 'TEST', 'FILLING_BLANK', NULL, NULL, NULL),
-    -- Part 6: Questions 136-138 (Cluster 13, ques_id = 50-52)
-    (NULL, '(B)Unfortunately, the cause of the error is unknown.', 'TEST', 'MULTICHOICE', NULL, NULL, 13),
-    (NULL, '(D)has been deleted', 'TEST', 'FILLING_BLANK', NULL, NULL, 13),
-    (NULL, '(A) any', 'TEST', 'FILLING_BLANK', NULL, NULL, 13),
-    -- Part 7: Questions 147-148 (Cluster 14, ques_id = 53-54)
-    ('What is the announcement about?', '(C)A restaurant opening for business', 'TEST', 'MULTICHOICE', NULL, NULL, 14),
-    ('What is suggested about Pedro’s Cantina?', '(A)It is closed on Mondays.', 'TEST', 'MULTICHOICE', NULL, NULL, 14),
-    -- Reading Test 2
-    -- Part 5: Question 102 (ques_id = 55)
-    ('Consumers must carefully read the nutritional facts indicated_____the labels of food products they purchase.', '(D)on', 'TEST', 'FILLING_BLANK', NULL, NULL, NULL),
-    -- Part 6: Questions 139-142 (Cluster 15, ques_id = 56-59)
-    (NULL, '(D)Based on', 'TEST', 'FILLING_BLANK', NULL, NULL, 15),
-    (NULL, '(C)As a shortlisted candidate, you will need to attend an interview.', 'TEST', 'MULTICHOICE', NULL, NULL, 15),
-    (NULL, '(B)will be asked', 'TEST', 'FILLING_BLANK', NULL, NULL, 15),
-    (NULL, '(D)you', 'TEST', 'FILLING_BLANK', NULL, NULL, 15),
-    -- Part 7: Questions 149-150 (Cluster 16, ques_id = 60-61)
-    ('Who is Mike Bunders?', '(A)An entertainer', 'TEST', 'MULTICHOICE', NULL, NULL, 16),
-    ('At 1:38 P.M., what does Ms. Ammon mean when she writes, “That’s great!”?', '(B)She will watch the show tomorrow night.', 'TEST', 'MULTICHOICE', NULL, NULL, 16),
-    -- Reading Test 3
-    -- Part 5: Question 103 (ques_id = 62)
-    ('Before Mr. Mosby became a supervisor, he was ______ a front desk receptionist at a hotel in Bali, Indonesia.', '(A)formerly', 'TEST', 'FILLING_BLANK', NULL, NULL, NULL),
-    -- Part 6: Questions 143-146 (Cluster 17, ques_id = 63-66)
-    (NULL, '(B) reliable', 'TEST', 'FILLING_BLANK', NULL, NULL, 17),
-    (NULL, '(D) such as', 'TEST', 'FILLING_BLANK', NULL, NULL, 17),
-    (NULL, '(A) This gift is a token of our appreciation for your patience.', 'TEST', 'MULTICHOICE', NULL, NULL, 17),
-    (NULL, '(A) consult', 'TEST', 'FILLING_BLANK', NULL, NULL, 17),
-    -- Part 7: Questions 151-153 (Cluster 18, ques_id = 67-69)
-    ('What is the purpose of this letter?', '(C)To announce renovations', 'TEST', 'MULTICHOICE', NULL, NULL, 18),
-    ('What is stated about the store?', '(B)It has products available online.', 'TEST', 'MULTICHOICE', NULL, NULL, 18),
-    ('In which of the positions marked [1], [2], [3] and [4] does the following sentence best belong?  “This will allow us to display more items in the showroom and keep more items in stock.”', '(B)[2]', 'TEST', 'MULTICHOICE', NULL, NULL, 18);
+insert into test (id, test_collection_id, indexx, title, enabled)
+values  (1, 1, 1, 'Test 1: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', true),
+        (2, 1, 2, 'Test 2: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', true),
+        (3, 1, 3, 'Test 3: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', true),
+        (4, 1, 4, 'Test 4: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', true),
+        (5, 1, 4, 'Test 5: Bộ Đề Thi TOEIC LISTENING Thực Chiến Chuẩn Format 700+', true),
+        (6, 3, 1, 'Test TOEIC LISTENING đầu vào', true),
+        (7, 2, 1, 'Test 1: Bộ Đề Thi TOEIC READING Thực Chiến Chuẩn Format 700+', true),
+        (8, 2, 2, 'Test 2: Bộ Đề Thi TOEIC READING Thực Chiến Chuẩn Format 700+', true),
+        (9, 4, 1, 'Test TOEIC READING đầu vào', true);
 
 INSERT INTO question_cluster (indexes, paragraph, part, test_id)
 VALUES
