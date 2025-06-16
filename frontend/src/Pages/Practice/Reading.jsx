@@ -23,7 +23,8 @@ const Reading = () => {
       setShowModal(true);
     }
   };
-  const handleOnClickHistory = (test) => {
+  const handleOnClickHistory = (test, e) => {
+    e.stopPropagation();
     navigate("/test-history-reading", {
       state: {
         id: test.id,
@@ -174,7 +175,7 @@ const Reading = () => {
 
                 {hasPurchased && test.submitted === 1 && (
                   <button
-                    onClick={() => handleOnClickHistory(test)}
+                    onClick={(e) => handleOnClickHistory(test, e)}
                     className="absolute top-3 right-3 p-1 hover:bg-green-100 rounded-full transition-colors"
                     title="Xem lịch sử"
                   >
