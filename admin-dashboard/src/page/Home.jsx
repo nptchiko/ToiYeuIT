@@ -49,7 +49,7 @@ export default function Home() {
       try {
         setIsLoading(true);
         const data = await courseService.getAllCourses();
-        console.log("Course data:", data);
+        // console.log("Course data:", data);
         if (Array.isArray(data)) {
           // Ensure numeric fields are properly formatted
           const formattedData = data.map((course) => ({

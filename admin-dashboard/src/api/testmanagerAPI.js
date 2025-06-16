@@ -28,9 +28,10 @@ api.interceptors.request.use(
 // Tests API service
 const TestAPI = {
   // Get all tests with pagination
-  getAllTests: async (page = 1, size = 20) => {
+  getAllTests: async (page = 1, size = 40) => {
     try {
       const response = await api.get(`/admin/tests?page=${page}&size=${size}`);
+      // console.log("hehehe", response);
       return response.data;
     } catch (error) {
       console.error("Error fetching tests:", error);

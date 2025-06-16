@@ -50,7 +50,7 @@ const userService = {
     const response = await api.get(
       `/api/admin/users?page=${page}&size=${size}`
     );
-    // console.log("hehe", response.data.body);
+    console.log("hehe", response.data.body);
     return response.data.body;
   },
 
