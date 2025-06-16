@@ -4,7 +4,7 @@ import { forwardRef } from "react";
 const UserRow = forwardRef(({ user, onView, onEdit, onDelete }, ref) => {
   // Determine status color
   const getStatusColor = (status) => {
-    return status === "Đang hoạt động"
+    return status === "ACTIVE"
       ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-500"
       : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-500";
   };

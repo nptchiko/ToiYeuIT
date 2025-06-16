@@ -15,15 +15,15 @@ export default function EditUserModal({
   // Helper function to display status text
   const getStatusText = (status) => {
     if (typeof status === "boolean") {
-      return status ? "Đang hoạt động" : "Không hoạt động";
+      return status ? "ACTIVE" : "INACTIVE";
     }
-    return status === "Đang hoạt động" ? "Đang hoạt động" : "Không hoạt động";
+    return status === "ACTIVE" ? "ACTIVE" : "INACTIVE";
   };
 
   // Convert backend gender format to display format
   const displayGender = (gender) => {
-    if (gender === "m") return "Nam";
-    if (gender === "f") return "Nữ";
+    if (gender === "m") return "Male";
+    if (gender === "f") return "Female";
     return "Select gender"; // Default text when no gender is selected
   };
 
@@ -151,7 +151,7 @@ export default function EditUserModal({
                   <div className="flex items-center">
                     <span
                       className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                        getStatusText(formData.status) === "Đang hoạt động"
+                        getStatusText(formData.status) === "ACTIVE"
                           ? "bg-green-500"
                           : "bg-red-500"
                       }`}
@@ -168,13 +168,13 @@ export default function EditUserModal({
                         className="px-3 py-2.5 hover:bg-muted cursor-pointer transition-colors flex items-center"
                         onClick={() => {
                           onInputChange({
-                            target: { name: "status", value: true },
+                            target: { name: "status", value: "ACTIVE" },
                           });
                           setShowStatusDropdown(false);
                         }}
                       >
                         <span className="inline-block w-2 h-2 rounded-full mr-2 bg-green-500"></span>
-                        Đang hoạt động
+                        ACTIVE
                       </li>
                       <li
                         className="px-3 py-2.5 hover:bg-muted cursor-pointer transition-colors flex items-center"
@@ -182,14 +182,14 @@ export default function EditUserModal({
                           onInputChange({
                             target: {
                               name: "status",
-                              value: false,
+                              value: "INACTIVE",
                             },
                           });
                           setShowStatusDropdown(false);
                         }}
                       >
                         <span className="inline-block w-2 h-2 rounded-full mr-2 bg-red-500"></span>
-                        Không hoạt động
+                        INACTIVE
                       </li>
                     </ul>
                   </div>
@@ -225,11 +225,11 @@ export default function EditUserModal({
                           onInputChange({
                             target: { name: "gender", value: "m" },
                           });
-                          setDisplayedGender("Nam");
+                          setDisplayedGender("Male");
                           setShowGenderDropdown(false);
                         }}
                       >
-                        Nam
+                        Male
                       </li>
                       <li
                         className="px-3 py-2.5 hover:bg-muted cursor-pointer transition-colors"
@@ -237,11 +237,11 @@ export default function EditUserModal({
                           onInputChange({
                             target: { name: "gender", value: "f" },
                           });
-                          setDisplayedGender("Nữ");
+                          setDisplayedGender("Female");
                           setShowGenderDropdown(false);
                         }}
                       >
-                        Nữ
+                        Female
                       </li>
                     </ul>
                   </div>
