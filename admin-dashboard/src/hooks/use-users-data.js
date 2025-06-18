@@ -53,7 +53,7 @@ export const useUsersData = () => {
 
       const statsData = {
         totalUsers: fetchedUsers.length + (currentPage - 1) * pageSize,
-        totalStudents: fetchedUsers.filter((user) => user.role === "USER")
+        totalStudents: fetchedUsers.filter((user) => user.role === "STUDENT")
           .length,
         newRegistrations: Math.floor(fetchedUsers.length * 0.2),
         usersTrend: { percentage: 5.2 },
