@@ -34,20 +34,19 @@ services:
       start_period: 30s
 
   backend:
-    #  image: chiko1707/toiyeuit-backend:latest
+    image: chiko1707/toiyeuit-backend:latest
     build:
       context: ./backend/ToiYeuIT/
     container_name: backend
     environment:
+      JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8
       SPRING_PROFILES_ACTIVE: dev
       SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/ToiYeuIT?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8"
-      FRONTEND_PORT: bien moi truong tu docker compose
-      # DB_USER:
-      # DB_PASSWORD:
-      # DB_DATABASE:
-      # FRONTEND_PORT:
-      # ADMIN_EMAIL:
-      # ADMIN_PASSWORD:
+      DB_USER: root
+      DB_PASSWORD: 17071134
+      DB_DATABASE: ToiYeuIT
+      ADMIN_EMAIL: mikudeptrai@gmail.com
+      ADMIN_PASSWORD: 12345
     ports:
       - "8081:8081"
     networks:
@@ -68,7 +67,7 @@ services:
       - toiyeuit-network
 
   admin-dashboard:
-    #    image: chiko1707/toiyeuit-admin-dashboard:latest
+    image: chiko1707/toiyeuit-admin-dashboard:latest
     build:
       context: ./admin-dashboard
     container_name: admin-dashboard
