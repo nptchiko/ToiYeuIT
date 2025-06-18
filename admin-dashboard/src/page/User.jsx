@@ -1,5 +1,3 @@
-"use client";
-
 // Modal Components
 import { MODAL_TYPES } from "../Constants/user-constants";
 import FilterDropdown from "../components/User/FilterDropdown";

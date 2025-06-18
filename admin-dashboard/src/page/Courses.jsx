@@ -1,5 +1,3 @@
-"use client";
-
 import { VIEW_TYPES } from "../Constants/course-constants";
 import courseService from "../api/courseAPI";
 import CourseCard from "../components/Course/CourseCard";
@@ -21,6 +19,7 @@ import {
   Star,
   History,
   X,
+  Import,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 

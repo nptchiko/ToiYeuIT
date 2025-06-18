@@ -3,6 +3,7 @@
 import { FILTER_TYPES } from "../Constants/course-constants";
 import courseService from "../api/courseAPI";
 import { formatCourseData } from "../utils/course-utils";
+import { useUsersData } from "./use-users-data";
 import { useState, useEffect, useMemo } from "react";
 
 export const useCourseDashboard = () => {
@@ -11,6 +12,7 @@ export const useCourseDashboard = () => {
   const [error, setError] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+  const { stats: userStats } = useUsersData();
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState(FILTER_TYPES.ALL);
@@ -77,10 +79,8 @@ export const useCourseDashboard = () => {
   const stats = useMemo(() => {
     return {
       totalCourses: courses.length,
-      totalStudents: courses.reduce(
-        (sum, course) => sum + (course.students || 0),
-        0
-      ),
+      // Sử dụng totalStudents từ userStats thay vì tính từ courses
+      totalStudents: userStats?.totalStudents || 0,
       averageRating: courses.length
         ? (
             courses.reduce(
@@ -90,7 +90,7 @@ export const useCourseDashboard = () => {
           ).toFixed(1)
         : "0.0",
     };
-  }, [courses]);
+  }, [courses, userStats]);
 
   const refreshCourses = () => {
     setRefreshTrigger((prev) => prev + 1);

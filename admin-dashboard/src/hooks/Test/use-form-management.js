@@ -42,7 +42,7 @@ export const useFormManagement = () => {
     }));
   };
 
-  // Thêm handler cho test set input
+  // handler cho test set input
   const handleTestSetInputChange = (e) => {
     const { name, value } = e.target;
     setNewTestSet((prev) => ({

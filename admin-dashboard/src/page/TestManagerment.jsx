@@ -1,5 +1,3 @@
-"use client";
-
 // Modals
 import TestAPI from "../api/testmanagerAPI";
 import AddTestModal from "../components/test/AddTestModal";
@@ -12,9 +10,9 @@ import TestSetModal from "../components/test/TestSetModal";
 // Components
 import TestStats from "../components/test/TestStats";
 import TestTable from "../components/test/TestTable";
+// Hooks
 import { useFormManagement } from "../hooks/Test/use-form-management";
 import { useModalManagement } from "../hooks/Test/use-modal-management";
-// Hooks
 import { useTestData } from "../hooks/Test/use-test-data";
 // Utils and Constants
 import { validateTestForm } from "../utils/test-utils";
@@ -187,7 +185,6 @@ export default function TestManagement() {
     }
   };
 
-  // Cập nhật phần handleSubmit cho test để sử dụng đúng API
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -207,8 +204,8 @@ export default function TestManagement() {
         // Tạo test set mới với đầy đủ thông tin
         const testSetResponse = await TestAPI.createTestSet(
           newTest.testSet,
-          "", // skill - có thể để trống hoặc lấy từ form
-          "" // description - có thể để trống hoặc lấy từ form
+          "", // skill -
+          "" // description -
         );
 
         if (testSetResponse?.body) {
