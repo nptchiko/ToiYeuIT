@@ -42,6 +42,7 @@ services:
       JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8
       SPRING_PROFILES_ACTIVE: dev
       SPRING_DATASOURCE_URL: "jdbc:mysql://mysqldb:3306/ToiYeuIT?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8"
+      FRONTEND_PORT: test bien moi truong
       DB_USER: root
       DB_PASSWORD: 17071134
       DB_DATABASE: ToiYeuIT
