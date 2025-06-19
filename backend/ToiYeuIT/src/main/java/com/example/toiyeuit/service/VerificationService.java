@@ -6,6 +6,7 @@ import com.example.toiyeuit.exception.AppException;
 import com.example.toiyeuit.exception.ErrorCode;
 import com.example.toiyeuit.repository.UserRepository;
 import com.example.toiyeuit.repository.VerificationRepository;
+import com.example.toiyeuit.utils.SecurityUtils;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -46,10 +47,15 @@ public class VerificationService {
     @Transactional
     public Boolean confirmToken(String token){
 
+        var email = SecurityUtils.getCurrentUserLogin();
+
         var confirmToken = verifyingRepo.findByToken(token).orElseThrow(
                 () -> {
                     throw new AppException(ErrorCode.VERIFYING_TOKEN_NOT_FOUND);
                 });
+
+        if(!confirmToken.getUser().getEmail().equalsIgnoreCase(email))
+            throw new AppException(ErrorCode.INVALID_TOKEN);
 
         if (confirmToken.getConfirmAt() != null)
             throw new RuntimeException("Email is already confirmed");
@@ -57,7 +63,7 @@ public class VerificationService {
         LocalDateTime expiredAt = confirmToken.getExpiryDate();
 
         if (expiredAt.isBefore(LocalDateTime.now()))
-            throw new AppException(ErrorCode.EXPIRED_TOKEN);
+                throw new AppException(ErrorCode.EXPIRED_TOKEN);
 
         setConfirmedAt(token);
 
