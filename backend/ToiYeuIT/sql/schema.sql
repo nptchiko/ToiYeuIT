@@ -1,334 +1,304 @@
-CREATE DATABASE IF NOT EXISTS ToiYeuIT;
 
-use ToiYeuIT;
+CREATE DATABASE IF NOT EXISTS ToiYeuIT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE ToiYeuIT;
+-- Switch to the newly created database.
+USE ToiYeuIT;
 
+--
+-- Table structure for table `role`
+--
 CREATE TABLE `role` (
-  `role_id` int PRIMARY KEY AUTO_INCREMENT,
-  `name` varchar(255)
-);
+  `role_id` INT PRIMARY KEY AUTO_INCREMENT,
+  `name` VARCHAR(255)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create table user
-(
-    user_id  bigint auto_increment
-        primary key,
-    username varchar(255)               not null,
-    password varchar(255)               not null,
-    email    varchar(255)               not null,
-    gender   varchar(32) default 'm' null,
-    phone    varchar(255)               null,
-    role_id  int                        null,
-    status  bit                        null,
-    constraint email
-        unique (email),
-    constraint user_ibfk_1
-        foreign key (role_id) references role (role_id)
-) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;;
+--
+-- Table structure for table `user`
+--
+CREATE TABLE `user` (
+    `user_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `username` VARCHAR(255) NOT NULL,
+    `password` VARCHAR(255) NOT NULL,
+    `email` VARCHAR(255) NOT NULL UNIQUE,
+    `gender` VARCHAR(32) DEFAULT 'm',
+    `phone` VARCHAR(255),
+    `role_id` INT,
+    `status` BIT,
+    FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create index role_id
-    on user (role_id);
+CREATE INDEX `role_id` ON `user` (`role_id`);
 
-
+--
+-- Table structure for table `skill`
+--
 CREATE TABLE `skill` (
-  `id` int PRIMARY KEY AUTO_INCREMENT,
-  `name` varchar(255) null
-);
+  `id` INT PRIMARY KEY AUTO_INCREMENT,
+  `name` VARCHAR(255)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create table course
-(
-    course_id   int auto_increment
-        primary key,
-    title       varchar(100)                                                          null,
-    description varchar(255)                                                          null,
-    level       enum ('BASIC', 'INTERMEDIATE', 'ADVANCED') collate utf8mb4_unicode_ci not null,
-    price       double                                                                null,
-    enabled     tinyint(1)                                                            null,
-    duration    int                                                                   null,
-    tag         varchar(255)                                                          null,
-    type        enum ('LR', 'SW')  null
-) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+--
+-- Table structure for table `course`
+--
+CREATE TABLE `course` (
+    `course_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `title` VARCHAR(100),
+    `description` VARCHAR(255),
+    `level` ENUM ('BASIC', 'INTERMEDIATE', 'ADVANCED') NOT NULL,
+    `price` DOUBLE,
+    `enabled` TINYINT(1),
+    `duration` INT,
+    `tag` VARCHAR(255),
+    `type` ENUM ('LR', 'SW')
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Table structure for table `lesson`
+--
+CREATE TABLE `lesson` (
+    `lesson_id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+    `course_id` INT NOT NULL,
+    `title` VARCHAR(100) NOT NULL,
+    `description` VARCHAR(255),
+    `order_index` INT NOT NULL,
+    `video_url` VARCHAR(255),
+    `is_submitted` TINYINT(1) DEFAULT 0,
+    `materials_url` VARCHAR(255),
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`course_id`) REFERENCES `course`(`course_id`) ON DELETE CASCADE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Table structure for table `user_lesson_progress`
+--
+CREATE TABLE `user_lesson_progress` (
+    `progress_id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `user_id` BIGINT NOT NULL,
+    `lesson_id` BIGINT NOT NULL,
+    `is_submitted` TINYINT(1) DEFAULT 0,
+    `last_accessed` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY `uk_user_lesson` (`user_id`, `lesson_id`),
+    FOREIGN KEY (`user_id`) REFERENCES `user`(`user_id`),
+    FOREIGN KEY (`lesson_id`) REFERENCES `lesson`(`lesson_id`)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE lesson (
-    lesson_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    course_id INT NOT NULL,
-    title VARCHAR(100) NOT NULL,
-    description VARCHAR(255),
-    order_index INT NOT NULL, -- To maintain order of lessons within a course
-    video_url VARCHAR(255), -- URL for the lesson video
-    is_submitted  tinyint(1) default 0                 null,
-    materials_url VARCHAR(255), -- URL for PDF or image materials
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (course_id) REFERENCES course(course_id) ON DELETE CASCADE
-);
+--
+-- Table structure for table `test_collection`
+--
+CREATE TABLE `test_collection` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `skill_id` INT,
+    `description` VARCHAR(255),
+    `title` VARCHAR(255),
+    FOREIGN KEY (`skill_id`) REFERENCES `skill` (`id`)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE user_lesson_progress (
-    progress_id BIGINT NOT NULL AUTO_INCREMENT,
-    user_id BIGINT NOT NULL,
-    lesson_id BIGINT NOT NULL,
-    is_submitted TINYINT(1) DEFAULT 0,
-    last_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (progress_id),
-    UNIQUE KEY uk_user_lesson (user_id, lesson_id),
-    FOREIGN KEY (user_id) REFERENCES user(user_id),
-    FOREIGN KEY (lesson_id) REFERENCES lesson(lesson_id)
-);
+CREATE INDEX `skill_id` ON `test_collection` (`skill_id`);
 
+--
+-- Table structure for table `test`
+--
+CREATE TABLE `test` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `test_collection_id` INT NOT NULL,
+    `indexx` INT NOT NULL,
+    `title` VARCHAR(255),
+    `enabled` BIT DEFAULT b'1',
+    FOREIGN KEY (`test_collection_id`) REFERENCES `test_collection` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create table test_collection
-(
-    id          int auto_increment
-        primary key,
-    skill_id    int          null,
-    description varchar(255) null,
-    title       varchar(255) null,
-    constraint test_collection_ibfk_2
-        foreign key (skill_id) references skill (id)
-) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;  ;
+--
+-- Table structure for table `question_cluster`
+--
+CREATE TABLE `question_cluster` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `indexes` INT NOT NULL,
+    `paragraph` TEXT,
+    `part` INT NOT NULL,
+    `test_id` INT,
+    FOREIGN KEY (`test_id`) REFERENCES `test` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create index skill_id
-    on test_collection (skill_id);
+--
+-- Table structure for table `question`
+--
+CREATE TABLE `question` (
+    `ques_id` BIGINT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    `description` VARCHAR(255),
+    `correct_ans` VARCHAR(255) NOT NULL,
+    `question_scope` ENUM ('TEST', '') DEFAULT 'TEST' NOT NULL,
+    `question_type` ENUM ('MULTICHOICE', 'FILLING_BLANK') DEFAULT 'MULTICHOICE' NOT NULL,
+    `audio_src` VARCHAR(255),
+    `img_src` VARCHAR(255),
+    `question_cluster_id` INT,
+    FOREIGN KEY (`question_cluster_id`) REFERENCES `question_cluster` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create table test
-(
-    id                 int auto_increment
-        primary key,
-    test_collection_id int              not null,
-    indexx            int              not null,
-    title              varchar(255)     null,
-    enabled            bit default b'1' null,
-    constraint FK34np1jcju9km4vaswfl1oy9cp
-        foreign key (test_collection_id) references test_collection (id)
-            on update cascade on delete cascade
-) CHAR SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+--
+-- Table structure for table `multichoice_detail`
+--
+CREATE TABLE `multichoice_detail` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `ques_id` BIGINT NOT NULL,
+    `answer_key` ENUM ('A', 'B', 'C', 'D') NOT NULL,
+    `answer_description` VARCHAR(255),
+    FOREIGN KEY (`ques_id`) REFERENCES `question` (`ques_id`) ON UPDATE CASCADE ON DELETE CASCADE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Table structure for table `grammar`
+--
+CREATE TABLE `grammar` (
+    `grammar_id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+    `lesson_id` BIGINT NOT NULL UNIQUE,
+    `title` VARCHAR(100) NOT NULL,
+    `content` TEXT NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`lesson_id`) REFERENCES `lesson` (`lesson_id`) ON DELETE CASCADE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create table question_cluster
-(
-    id        int auto_increment
-        primary key,
-    indexes   int  not null,
-    paragraph text null,
-    part      int  not null,
-    test_id   int  null,
-    constraint FKkd53425gk00tlq2lije4tdyll
-        foreign key (test_id) references test (id)
-            on update cascade on delete cascade
-);
+--
+-- Table structure for table `grammar_quiz`
+--
+CREATE TABLE `grammar_quiz` (
+    `grammar_quiz_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `grammar_id` BIGINT NOT NULL,
+    `question_text` TEXT NOT NULL,
+    `order_index` INT NOT NULL,
+    `created_at` DATETIME(6),
+    `updated_at` DATETIME(6),
+    FOREIGN KEY (`grammar_id`) REFERENCES `grammar` (`grammar_id`) ON DELETE CASCADE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create table question
-(
-    ques_id  bigint auto_increment                                                      not null
-        primary key,
-    description         varchar(255)                                                null,
-    correct_ans         varchar(255)                                                not null,
-    question_scope      enum ('TEST', '')             default 'TEST'        not null,
-    question_type       enum ('MULTICHOICE', 'FILLING_BLANK') default 'MULTICHOICE' not null,
-    audio_src           varchar(255)                                                null,
-    img_src             varchar(255)                                                null,
-    question_cluster_id int                                                         null,
-    constraint question_cluster__fk
-        foreign key (question_cluster_id) references question_cluster (id)
-            on update cascade on delete cascade
-);
+--
+-- Table structure for table `quiz_option`
+--
+CREATE TABLE `quiz_option` (
+    `option_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `grammar_quiz_id` BIGINT NOT NULL,
+    `option_text` TEXT NOT NULL,
+    `is_correct` TINYINT(1) DEFAULT 0,
+    `created_at` DATETIME(6),
+    `updated_at` DATETIME(6),
+    FOREIGN KEY (`grammar_quiz_id`) REFERENCES `grammar_quiz` (`grammar_quiz_id`) ON DELETE CASCADE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create table multichoice_detail
-(
-    id int auto_increment,
-    ques_id            bigint                    not null,
-    answer_key             enum ('A', 'B', 'C', 'D') not null,
-    answer_description varchar(255)              null,
-    primary key (id),
-    constraint multichoice_detail_ibfk_1
-        foreign key (ques_id) references question (ques_id)
-            on update cascade on delete cascade
-);
+--
+-- Table structure for table `quiz_user_submission`
+--
+CREATE TABLE `quiz_user_submission` (
+    `submission_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `user_id` BIGINT NOT NULL,
+    `question_id` BIGINT NOT NULL,
+    `selected_option_id` BIGINT NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY `uk_quiz_user_question` (`user_id`, `question_id`),
+    FOREIGN KEY (`selected_option_id`) REFERENCES `quiz_option` (`option_id`) ON DELETE CASCADE,
+    FOREIGN KEY (`question_id`) REFERENCES `grammar_quiz` (`grammar_quiz_id`) ON DELETE CASCADE,
+    FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE grammar (
-                         grammar_id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                         lesson_id BIGINT NOT NULL UNIQUE, -- Each lesson must have exactly one grammar entry
-                         title VARCHAR(100) NOT NULL,
-                         content TEXT NOT NULL,
-                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                         CONSTRAINT fk_grammar_lesson FOREIGN KEY (lesson_id) REFERENCES lesson(lesson_id) ON DELETE CASCADE
-);
+--
+-- Table structure for table `test_detail`
+--
+CREATE TABLE `test_detail` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `belong_to` INT NOT NULL,
+    `question_id` BIGINT NOT NULL,
+    `part` INT NOT NULL,
+    `indexx` INT NOT NULL,
+    FOREIGN KEY (`belong_to`) REFERENCES `test` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`question_id`) REFERENCES `question` (`ques_id`) ON UPDATE CASCADE ON DELETE CASCADE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create table grammar_quiz
-(
-    grammar_quiz_id bigint auto_increment
-        primary key,
-    grammar_id      bigint      not null,
-    question_text   text        not null,
-    order_index     int         not null,
-    created_at      datetime(6) null,
-    updated_at      datetime(6) null,
-    constraint fk_quiz_grammar
-        foreign key (grammar_id) references grammar (grammar_id)
-            on delete cascade
-);
+CREATE INDEX `question_id` ON `test_detail` (`question_id`);
 
--- Options for quiz questions
+--
+-- Table structure for table `test_submission`
+--
+CREATE TABLE `test_submission` (
+    `submission_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `test_id` INT,
+    `last_answered_by` BIGINT,
+    `last_answered_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `score` FLOAT,
+    FOREIGN KEY (`test_id`) REFERENCES `test` (`id`) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (`last_answered_by`) REFERENCES `user` (`user_id`) ON UPDATE CASCADE ON DELETE CASCADE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create table quiz_option
-(
-    option_id       bigint auto_increment
-        primary key,
-    grammar_quiz_id bigint               not null,
-    option_text     text                 not null,
-    is_correct      tinyint(1) default 0 null,
-    created_at      datetime(6)          null,
-    updated_at      datetime(6)          null,
-    constraint fk_option_question
-        foreign key (grammar_quiz_id) references grammar_quiz (grammar_quiz_id)
-            on delete cascade
-);
+--
+-- Table structure for table `test_result`
+--
+CREATE TABLE `test_result` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `answer` VARCHAR(150) NOT NULL,
+    `part` INT NOT NULL,
+    `question_id` BIGINT,
+    `submit_id` BIGINT,
+    FOREIGN KEY (`question_id`) REFERENCES `question` (`ques_id`) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (`submit_id`) REFERENCES `test_submission` (`submission_id`) ON UPDATE CASCADE ON DELETE CASCADE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create table quiz_user_submission
-(
-    submission_id      bigint auto_increment
-        primary key,
-    user_id            bigint                              not null,
-    question_id        bigint                              not null,
-    selected_option_id bigint                              not null,
-    created_at         timestamp default CURRENT_TIMESTAMP null,
-    updated_at         timestamp default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
-    constraint uk_quiz_user_question
-        unique (user_id, question_id),
-    constraint fk_submission_option
-        foreign key (selected_option_id) references quiz_option (option_id)
-            on delete cascade,
-    constraint fk_submission_question
-        foreign key (question_id) references grammar_quiz (grammar_quiz_id)
-            on delete cascade,
-    constraint fk_submission_user
-        foreign key (user_id) references user (user_id)
-            on delete cascade
-);
+--
+-- Table structure for table `flashcard_decks`
+--
+CREATE TABLE `flashcard_decks` (
+  `deck_id` INT PRIMARY KEY AUTO_INCREMENT,
+  `creator_id` BIGINT,
+  `deck_name` VARCHAR(255) NOT NULL,
+  `description` TEXT,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`creator_id`) REFERENCES `user` (`user_id`)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create table test_detail
-(
-    id int auto_increment,
-    belong_to   int    not null,
-    question_id bigint not null,
-    part        int    not null,
-    indexx     int    not null,
-    primary key (id),
-    constraint test_detail_ibfk_1
-        foreign key (belong_to) references test (id)
-            on delete cascade,
-    constraint test_detail_ibfk_2
-        foreign key (question_id) references question (ques_id)
-            on update cascade on delete cascade
-);
+--
+-- Table structure for table `flashcards`
+--
+CREATE TABLE `flashcards` (
+  `card_id` INT PRIMARY KEY AUTO_INCREMENT,
+  `deck_id` INT,
+  `front_content` TEXT NOT NULL,
+  `back_content` TEXT NOT NULL,
+  `audio_url` VARCHAR(255),
+  `is_favorite` BOOLEAN DEFAULT FALSE,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`deck_id`) REFERENCES `flashcard_decks` (`deck_id`)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-create index question_id
-    on test_detail (question_id);
+--
+-- Table structure for table `order_course`
+--
+CREATE TABLE `order_course` (
+    `user_id` BIGINT NOT NULL,
+    `course_id` INT NOT NULL,
+    `status` VARCHAR(32) DEFAULT 'PENDING',
+    `payment_method` VARCHAR(32) DEFAULT 'VNPAY' NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `cost` DOUBLE,
+    PRIMARY KEY (`user_id`, `course_id`),
+    FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
+    FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE INDEX `course_id` ON `order_course` (`course_id`);
 
-create table test_submission
-(
-    submission_id    bigint auto_increment
-        primary key,
-    test_id          int                                 null,
-    last_answered_by bigint                              null,
-    last_answered_at timestamp default CURRENT_TIMESTAMP null,
-    score            float                               null,
-    constraint test_submission_ibfk_1
-        foreign key (test_id) references test (id)
-            on update cascade on delete cascade,
-    constraint test_submission_ibfk_2
-        foreign key (last_answered_by) references user (user_id)
-            on update cascade on delete cascade
-);
+--
+-- Table structure for table `enrollment`
+--
+CREATE TABLE `enrollment` (
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `enrolled_at` DATETIME(6),
+    `expired_at` DATETIME(6),
+    `status` ENUM ('COMPLETED', 'PENDING', 'EXPIRED'),
+    `course_id` INT,
+    `user_id` BIGINT,
+    FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON UPDATE CASCADE ON DELETE CASCADE
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
-create table test_result
-(
-    id          int auto_increment
-        primary key,
-    answer      varchar(150) not null,
-    part        int          not null,
-    question_id bigint       null,
-    submit_id   bigint       null,
-    constraint FK787s15vwqnuckvarfil6r6wsk
-        foreign key (question_id) references question (ques_id)
-            on update cascade on delete cascade,
-    constraint FKqw150dx9te5yl1xh95r05wa0h
-        foreign key (submit_id) references test_submission (submission_id)
-            on update cascade on delete cascade
-);
-
-CREATE TABLE `flashcard_decks`
-(
-    `deck_id`     int PRIMARY KEY AUTO_INCREMENT,
-    `creator_id`  bigint,
-    `deck_name`   varchar(255) NOT NULL,
-    `description` text,
-    `created_at`  timestamp DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (`creator_id`) REFERENCES `user` (`user_id`)
-) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
-CREATE TABLE `flashcards`
-(
-    `card_id`       INT PRIMARY KEY AUTO_INCREMENT,
-    `deck_id`       INT,
-    `front_content` TEXT NOT NULL,
-    `back_content`  TEXT NOT NULL,
-    `audio_url`     VARCHAR(255),            -- Optional audio file link
-    `is_favorite`   BOOLEAN   DEFAULT FALSE, -- Because someone out there is emotionally attached to one flashcard
-    `created_at`    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at`    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (`deck_id`) REFERENCES `flashcard_decks` (`deck_id`)
-) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;;
-
-# CREATE TABLE `enrollment` (
-#   `user_id` bigint,
-#   `course_id` int,
-#   `status` enum('COMPLETED', 'PENDING', 'EXPIRED'),
-#   `enrolled_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-#   `expired_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-#   PRIMARY KEY (`user_id`, `course_id`),
-#   FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
-#   FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`)
-# );
-#
-
-create table order_course
-(
-    user_id        bigint                                not null,
-    course_id      int                                   not null,
-    status         varchar(32) default 'PENDING'         null,
-    payment_method varchar(32) default 'VNPAY'           not null,
-    created_at     timestamp   default CURRENT_TIMESTAMP null,
-    cost           double                                null,
-    primary key (user_id, course_id),
-    constraint order_course_ibfk_1
-        foreign key (user_id) references user (user_id),
-    constraint order_course_ibfk_2
-        foreign key (course_id) references course (course_id)
-);
-
-create table enrollment
-(
-    id          bigint auto_increment
-        primary key,
-    enrolled_at datetime(6)                              null,
-    expired_at  datetime(6)                              null,
-    status      enum ('COMPLETED', 'PENDING', 'EXPIRED') null,
-    course_id   int                                      null,
-    user_id     bigint                                   null,
-    constraint FKbhhcqkw1px6yljqg92m0sh2gt
-        foreign key (course_id) references course (course_id)
-            on update cascade on delete cascade,
-    constraint FKgpuyid9pbfpxghv9vyhb0ictd
-        foreign key (user_id) references user (user_id)
-            on update cascade on delete cascade
-);
-
-create index course_id
-    on order_course (course_id);
