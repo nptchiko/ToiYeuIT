@@ -1,6 +1,6 @@
 "use client";
 
-import courseService from "../api/courseAPI";
+import courseService from "../../../api/courseAPI";
 import { X, Info, CheckCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -313,6 +313,43 @@ export default function CourseForm({ course = null, onClose, onSave }) {
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1.5 text-foreground">
+                Course Type <span className="text-destructive">*</span>
+              </label>
+              <div className="relative">
+                <select
+                  name="type"
+                  value={formData.type}
+                  onChange={handleChange}
+                  className="w-full p-2.5 bg-background border border-input rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground appearance-none pr-10"
+                  required
+                >
+                  <option value="LR">Listening and Reading </option>
+
+                  <option value="SW">Speaking and Writting </option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg
+                    className="h-4 w-4 text-muted-foreground"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Select your type course you want to create
+              </p>
             </div>
 
             {/* Appearance */}

@@ -1,5 +1,3 @@
-"use client";
-
 import { useToast } from "../components/toast-context";
 import { api, AuthService } from "../services/auth-service";
 import { TokenService } from "../services/auth-service";

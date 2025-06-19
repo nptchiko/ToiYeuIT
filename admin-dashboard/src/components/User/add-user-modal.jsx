@@ -1,5 +1,3 @@
-"use client";
-
 import { X, User, Mail, Phone, UserCircle, Lock } from "lucide-react";
 import { useState } from "react";
 
@@ -206,7 +204,7 @@ export default function AddUserModal({
             <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg border border-blue-100 dark:border-blue-800">
               <p className="text-sm text-blue-800 dark:text-blue-300">
                 <span className="font-medium">Note:</span> New users are created
-                with the "user" role by default. The "Học viên" role is assigned
+                with the "User" role by default. The"Student" role is assigned
                 after purchase.
               </p>
             </div>
