@@ -130,7 +130,6 @@ const LessonsList = () => {
                     {lesson.title}
                   </h3>
                   <div className="flex items-center text-sm text-gray-500 mt-1">
-                    <span>{lesson.sections || 0} sections</span>
                     {lesson.isSubmitted && (
                       <span className="flex items-center ml-3 text-green-600">
                         <CheckCircle size={14} className="mr-1" />
