@@ -21,7 +21,7 @@ api.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  },
+  }
 );
 
 // Lesson API service
@@ -84,7 +84,7 @@ export const LessonAPI = {
     try {
       const response = await api.put(
         `/admin/lessons/course/${courseId}/reorder`,
-        lessonIds,
+        lessonIds
       );
       return response.data;
     } catch (error) {
@@ -96,24 +96,11 @@ export const LessonAPI = {
   duplicateLesson: async (lessonId, targetCourseId) => {
     try {
       const response = await api.post(
-        `/admin/lessons/${lessonId}/duplicate?targetCourseId=${targetCourseId}`,
+        `/admin/lessons/${lessonId}/duplicate?targetCourseId=${targetCourseId}`
       );
       return response.data;
     } catch (error) {
       console.error("Error duplicating lesson:", error);
-      throw error;
-    }
-  },
-};
-
-// Course API for getting courses list
-export const CourseAPI = {
-  getAllCourses: async () => {
-    try {
-      const response = await api.get("/admin/courses");
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching courses:", error);
       throw error;
     }
   },

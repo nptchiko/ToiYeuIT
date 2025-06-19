@@ -23,6 +23,7 @@ export const useCourseDashboard = () => {
       try {
         setLoading(true);
         const data = await courseService.getAllCourses();
+        console.log("jiihi", data);
         if (Array.isArray(data)) {
           const formattedData = formatCourseData(data);
           setCourses(formattedData);
