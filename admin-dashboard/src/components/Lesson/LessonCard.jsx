@@ -59,16 +59,16 @@ const LessonCard = ({ lesson, onEdit, onDelete, onDuplicate, onView }) => {
 
       <div className="flex items-center justify-between pt-4 border-t border-gray-100">
         <span className="text-sm text-gray-500">
-          Course: {lesson.courseName || "Unknown"}
+          {/* Course: {lesson.courseName || "Unknown"} */}
         </span>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => onView(lesson)}
-            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-            title="View Details"
-          >
-            <Eye className="h-4 w-4" />
-          </button>
+          {/* <button */}
+          {/*   onClick={() => onView(lesson)} */}
+          {/*   className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" */}
+          {/*   title="View Details" */}
+          {/* > */}
+          {/*   <Eye className="h-4 w-4" /> */}
+          {/* </button> */}
           <button
             onClick={() => onEdit(lesson)}
             className="p-2 text-gray-400 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
