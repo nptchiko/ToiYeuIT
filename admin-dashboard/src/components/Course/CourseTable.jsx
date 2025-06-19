@@ -18,7 +18,7 @@ export default function CourseTable({
   onDelete,
 }) {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-ox-aut">
       <table className="min-w-full">
         <thead>
           <tr className="bg-secondary">

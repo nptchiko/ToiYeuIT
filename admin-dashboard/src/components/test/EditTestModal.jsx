@@ -49,7 +49,7 @@ export default function EditTestModal({
               />
             </div>
 
-            {/* Status */}
+            {/* Status
             <div className="space-y-2">
               <label
                 htmlFor="edit-status"
@@ -78,7 +78,7 @@ export default function EditTestModal({
                   </option>
                 ))}
               </select>
-            </div>
+            </div> */}
 
             {/* Test Info Display */}
             <div className="bg-muted/50 rounded-lg p-4 space-y-2">

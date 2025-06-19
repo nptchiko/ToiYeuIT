@@ -1,6 +1,6 @@
 "use client";
 
-import { getStatusColor } from "../../utils/test-utils";
+// import { getStatusColor } from "../../utils/test-utils";
 import {
   FileText,
   Clock,
@@ -77,9 +77,9 @@ export default function TestTable({
                     <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Duration
                     </th>
-                    <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    {/* <th className="px-6 py-3.5 bg-muted/50 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Status
-                    </th>
+                    </th> */}
                     <th className="px-6 py-3.5 bg-muted/50 flex justify-center text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Actions
                     </th>
@@ -120,7 +120,7 @@ export default function TestTable({
                           {test.duration} minute
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      {/* <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
                             test.status
@@ -128,7 +128,7 @@ export default function TestTable({
                         >
                           {test.status}
                         </span>
-                      </td>
+                      </td> */}
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <div className="flex space-x-2 justify-end">
                           <button

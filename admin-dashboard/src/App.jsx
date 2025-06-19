@@ -5,6 +5,7 @@ import { useAuth } from "./hooks/auth-context";
 import { AuthProvider } from "./hooks/auth-provider";
 import Courses from "./page/Courses";
 import Home from "./page/Home";
+import Lesson from "./page/Lesson.jsx";
 import ProfilePage from "./page/Profile";
 import TestManagement from "./page/TestManagerment";
 import Users from "./page/User";
@@ -88,7 +89,16 @@ function App() {
                 </AdminProtectedRoute>
               }
             />
-
+            <Route
+              path="/lesson"
+              element={
+                <AdminProtectedRoute>
+                  <Layout>
+                    <Lesson />
+                  </Layout>
+                </AdminProtectedRoute>
+              }
+            />
             {/* Trang không tìm thấy */}
             <Route
               path="*"

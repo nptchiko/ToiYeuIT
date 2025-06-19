@@ -240,6 +240,7 @@ export default function TestManagement() {
       };
 
       const createdTest = await TestAPI.createTest(testToAdd);
+      console.log("hehehe", createdTest.id);
 
       if (
         createdTest &&
@@ -255,6 +256,7 @@ export default function TestManagement() {
           duration: createdTest.body?.duration || newTest.duration,
           questions: newTest.questions || 0,
         };
+        console.log("newTestData", newTestData);
 
         setTests((prevTests) => [...prevTests, newTestData]);
         closeModal();
