@@ -6,6 +6,7 @@ import com.example.toiyeuit.dto.request.user.UserCreationRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.dto.response.OverviewResponse;
 import com.example.toiyeuit.dto.response.UserResponse;
+import com.example.toiyeuit.enums.PredefinedRole;
 import com.example.toiyeuit.repository.UserRepository;
 import com.example.toiyeuit.service.UserService;
 import org.slf4j.Logger;
@@ -42,11 +43,13 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ApiResponse<Void> updateUser(@PathVariable("id") Long id, @RequestBody UpdateUserRequest request){
+        var user = userService.getUserById(id);
         userService.updateUser(id,
                 AdminUpdateUserRequest.builder()
                         .gender(request.getGender())
                         .username(request.getUsername())
                         .phone(request.getPhone())
+                        .role(PredefinedRole.fromRole(user.getRole()))
                         .build()
                 );
 
