@@ -1,6 +1,6 @@
 "use client";
 
-import { AuthService } from "../../../src/utils/auth-service";
+import { AuthService, TokenService } from "../../../src/utils/auth-service";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -30,7 +30,10 @@ const GoogleCallbackHandler = () => {
             // console.log("Redirecting to:", redirectPath);
 
             // Sử dụng navigate thay vì window.location.replace
-            navigate(redirectPath, { replace: true });
+            if (TokenService.setToken()) {
+              navigate(redirectPath, { replace: true });
+            }
+            window.location.reload();
           } else {
             throw new Error("Token không được lưu thành công");
           }
