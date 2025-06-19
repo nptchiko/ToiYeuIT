@@ -91,6 +91,7 @@ public class PaymentService {
     }
 
     public List<OrderCourseResponse> getOrderHistoryOfCurrentUser() throws ResourceNotFoundException {
+
         User user = userService.getUserByEmail(SecurityUtils.getCurrentUserLogin());
 
         return orderCourseRepository.findByUserId(user.getId())

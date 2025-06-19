@@ -100,5 +100,14 @@ public class AdminCourseController {
                 .build();
 
     }
+    @GetMapping("/chart-revenue")
+      public ApiResponse<List<Long>> getChartRevenue(){
+            var result = courseService.getChartRevenue();
+            return ApiResponse.<List<Long>>builder()
+                    .code(200)
+                    .body(result)
+                    .build();
+      }
+
 
 }
