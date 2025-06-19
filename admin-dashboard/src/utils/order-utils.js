@@ -18,8 +18,8 @@ export const formatCurrency = (cost) => {
 
 export const getStatusText = (status) => {
   const statusMap = {
-    COMPLETE: "COMPLETE",
-    PENDING: "PENDING", // Fixed typo: PEDDING -> PENDING
+    PAID: "COMPLETE",
+    PENDING: "PENDING",
     CANCELLED: "CANCELLED",
   };
   return statusMap[status] || status;
@@ -27,7 +27,7 @@ export const getStatusText = (status) => {
 
 export const getPaymentMethodText = (method) => {
   const methodMap = {
-    credit_card: "Thẻ tín dụng",
+    // credit_card: "Thẻ tín dụng",
     VNPAY: "VNPAY",
     // e_wallet: "Ví điện tử",
     // cash: "Tiền mặt",

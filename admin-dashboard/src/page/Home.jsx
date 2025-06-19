@@ -264,16 +264,9 @@ export default function Home() {
       </div>
 
       {/* Charts Section */}
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-6">
         <Card className="border border-border shadow-none hover:shadow-md transition-shadow duration-300">
-          <CardHeader>
-            <CardTitle className="text-base font-medium text-foreground">
-              Revenue Stats
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <BarChart />
-          </CardContent>
+          <BarChart />
         </Card>
 
         <Card className="border border-border shadow-none hover:shadow-md transition-shadow duration-300">
@@ -289,7 +282,7 @@ export default function Home() {
       </div>
 
       {/* Statistics Section */}
-      <div className="mt-6">
+      {/* <div className="mt-6">
         <Card className="border border-border shadow-none hover:shadow-md transition-shadow duration-300">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg font-medium text-foreground">
@@ -300,7 +293,7 @@ export default function Home() {
             <AreaChart />
           </CardContent>
         </Card>
-      </div>
+      </div> */}
     </div>
   );
 }

@@ -37,99 +37,198 @@ export default function OrderHistoryPage() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Fetch orders with useCallback to prevent unnecessary re-renders
-  const fetchOrders = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  // Store current page orders from API
+  const [currentPageOrders, setCurrentPageOrders] = useState([]);
+  // Store all filtered orders for stats calculation
+  const [allFilteredOrders, setAllFilteredOrders] = useState([]);
 
-      const response = await orderService.getOrderHistory(
-        currentPage,
-        itemsPerPage,
-        {
-          search: debouncedSearchQuery,
-          status: statusFilter !== "all" ? statusFilter : undefined,
-          paymentMethod:
-            paymentMethodFilter !== "all" ? paymentMethodFilter : undefined,
-          sortBy,
-          sortOrder,
-        }
-      );
+  // Fetch orders with pagination from API, but apply filters locally
+  const fetchOrders = useCallback(
+    async (page = currentPage, size = itemsPerPage) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      console.log("Fetched orders response:", response);
-
-      if (response.code === 0) {
-        setOrders(response.body.orders || []);
-        setPagination({
-          ...response.body.pagination,
-          itemsPerPage: itemsPerPage, // Ensure itemsPerPage is set correctly
+        // Fetch orders from API with pagination but no filters
+        const response = await orderService.getOrderHistory(page, size, {
+          sortBy: sortBy,
+          sortOrder: sortOrder,
+          // Don't send filters to API - we'll handle them locally
         });
-      } else {
-        setError(response.message || "Failed to fetch orders");
-        setOrders([]);
+
+        console.log("Fetched orders response:", response);
+
+        if (response.code === 0) {
+          const apiOrders = response.body.orders || [];
+
+          // Store the current page orders
+          setCurrentPageOrders(apiOrders);
+
+          // Update pagination from API response
+          setPagination(
+            response.body.pagination || {
+              totalItems: 0,
+              totalPages: 0,
+              currentPage: page,
+              itemsPerPage: size,
+            }
+          );
+
+          // For stats, we need to fetch all orders without pagination
+          // This is a separate call to get all data for filtering
+          if (page === 1) {
+            fetchAllOrdersForStats();
+          }
+        } else {
+          setError(response.message || "Failed to fetch orders");
+          setCurrentPageOrders([]);
+          setPagination({
+            totalItems: 0,
+            totalPages: 0,
+            currentPage: page,
+            itemsPerPage: size,
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching orders:", err);
+        setError(
+          err.message || "Unable to load order history. Please try again later."
+        );
+        setCurrentPageOrders([]);
         setPagination({
           totalItems: 0,
           totalPages: 0,
-          currentPage: 1,
-          itemsPerPage: itemsPerPage,
+          currentPage: page,
+          itemsPerPage: size,
         });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [currentPage, itemsPerPage, sortBy, sortOrder]
+  );
+
+  // Separate function to fetch all orders for stats calculation
+  const fetchAllOrdersForStats = useCallback(async () => {
+    try {
+      const response = await orderService.getOrderHistory(
+        1,
+        1000, // Large number to get all orders
+        {
+          sortBy: sortBy,
+          sortOrder: sortOrder,
+        }
+      );
+
+      if (response.code === 0) {
+        setAllFilteredOrders(response.body.orders || []);
       }
     } catch (err) {
-      console.error("Error fetching orders:", err);
-      setError(
-        err.message || "Unable to load order history. Please try again later."
-      );
-      setOrders([]);
-      setPagination({
-        totalItems: 0,
-        totalPages: 0,
-        currentPage: 1,
-        itemsPerPage: itemsPerPage,
-      });
-    } finally {
-      setLoading(false);
+      console.error("Error fetching all orders for stats:", err);
+      setAllFilteredOrders([]);
     }
+  }, [sortBy, sortOrder]);
+
+  // Fetch orders when component mounts or when pagination/sorting changes
+  useEffect(() => {
+    fetchOrders(currentPage, itemsPerPage);
+  }, [fetchOrders]);
+
+  // Apply local filters only to current page orders for display
+  const filteredCurrentPageOrders = useMemo(() => {
+    let filtered = [...currentPageOrders];
+
+    // Apply search filter
+    if (debouncedSearchQuery.trim()) {
+      const searchTerm = debouncedSearchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (order) =>
+          order.courseTitle?.toLowerCase().includes(searchTerm) ||
+          order.username?.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    // Apply status filter
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((order) => order.status === statusFilter);
+    }
+
+    // Apply payment method filter
+    if (paymentMethodFilter !== "all") {
+      filtered = filtered.filter(
+        (order) => order.paymentMethod === paymentMethodFilter
+      );
+    }
+
+    return filtered;
   }, [
-    currentPage,
-    itemsPerPage,
+    currentPageOrders,
     debouncedSearchQuery,
     statusFilter,
     paymentMethodFilter,
-    sortBy,
-    sortOrder,
   ]);
 
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
+  // Apply local filters to all orders for stats calculation
+  const filteredAllOrders = useMemo(() => {
+    let filtered = [...allFilteredOrders];
 
-  // Reset page when filters change
-  useEffect(() => {
-    if (currentPage !== 1) {
-      setCurrentPage(1);
+    // Apply search filter
+    if (debouncedSearchQuery.trim()) {
+      const searchTerm = debouncedSearchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (order) =>
+          order.courseTitle?.toLowerCase().includes(searchTerm) ||
+          order.username?.toLowerCase().includes(searchTerm)
+      );
     }
-  }, [debouncedSearchQuery, statusFilter, paymentMethodFilter, currentPage]);
 
-  // Calculate stats - Handle case when orders is empty
+    // Apply status filter
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((order) => order.status === statusFilter);
+    }
+
+    // Apply payment method filter
+    if (paymentMethodFilter !== "all") {
+      filtered = filtered.filter(
+        (order) => order.paymentMethod === paymentMethodFilter
+      );
+    }
+
+    return filtered;
+  }, [
+    allFilteredOrders,
+    debouncedSearchQuery,
+    statusFilter,
+    paymentMethodFilter,
+  ]);
+
+  // Update orders for display
+  useEffect(() => {
+    setOrders(filteredCurrentPageOrders);
+  }, [filteredCurrentPageOrders]);
+
+  // Calculate stats based on all filtered orders
   const stats = useMemo(() => {
-    if (!orders || orders.length === 0) {
+    const totalItems = filteredAllOrders.length;
+
+    if (totalItems === 0) {
       return {
-        total: pagination.totalItems || 0,
+        total: 0,
         completed: 0,
         pending: 0,
         failed: 0,
       };
     }
 
-    // Count based on actual status values from API
-    const statusCounts = orders.reduce(
+    // Count based on filtered orders
+    const statusCounts = filteredAllOrders.reduce(
       (acc, order) => {
-        const status = order.status?.toLowerCase();
-        if (status === "paid" || status === "completed") {
+        const status = order.status;
+        if (status === "PAID") {
           acc.completed++;
-        } else if (status === "pending") {
+        } else if (status === "PENDING") {
           acc.pending++;
-        } else if (status === "failed" || status === "cancelled") {
+        } else if (status === "CANCELLED") {
           acc.failed++;
         }
         return acc;
@@ -138,10 +237,24 @@ export default function OrderHistoryPage() {
     );
 
     return {
-      total: pagination.totalItems,
+      total: totalItems,
       ...statusCounts,
     };
-  }, [orders, pagination.totalItems]);
+  }, [filteredAllOrders]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
+  }, [debouncedSearchQuery, statusFilter, paymentMethodFilter]);
+
+  // Reset page when sort changes
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    }
+  }, [sortBy, sortOrder]);
 
   // Event handlers
   const handlePageChange = (page) => {
@@ -150,7 +263,7 @@ export default function OrderHistoryPage() {
 
   const handleItemsPerPageChange = (newItemsPerPage) => {
     setItemsPerPage(newItemsPerPage);
-    setCurrentPage(1); // Reset to first page when changing items per page
+    setCurrentPage(1);
   };
 
   const handleSort = (column) => {
@@ -163,8 +276,8 @@ export default function OrderHistoryPage() {
   };
 
   const handleExport = () => {
-    if (orders && orders.length > 0) {
-      exportToCSV(orders);
+    if (filteredAllOrders && filteredAllOrders.length > 0) {
+      exportToCSV(filteredAllOrders); // Export all filtered data
     }
   };
 
@@ -178,7 +291,11 @@ export default function OrderHistoryPage() {
   };
 
   const handleRetry = () => {
-    fetchOrders();
+    fetchOrders(currentPage, itemsPerPage);
+  };
+
+  const handleRefresh = () => {
+    fetchOrders(currentPage, itemsPerPage);
   };
 
   return (
@@ -223,11 +340,11 @@ export default function OrderHistoryPage() {
           setStatusFilter={setStatusFilter}
           paymentMethodFilter={paymentMethodFilter}
           setPaymentMethodFilter={setPaymentMethodFilter}
-          onRefresh={fetchOrders}
+          onRefresh={handleRefresh}
           onExport={handleExport}
           onClearFilters={clearFilters}
           loading={loading}
-          hasOrders={orders && orders.length > 0}
+          hasOrders={filteredAllOrders && filteredAllOrders.length > 0}
         />
 
         {/* Loading state */}

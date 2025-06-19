@@ -28,12 +28,13 @@ export default function OrderTable({
   onSort,
 }) {
   const getStatusBadge = (status) => {
+    // Debug: Log the actual status value
     const statusConfig = {
       PAID: {
         icon: CheckCircle,
         className: "bg-green-100 text-green-800 border-green-200",
       },
-      PEDING: {
+      PENDING: {
         icon: Clock,
         className: "bg-yellow-100 text-yellow-800 border-yellow-200",
       },
@@ -100,22 +101,22 @@ export default function OrderTable({
               <thead>
                 <tr className="bg-gray-50">
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <SortButton column="courseTitle">Khóa học</SortButton>
+                    <SortButton column="courseTitle">Course</SortButton>
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <SortButton column="username">Học viên</SortButton>
+                    <SortButton column="username">Student</SortButton>
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Trạng thái
+                    Status
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Thanh toán
+                    Payment
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <SortButton column="amount">Số tiền</SortButton>
+                    <SortButton column="amount">Cost</SortButton>
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <SortButton column="createdAt">Ngày đặt</SortButton>
+                    <SortButton column="createdAt">Time</SortButton>
                   </th>
                 </tr>
               </thead>
