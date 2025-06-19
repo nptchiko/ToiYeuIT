@@ -16,6 +16,6 @@ public interface UserLessonProgressRepository extends JpaRepository<UserLessonPr
     List<UserLessonProgress> findAllByUserId(Long userId);
 
     List<UserLessonProgress> findAllByLessonId(Long lessonId);
-
     Boolean existsByUserIdAndLessonIdAndIsSubmitted(Long userId, Long lessonId, Boolean isSubmitted);
+    void deleteByLessonId(Long lessonId);
 }
