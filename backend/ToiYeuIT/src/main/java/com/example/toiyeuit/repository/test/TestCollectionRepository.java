@@ -22,6 +22,7 @@ public interface TestCollectionRepository extends JpaRepository<TestCollection, 
                     "WHERE tc.skill_id = :id "
 
     )
+
     List<TestCollection> findAllBySkillId(@Param("id") Integer id);
 
     void deleteTestCollectionById(long id);

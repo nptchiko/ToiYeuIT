@@ -56,6 +56,7 @@ public class CourseService {
     }
 
     public void delete(int id) {
+
         Course course = courseRepository.findById(id).orElseThrow(() ->
                 new RuntimeException("Course not found with id " + id));
 

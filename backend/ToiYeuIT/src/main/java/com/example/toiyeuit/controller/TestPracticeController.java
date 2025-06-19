@@ -24,6 +24,7 @@ public class TestPracticeController {
     private final TestSubmitService service;
     private final TestResultService resultService;
     private final TestService testService;
+
     @GetMapping
     public ApiResponse<List<TestSetResponse>> tests(){
         var result = testsService.getAll();

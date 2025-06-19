@@ -8,30 +8,11 @@ INSERT INTO course (title, description, level, price, enabled, duration, tag, ty
 INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 850+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.', 'INTERMEDIATE', 1800000.00, 1, 8, 'Đề xuất', 'LR');
 INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 900+ Nâng Cao', 'Tăng tốc luyện đề và kỹ năng phản xạ đề thi thực tế.', 'ADVANCED', 2400000.00, 1, 10, 'VIP', 'SW');
 
-/*INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 450+ Cơ Bản', 'Nền tảng từ vựng, ngữ pháp và kỹ năng làm bài cơ bản.', 'BASIC', 1200000, 1, 6, 'Phổ biến', 'LR');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', '123', 'INTERMEDIATE', 1800000, 1, 8, 'VIP', 'LR');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 800+ Nâng Cao', 'Tăng tốc luyện đề và kỹ năng phản xạ đề thi thực tế.', 'ADVANCED', 2400000, 1, 10, 'Premium', 'LR');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 750+ Cơ Bản', 'Nền tảng từ vựng, ngữ pháp và kỹ năng làm bài cơ bản.', 'BASIC', 1200000, 1, 6, 'Mới', 'SW');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 850+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.', 'INTERMEDIATE', 1800000, 1, 8, 'Đề xuất', 'SW');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung ', 'Rèn luyện kỹ năng Part 3-4-5-6, ', 'INTERMEDIATE', 1800000, 0, 8, 'Bestseller', 'LR');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6, c', 'INTERMEDIATE', 1800000, 1, 8, 'Bestseller', 'LR');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6', 'INTERMEDIATE', 1800000, 0, 8, 'Bestseller', 'LR');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp 223', 'Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.', 'INTERMEDIATE', 18000000, 1, 8, 'Bestseller', 'LR');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.', 'BASIC', 1800000, 1, 8, 'Bestseller', 'LR');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.', 'INTERMEDIATE', 1800000, 1, 90, 'Bestseller', 'LR');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.', 'INTERMEDIATE', 1800000, 1, 8, 'Bestseller', 'SW');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.', 'INTERMEDIATE', 1800000, 0, 8, 'Bestseller', 'LR');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6,', 'INTERMEDIATE', 1800000, 1, 8, 'Bestseller', 'LR');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.', 'BASIC', 1800000, 1, 8, 'Bestseller', 'LR');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.', 'INTERMEDIATE', 1800000, 1, 8, 'Bestseller', 'LR');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6', 'INTERMEDIATE', 1800000, 1, 8, 'Bestseller', 'LR');
-INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('string', 'string', 'BASIC', 0, 0, 0, 'string', 'LR');
-*/
-
 INSERT INTO skill (name) VALUES ('LISTENING');
 INSERT INTO skill (name) VALUES ('READING');
 INSERT INTO skill (name) VALUES ('WRITING');
 INSERT INTO skill (name) VALUES ('SPEAKING');
+
 
 
 INSERT INTO lesson (lesson_id, course_id, title, description, order_index, video_url, materials_url) VALUES
