@@ -180,10 +180,6 @@ export default function Flashcard() {
   };
 
   const deleteDeck = async () => {
-    if (decks.length <= 1) {
-      alert("Không thể xóa bộ thẻ duy nhất!");
-      return;
-    }
     const newDecks = [...decks];
     newDecks.splice(deckIndex, 1);
     await flashcardService.deleteDeckById(decks[deckIndex].id);
@@ -302,7 +298,6 @@ export default function Flashcard() {
           <button
             className="flex-1 bg-red-500 text-white py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-red-600 transition-colors"
             onClick={() => setShowDeleteDeckConfirm(true)}
-            disabled={decks.length <= 1}
           >
             <Trash2 size={20} />
             <span>Xóa bộ thẻ</span>
