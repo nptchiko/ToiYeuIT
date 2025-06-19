@@ -1,6 +1,4 @@
-"use client";
 
-// import Vnpay from "./../../../../../frontend/src/Pages/By_Course/Vnpay";
 import { Search, X, RefreshCw, Download } from "lucide-react";
 
 export default function OrderFilters({
@@ -30,9 +28,9 @@ export default function OrderFilters({
             className="px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">All statuses</option>
-            <option value="completed">Complete</option>
-            <option value="pending">Peding</option>
-            <option value="failed">Cancelled</option>
+            <option value="PAID">Complete</option>
+            <option value="PENDING">Pending</option>
+            <option value="CANCELLED">Cancelled</option>
           </select>
 
           {/* Payment Method Filter */}
@@ -41,9 +39,8 @@ export default function OrderFilters({
             onChange={(e) => setPaymentMethodFilter(e.target.value)}
             className="px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="all">All payment methods </option>
-            <option value="credit_card">Credit card</option>
-            <option value="VNPAY"> Thanh toán VNPAY</option>
+            <option value="all">All payment methods</option>
+            <option value="VNPAY">Thanh toán VNPAY</option>
           </select>
 
           {/* Search */}
