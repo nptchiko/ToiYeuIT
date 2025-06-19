@@ -17,7 +17,6 @@ public interface TestSetMapper {
     @Mapping(target = "tests", source = "tests")
     TestSetResponse toTestSet(TestCollection tests);
 
-
     TestResponse toTestResponse(Test test);
 
 }

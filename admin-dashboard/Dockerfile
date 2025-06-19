@@ -7,7 +7,7 @@ COPY package*.json ./
 
 RUN npm install #&  npm install universal-cookie, axios, clsx
 
-COPY . .
+COPY ../ .
 
 # ------- BUILDER ---------
 

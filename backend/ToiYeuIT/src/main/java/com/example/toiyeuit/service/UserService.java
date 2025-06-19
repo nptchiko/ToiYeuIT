@@ -134,6 +134,7 @@ public class UserService {
     public void updateUser(long id, AdminUpdateUserRequest request){
 
         var _user = getUserById(id);
+        updateRole(_user, request.getRole());
         userMapper.updateUser(_user, request);
 
         userRepository.save(_user);

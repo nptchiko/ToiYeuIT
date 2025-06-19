@@ -51,7 +51,11 @@ public class TestCollectionService {
         var _skill = skillRepository.findByName(skillName).orElseThrow(
                 () -> new AppException(ErrorCode.SKILL_NOT_FOUND));
 
-        var result = testsRepositoty.findAllBySkillId(_skill.getId()).stream().map(testsMapper::toTestSet).toList();
+        var result = testsRepositoty.findAllBySkillId(_skill.getId())
+                .stream()
+                //.filter(t -> t.)
+                .map(testsMapper::toTestSet)
+                .toList();
         addSubmitStatus(result, user.getId());
 
         return result;
