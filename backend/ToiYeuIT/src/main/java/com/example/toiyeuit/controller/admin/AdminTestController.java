@@ -66,7 +66,7 @@ public class AdminTestController {
         return ApiResponse.<TestResponse>builder()
                 .code(200)
                 .message("Successfully")
-                .body(body)g
+                .body(body)
                 .build();
 
     }
