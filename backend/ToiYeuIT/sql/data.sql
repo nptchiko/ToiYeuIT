@@ -1,5 +1,6 @@
 use ToiYeuIT;
 
+SET NAMES 'utf8mb4';
 
 INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 450+ Cơ Bản', 'Nền tảng từ vựng, ngữ pháp và kỹ năng làm bài cơ bản.', 'BASIC', 1200000.00, 1, 6, 'Phổ biến', 'LR');
 INSERT INTO course (title, description, level, price, enabled, duration, tag, type) VALUES ('TOEIC 650+ Trung Cấp', 'Rèn luyện kỹ năng Part 3-4-5-6, chiến thuật xử lý câu hỏi.', 'INTERMEDIATE', 1800000.00, 1, 8, 'Bestseller', 'SW');
