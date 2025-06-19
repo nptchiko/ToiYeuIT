@@ -63,6 +63,16 @@ const hslToRgb = (h, s, l) => {
   return { r, g, b };
 };
 
+// Function to adjust revenue data - subtract 9,000,000 from months with value > 0
+const adjustRevenueData = (revenueArray) => {
+  return revenueArray.map((value) => {
+    if (value > 0) {
+      return Math.max(0, value - 10800000); // Ensure value doesn't go below 0
+    }
+    return value;
+  });
+};
+
 export function BarChart({
   refreshInterval = null, // Set to number (ms) for auto-refresh
   onDataChange = null, // Callback when data changes
@@ -71,6 +81,7 @@ export function BarChart({
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
   const [chartData, setChartData] = useState(null);
+  const [originalData, setOriginalData] = useState(null); // Store original data
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -87,12 +98,21 @@ export function BarChart({
       // Format data with predefined labels (Jan-Dec)
       const formattedData = formatChartData(apiResponse);
 
-      setChartData(formattedData);
+      // Store original data
+      setOriginalData(formattedData);
+
+      // Apply revenue adjustment (subtract 9,000,000 from months with value > 0)
+      const adjustedData = {
+        ...formattedData,
+        revenue: adjustRevenueData(formattedData.revenue),
+      };
+
+      setChartData(adjustedData);
       setLastUpdated(new Date());
 
-      // Call callback if provided
+      // Call callback if provided (use adjusted data)
       if (onDataChange) {
-        onDataChange(formattedData);
+        onDataChange(adjustedData);
       }
     } catch (err) {
       console.error("Error fetching chart data:", err);
@@ -101,7 +121,7 @@ export function BarChart({
       setError(errorMessage);
 
       // Set empty data on error with default labels
-      setChartData({
+      const emptyData = {
         labels: [
           "Tháng 1",
           "Tháng 2",
@@ -117,7 +137,10 @@ export function BarChart({
           "Tháng 12",
         ],
         revenue: Array(12).fill(0),
-      });
+      };
+
+      setOriginalData(emptyData);
+      setChartData(emptyData);
     } finally {
       setLoading(false);
     }
@@ -185,7 +208,7 @@ export function BarChart({
         labels,
         datasets: [
           {
-            label: "Doanh thu",
+            label: "Doanh thu (Đã điều chỉnh)",
             data: revenue,
             backgroundColor: primaryColor,
             borderColor: primaryColor,
@@ -254,6 +277,34 @@ export function BarChart({
               },
               label: function (context) {
                 const value = context.parsed.y;
+                const monthIndex = context.dataIndex;
+
+                // Show both original and adjusted values if there was an adjustment
+                if (
+                  originalData &&
+                  originalData.revenue[monthIndex] > 0 &&
+                  originalData.revenue[monthIndex] !== value
+                ) {
+                  const originalValue = originalData.revenue[monthIndex];
+                  const originalFormatted =
+                    originalValue >= 1000000
+                      ? `${(originalValue / 1000000)
+                          .toFixed(1)
+                          .replace(".0", "")}M VNĐ`
+                      : `${originalValue.toLocaleString("vi-VN")}VNĐ`;
+
+                  const adjustedFormatted =
+                    value >= 1000000
+                      ? `${(value / 1000000).toFixed(1).replace(".0", "")}M VNĐ`
+                      : `${value.toLocaleString("vi-VN")}VNĐ`;
+
+                  return [
+                    `Gốc: ${originalFormatted}`,
+                    `Điều chỉnh: ${adjustedFormatted}`,
+                  ];
+                }
+
+                // Show normal value if no adjustment
                 if (value >= 1000000) {
                   return ` ${(value / 1000000)
                     .toFixed(1)
@@ -330,7 +381,7 @@ export function BarChart({
         chart.destroy();
       }
     };
-  }, [chartData, loading]);
+  }, [chartData, originalData, loading]);
 
   // Manual refresh function
   const handleRefresh = () => {
@@ -373,9 +424,13 @@ export function BarChart({
     );
   }
 
-  // Calculate total revenue for display
+  // Calculate total revenue for display (using adjusted data)
   const totalRevenue =
     chartData?.revenue?.reduce((sum, value) => sum + value, 0) || 0;
+
+  // Calculate original total for comparison
+  const originalTotalRevenue =
+    originalData?.revenue?.reduce((sum, value) => sum + value, 0) || 0;
 
   return (
     <div className="h-[400px] w-full relative bg-card rounded-xl shadow-lg border overflow-hidden">
@@ -387,22 +442,38 @@ export function BarChart({
         {/* Header */}
         <div className="flex justify-between items-start mb-6">
           <div className="flex-1">
-            <h3 className="text-base font-medium text-foreground">
+            <h3 className="text-base font-bold uppercase text-foreground">
               Revenue Stats
             </h3>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-4 text-sm font-semibold text-primary">
               {lastUpdated && (
                 <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                  <span className="w-2 h-2 bg-green-500 rounded-full "></span>
                   Updated: {lastUpdated.toLocaleTimeString("vi-VN")}
                 </span>
               )}
-              <span className="font-semibold text-primary">
-                Sumarise:{" "}
-                {totalRevenue >= 1000
-                  ? `${(totalRevenue / 1000).toFixed(1).replace(".0", "")}M VNĐ`
-                  : `${totalRevenue.toLocaleString("vi-VN")}K VNĐ`}
-              </span>
+              <div className="flex flex-col gap-1">
+                <span className="font-semibold text-primary">
+                  Adjustment Total:{" "}
+                  {totalRevenue >= 1000000
+                    ? `${(totalRevenue / 1000000)
+                        .toFixed(1)
+                        .replace(".0", "")}M VNĐ`
+                    : `${totalRevenue.toLocaleString("vi-VN")}K VNĐ`}
+                </span>
+              </div>
+              <div>
+                {originalTotalRevenue !== totalRevenue && (
+                  <span className="font-semibold text-primary">
+                    Origin Revenue:{" "}
+                    {originalTotalRevenue >= 1000000
+                      ? `${(originalTotalRevenue / 1000000)
+                          .toFixed(1)
+                          .replace(".0", "")}M VNĐ`
+                      : `${originalTotalRevenue.toLocaleString("vi-VN")}K VNĐ`}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 

@@ -68,6 +68,12 @@ const userService = {
   deleteUser: async (userId) => {
     return api.delete(`/api/admin/users/${userId}`);
   },
+
+  // Get course enrollments
+  getCourseEnrollments: async () => {
+    const response = await api.get("/api/admin/courses/enrollments");
+    return response.data.body;
+  },
 };
 
 export { api, userService };
