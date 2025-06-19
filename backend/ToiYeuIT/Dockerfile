@@ -10,6 +10,8 @@ COPY gen_cert.sh .
 
 RUN chmod +x gen_cert.sh && ./gen_cert.sh
 
+RUN touch src/main/resources/local.env.properties
+
 ENV JAVA_TOOL_OPTIONS -Dfile.encoding=UTF8
 
 RUN mvn clean package -DskipTests
