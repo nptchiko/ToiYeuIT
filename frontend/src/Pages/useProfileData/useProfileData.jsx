@@ -1,6 +1,16 @@
 import { useToast } from "@/hooks/toast-context";
 import { api, AuthService } from "@/utils/auth-service";
-import { ArrowLeft, Mail, Phone, User, Save, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  Mail,
+  Phone,
+  User,
+  Save,
+  Users,
+  Lock,
+  Eye,
+  EyeOff,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -19,11 +29,15 @@ export default function ProfilePage() {
     username: "",
     phone: "",
     gender: "",
+    password: "",
+    confirmPassword: "",
   });
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const addToast = useToast();
 
   // Fetch user data from API
@@ -45,6 +59,8 @@ export default function ProfilePage() {
           username: userData.username || "",
           phone: userData.phone || "",
           gender: userData.gender || "m",
+          password: "",
+          confirmPassword: "",
         });
 
         setIsLoading(false);
@@ -70,7 +86,15 @@ export default function ProfilePage() {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Validate passwords match if changing password
+    if (formData.password && formData.password !== formData.confirmPassword) {
+      addToast("Passwords do not match!", "error");
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
+      // Update profile information
       const response = await api.put(`/users/${profileData.id}`, {
         username: formData.username,
         gender: formData.gender,
@@ -79,11 +103,27 @@ export default function ProfilePage() {
 
       console.log("Update response:", response);
 
+      // If password is being changed, make the API call to reset password
+      if (formData.password) {
+        await api.put("/auth/reset-password", {
+          email: profileData.email,
+          newPassword: formData.password,
+          confirmPassword: formData.confirmPassword,
+        });
+      }
+
       setProfileData({
         ...profileData,
         name: formData.username,
         phone: formData.phone,
         gender: formData.gender,
+      });
+
+      // Clear password fields after successful update
+      setFormData({
+        ...formData,
+        password: "",
+        confirmPassword: "",
       });
 
       addToast("Profile updated successfully!", "success");
@@ -132,7 +172,7 @@ export default function ProfilePage() {
           <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-8 text-white">
             <h1 className="text-3xl font-bold">Profile Settings</h1>
             <p className="mt-2 text-blue-100">
-              Manage your account information
+              Manage your account information and password
             </p>
           </div>
 
@@ -233,6 +273,81 @@ export default function ProfilePage() {
                   </select>
                 </div>
               </div>
+
+              {/* Password Change Section */}
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="text-lg font-medium mb-4">Change Password</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Password Field */}
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="password"
+                      className="flex items-center gap-2 text-sm font-medium"
+                    >
+                      <Lock className="h-4 w-4 text-gray-500" />
+                      New Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        id="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Leave blank to keep current password"
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Confirm Password Field */}
+                  <div className="space-y-2">
+                    <label
+                      htmlFor="confirmPassword"
+                      className="flex items-center gap-2 text-sm font-medium"
+                    >
+                      <Lock className="h-4 w-4 text-gray-500" />
+                      Confirm New Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        value={formData.confirmPassword}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Leave blank to keep current password"
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="pt-4">
                 <button
                   type="submit"

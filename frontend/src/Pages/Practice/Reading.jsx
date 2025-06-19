@@ -36,6 +36,7 @@ const Reading = () => {
       try {
         const res = await ReadingApi.getReadingAip();
         const response = await api.get("/users/user-info");
+        console.log(response.data);
         const role = response.data.body.role;
         setHasPurchased(role === "STUDENT" || role === "ADMIN");
         setData(res.body);

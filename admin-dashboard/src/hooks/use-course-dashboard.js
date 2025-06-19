@@ -1,5 +1,3 @@
-"use client";
-
 import { FILTER_TYPES } from "../Constants/course-constants";
 import courseService from "../api/courseAPI";
 import { formatCourseData } from "../utils/course-utils";
@@ -25,7 +23,6 @@ export const useCourseDashboard = () => {
       try {
         setLoading(true);
         const data = await courseService.getAllCourses();
-
         if (Array.isArray(data)) {
           const formattedData = formatCourseData(data);
           setCourses(formattedData);

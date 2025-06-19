@@ -122,7 +122,6 @@ export const courseService = {
   // Get revenue - Fixed endpoint URL
   revenueCourse: async () => {
     try {
-      // Fixed the endpoint URL - added missing slash at the beginning
       const response = await api.get("/api/admin/courses/revenue");
       console.log("Revenue API response:", response.data);
       return response;
