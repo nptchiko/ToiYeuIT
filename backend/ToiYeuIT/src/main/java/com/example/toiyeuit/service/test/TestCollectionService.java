@@ -53,9 +53,10 @@ public class TestCollectionService {
 
         var result = testsRepositoty.findAllBySkillId(_skill.getId())
                 .stream()
-                //.filter(t -> t.)
+                .filter(t -> !t.getTitle().contains("Đầu Vào"))
                 .map(testsMapper::toTestSet)
                 .toList();
+
         addSubmitStatus(result, user.getId());
 
         return result;

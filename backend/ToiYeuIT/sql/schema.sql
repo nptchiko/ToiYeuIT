@@ -300,5 +300,3 @@ CREATE TABLE `enrollment` (
     FOREIGN KEY (`course_id`) REFERENCES `course` (`course_id`) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON UPDATE CASCADE ON DELETE CASCADE
 ) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-
