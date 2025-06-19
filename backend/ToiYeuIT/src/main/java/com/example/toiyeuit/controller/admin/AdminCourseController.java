@@ -3,6 +3,8 @@ package com.example.toiyeuit.controller.admin;
 
 import com.example.toiyeuit.dto.admin.CrudCourseRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
+import com.example.toiyeuit.dto.response.OrderCourseResponse;
+import com.example.toiyeuit.dto.response.admin.AdminOrderCourseResponse;
 import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.service.admin.AdminCourseService;
 import lombok.AccessLevel;
@@ -11,6 +13,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -80,5 +83,31 @@ public class AdminCourseController {
                 .message(String.format("Deleted course with id=%d", id))
                 .build();
     }
+
+    @GetMapping("/order-history")
+    public ApiResponse<AdminOrderCourseResponse> getOrderHistory(
+            @RequestParam("page") int page,
+            @RequestParam("size") int size
+    ){
+        Sort sort = Sort.by(Sort.Direction.DESC,"createdAt");
+        Pageable pageable = PageRequest.of(page-1, size, sort);
+
+        var result = courseService.getOrderHistory(pageable);
+
+        return ApiResponse.<AdminOrderCourseResponse>builder()
+                .code(200)
+                .body(result)
+                .build();
+
+    }
+    @GetMapping("/chart-revenue")
+      public ApiResponse<List<Long>> getChartRevenue(){
+            var result = courseService.getChartRevenue();
+            return ApiResponse.<List<Long>>builder()
+                    .code(200)
+                    .body(result)
+                    .build();
+      }
+
 
 }

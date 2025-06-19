@@ -32,7 +32,7 @@ public class User {
 
     private String email;
 
-    @Column(columnDefinition = "varchar(32) default 'MALE'")
+    @Column(columnDefinition = "varchar(32) default 'm'")
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
@@ -50,7 +50,7 @@ public class User {
     Set<FlashcardDeck> flashcardDeck;
 
     @Column(name = "status")
-    private Boolean status;
+    private boolean status;
 
     @PrePersist
     void setStatus(){

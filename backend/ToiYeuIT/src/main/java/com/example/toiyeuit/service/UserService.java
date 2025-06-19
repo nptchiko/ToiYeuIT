@@ -1,6 +1,6 @@
 package com.example.toiyeuit.service;
 
-import com.example.toiyeuit.dto.request.user.UpdateUserRequest;
+import com.example.toiyeuit.dto.admin.AdminUpdateUserRequest;
 import com.example.toiyeuit.dto.request.user.UserCreationRequest;
 import com.example.toiyeuit.dto.response.OverviewResponse;
 import com.example.toiyeuit.dto.response.PaginationResponse;
@@ -24,7 +24,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -92,9 +91,11 @@ public class UserService {
             );
 
         var role = roleService.findRoleByName(_role);
+        String roleUser = user.getRole().getName();
 
-        if (user.getRole().getName().equalsIgnoreCase(role.getName()))
+        if (roleUser.equalsIgnoreCase(PredefinedRole.ADMIN.name()) || roleUser.equalsIgnoreCase(role.getName()))
             return;
+
         user.setRole(role);
         userRepository.save(user);
     }
@@ -130,9 +131,10 @@ public class UserService {
 
 
     @Transactional
-    public void updateUser(long id, UpdateUserRequest request){
+    public void updateUser(long id, AdminUpdateUserRequest request){
 
         var _user = getUserById(id);
+        updateRole(_user, request.getRole());
         userMapper.updateUser(_user, request);
 
         userRepository.save(_user);

@@ -1,4 +1,3 @@
-"use client";
 
 import { Search, X, RefreshCw, Download } from "lucide-react";
 

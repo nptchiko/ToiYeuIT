@@ -12,8 +12,9 @@ import java.time.LocalDateTime;
 public class OrderCourseResponse {
     private String courseTitle;
     private String username;
-    private String courseThumbnailUrl;
+    private String email;
     private String status;
     private String paymentMethod;
     private LocalDateTime createdAt;
+    private Double cost;
 }

@@ -46,7 +46,7 @@ public class CourseService {
         assert course.getTitle() != null;
 
         if (existByTiltle(course.getTitle()))
-            throw new AppException(ErrorCode.COURSE_NOT_FOUND);
+            throw new AppException(ErrorCode.COURSE_EXISTED);
 
         return courseRepository.save(course);
     }
@@ -56,6 +56,7 @@ public class CourseService {
     }
 
     public void delete(int id) {
+
         Course course = courseRepository.findById(id).orElseThrow(() ->
                 new RuntimeException("Course not found with id " + id));
 

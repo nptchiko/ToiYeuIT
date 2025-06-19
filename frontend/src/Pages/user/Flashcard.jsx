@@ -30,27 +30,6 @@ export default function Flashcard() {
   const [newCardEng, setNewCardEng] = useState("");
   const [studyMode, setStudyMode] = useState("all"); // all, starred
 
-  // const [decks, setDecks] = useState([
-  //   {
-  //     name: "Từ vựng cơ bản",
-  //     cards: [
-  //       { vietnamese: "một", english: "one", starred: false },
-  //       { vietnamese: "hai", english: "two", starred: false },
-  //       { vietnamese: "ba", english: "three", starred: false },
-  //       { vietnamese: "bốn", english: "four", starred: false },
-  //       { vietnamese: "năm", english: "five", starred: false },
-  //     ],
-  //   },
-  //   {
-  //     name: "Từ vựng động vật",
-  //     cards: [
-  //       { vietnamese: "con mèo", english: "cat", starred: false },
-  //       { vietnamese: "con chó", english: "dog", starred: false },
-  //       { vietnamese: "con voi", english: "elephant", starred: false },
-  //     ],
-  //   },
-  // ]);
-
   const [decks, setDecks] = useState([]);
   // Get cards from server
   useEffect(() => {
@@ -181,21 +160,26 @@ export default function Flashcard() {
     }
   };
 
-  const addNewDeck = () => {
+  const addNewDeck = async () => {
     if (newDeckName.trim()) {
-      setDecks([...decks, { name: newDeckName, cards: [] }]);
       const newDeckObject = { name: newDeckName };
-      flashcardService.createNewDeck(newDeckObject);
+      const returnedBlog = await flashcardService.createNewDeck(newDeckObject);
+
+      console.log(returnedBlog);
+      setDecks((prevDeck) => [
+        ...prevDeck,
+        {
+          name: returnedBlog.body.deckName,
+          cards: [],
+          id: returnedBlog.body.deckId,
+        },
+      ]);
       setNewDeckName("");
       setShowAddDeck(false);
     }
   };
 
   const deleteDeck = async () => {
-    if (decks.length <= 1) {
-      alert("Không thể xóa bộ thẻ duy nhất!");
-      return;
-    }
     const newDecks = [...decks];
     newDecks.splice(deckIndex, 1);
     await flashcardService.deleteDeckById(decks[deckIndex].id);
@@ -205,23 +189,26 @@ export default function Flashcard() {
     setShowDeleteDeckConfirm(false);
   };
 
-  const addNewCard = () => {
+  const addNewCard = async () => {
     if (newCardVie.trim() && newCardEng.trim()) {
       const newDecks = [...decks];
-      newDecks[deckIndex].cards.push({
-        vietnamese: newCardVie,
-        english: newCardEng,
-        starred: false,
-      });
       const newCardObject = {
         frontContent: newCardEng,
         backContent: newCardVie,
         isFavorite: false,
       };
 
-      flashcardService
-        .createNewFlashcard(decks[deckIndex].id, newCardObject)
-        .then((response) => console.log(response));
+      const returnedObject = await flashcardService.createNewFlashcard(
+        decks[deckIndex].id,
+        newCardObject,
+      );
+
+      newDecks[deckIndex].cards.push({
+        vietnamese: newCardVie,
+        english: newCardEng,
+        starred: false,
+        id: returnedObject.body.id,
+      });
 
       setDecks(newDecks);
       setNewCardVie("");
@@ -311,7 +298,6 @@ export default function Flashcard() {
           <button
             className="flex-1 bg-red-500 text-white py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-red-600 transition-colors"
             onClick={() => setShowDeleteDeckConfirm(true)}
-            disabled={decks.length <= 1}
           >
             <Trash2 size={20} />
             <span>Xóa bộ thẻ</span>

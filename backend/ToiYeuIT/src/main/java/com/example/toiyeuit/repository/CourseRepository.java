@@ -3,12 +3,13 @@ package com.example.toiyeuit.repository;
 import com.example.toiyeuit.entity.course.Course;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,16 +38,13 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     Page<Course> findAll(Pageable pageable);
 
 
-    @Query(
-            nativeQuery = true,
-            value = "SELECT sum(c.price) " +
+    @Query(nativeQuery = true,
+            value = "SELECT COALESCE(SUM(c.price), 0) " +
                     "FROM enrollment e " +
-                    "JOIN course c " +
-                    "on c.course_id = e.course_id " +
-                    "where YEAR(e.enrolled_at) = YEAR(CURRENT_DATE()) " +
-                    "AND MONTH(e.enrolled_at) = MONTH(CURRENT_DATE())"
-    )
-    long retrieveMonthlyRevenue();
+                    "JOIN course c ON c.course_id = e.course_id " +
+                    "WHERE YEAR(NOW()) = YEAR(e.enrolled_at) " +
+                    "AND MONTH(:date) = MONTH(e.enrolled_at)")
+    Long retrieveEachMonthRevenue(LocalDate date);
 
     @Modifying
     @Query(

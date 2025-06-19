@@ -60,7 +60,7 @@ public class AdminTestService {
                 testCollectionRepository.save(
                         TestCollection.builder()
                                 .description(request.getDescription())
-                                .skill(skillService.findBySkillName(request.getName()))
+                                .skill(skillService.findBySkillName(request.getSkill().toUpperCase()))
                                 .tests(null)
                                 .title(request.getName())
                                 .build()

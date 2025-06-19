@@ -1,13 +1,14 @@
 package com.example.toiyeuit.controller;
 
+import com.example.toiyeuit.dto.admin.AdminUpdateUserRequest;
 import com.example.toiyeuit.dto.request.user.UpdateUserRequest;
 import com.example.toiyeuit.dto.request.user.UserCreationRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.dto.response.OverviewResponse;
 import com.example.toiyeuit.dto.response.UserResponse;
+import com.example.toiyeuit.enums.PredefinedRole;
 import com.example.toiyeuit.repository.UserRepository;
 import com.example.toiyeuit.service.UserService;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -39,15 +40,25 @@ public class UserController {
                 .build();
     }
 
+
     @PutMapping("/{id}")
     public ApiResponse<Void> updateUser(@PathVariable("id") Long id, @RequestBody UpdateUserRequest request){
-        userService.updateUser(id, request);
+        var user = userService.getUserById(id);
+        userService.updateUser(id,
+                AdminUpdateUserRequest.builder()
+                        .gender(request.getGender())
+                        .username(request.getUsername())
+                        .phone(request.getPhone())
+                        .role(PredefinedRole.fromRole(user.getRole()))
+                        .build()
+                );
 
         return ApiResponse.<Void>builder()
                 .code(200)
                 .message("Update user successful")
                 .build();
     }
+
 
     @GetMapping("/user-info")
     public ApiResponse<UserResponse> info() {

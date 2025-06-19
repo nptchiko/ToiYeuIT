@@ -62,10 +62,11 @@ public class AdminTestController {
 
     @PostMapping("/test")
     public ApiResponse<TestResponse> addTest(@RequestBody TestCreationRequest request){
-        adminTestService.saveTest(request);
+        var body = adminTestService.saveTest(request);
         return ApiResponse.<TestResponse>builder()
                 .code(200)
                 .message("Successfully")
+                .body(body)
                 .build();
 
     }

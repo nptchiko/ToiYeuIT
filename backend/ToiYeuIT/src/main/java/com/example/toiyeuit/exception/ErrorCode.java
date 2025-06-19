@@ -20,6 +20,8 @@ public enum ErrorCode {
     INVALID_CONFIRM_LOGIC(4008, "Your confirmation password is wrong", HttpStatus.BAD_REQUEST),
     TEST_NOT_DONE(4009, "Current user haven never done this test before", HttpStatus.BAD_REQUEST),
     COURSE_NOT_FOUND(4010, "Course not found", HttpStatus.BAD_REQUEST),
+    COURSE_EXISTED(4011, "Course existed", HttpStatus.BAD_REQUEST),
+    USER_ACCOUNT_IS_BLOCKED(4012, "Tài khoản của bạn đã bị khóa, hãy liên hệ admin hỗ trợ", HttpStatus.BAD_REQUEST),
 
     // unauthenticated - 401
     UNAUTHENTICATED(4010, "You need to log in to perform this action.", HttpStatus.UNAUTHORIZED),

@@ -1,9 +1,13 @@
 package com.example.toiyeuit.service.admin;
 
 import com.example.toiyeuit.dto.admin.CrudCourseRequest;
+import com.example.toiyeuit.dto.response.PaginationResponse;
+import com.example.toiyeuit.dto.response.admin.AdminOrderCourseResponse;
 import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.mapper.CourseMapper;
+import com.example.toiyeuit.mapper.CourseOrderMapper;
 import com.example.toiyeuit.repository.CourseRepository;
+import com.example.toiyeuit.repository.OrderCourseRepository;
 import com.example.toiyeuit.service.CourseService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,6 +18,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.time.temporal.Temporal;
+import java.util.LinkedList;
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -23,9 +34,11 @@ public class AdminCourseService {
     CourseRepository courseRepository;
     private final CourseService courseService;
     private final CourseMapper courseMapper;
+    private final OrderCourseRepository orderCourseRepository;
+    private final CourseOrderMapper courseOrderMapper;
 
     public long getRevenue(){
-        return courseRepository.retrieveMonthlyRevenue();
+        return courseRepository.retrieveEachMonthRevenue(LocalDate.now());
     }
 
     public Course saveCourse(CrudCourseRequest request){
@@ -44,6 +57,7 @@ public class AdminCourseService {
     }
 
     public void deleteCourse(int id){
+
         courseService.delete(id);
     }
 
@@ -51,4 +65,33 @@ public class AdminCourseService {
     public void toggleVisiable(int id, boolean isEnabled){
         courseRepository.toggleVisiable(id, isEnabled ? 1 : 0);
     }
+
+    public AdminOrderCourseResponse getOrderHistory(Pageable pageable){
+        var pageOfOrder = orderCourseRepository.findAll(pageable);
+
+        var pagination = PaginationResponse.builder()
+                .totalPages(pageOfOrder.getTotalPages())
+                .totalItems((int) pageOfOrder.getTotalElements())
+                .build();
+
+        return AdminOrderCourseResponse.builder()
+                .orders(
+                        pageOfOrder.getContent().stream()
+                                .map(courseOrderMapper::toResponse)
+                                .toList()
+                )
+                .pagination(pagination)
+                .build();
+    }
+
+    public List<Long> getChartRevenue(){
+        var result = new LinkedList<Long>();
+        for (int i = 1; i <= 12; i++) {
+            var ym = YearMonth.of(2024, i);
+            result.add(courseRepository.retrieveEachMonthRevenue(
+                    ym.atDay(1)));
+        }
+        return result;
+    }
+
 }

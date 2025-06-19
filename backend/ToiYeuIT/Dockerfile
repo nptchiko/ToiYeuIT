@@ -2,9 +2,17 @@ FROM maven:3.9.9-eclipse-temurin-21-alpine AS build
 
 WORKDIR /app
 
-COPY pom.xml .
+COPY pom.xml .  
 
-COPY src ./src
+COPY src ./src 
+
+COPY gen_cert.sh .
+
+RUN chmod +x gen_cert.sh && ./gen_cert.sh
+
+RUN touch src/main/resources/local.env.properties
+
+ENV JAVA_TOOL_OPTIONS -Dfile.encoding=UTF8
 
 RUN mvn clean package -DskipTests
 
@@ -14,6 +22,8 @@ WORKDIR /app
 
 COPY --from=build /app/target/ToiYeuIt.jar .
 
+ENV JAVA_TOOL_OPTIONS -Dfile.encoding=UTF8
+
 EXPOSE 8081
 
-CMD ["java", "-jar", "ToiYeuIt.jar"]
+CMD ["java","-jar", "ToiYeuIt.jar"]
