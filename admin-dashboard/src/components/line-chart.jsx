@@ -1,6 +1,3 @@
-// charts/LineChart.jsx
-"use client";
-
 import chartData from "../json/chart-data.json";
 import {
   defaultTooltipConfig,

@@ -11,8 +11,8 @@ import {
 export default function ViewUserModal({ user, onClose }) {
   // Convert gender from backend format (m/f) to display format (Nam/Nữ)
   const displayGender = (gender) => {
-    if (gender === "m") return "Nam";
-    if (gender === "f") return "Nữ";
+    if (gender === "m") return "Mail";
+    if (gender === "f") return "Female";
     return gender;
   };
 
@@ -59,16 +59,14 @@ export default function ViewUserModal({ user, onClose }) {
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-muted-foreground"></span>
                 <span
                   className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                    user.status === "Đang hoạt động"
+                    user.status === "ACTIVE"
                       ? "bg-green-100 text-green-800"
                       : "bg-red-100 text-red-800"
                   }`}
                 >
                   <span
                     className={`inline-block w-1.5 h-1.5 rounded-full mr-1 ${
-                      user.status === "Đang hoạt động"
-                        ? "bg-green-500"
-                        : "bg-red-500"
+                      user.status === "ACTIVE" ? "bg-green-500" : "bg-red-500"
                     }`}
                   ></span>
                   {user.status}

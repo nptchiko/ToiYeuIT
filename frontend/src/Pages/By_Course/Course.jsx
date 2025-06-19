@@ -1,9 +1,10 @@
-import React from "react";
 import volume from "../../assets/By_Course/Lovepik.png";
+import { ArrowLeft } from "lucide-react";
+import React from "react";
 import { useState } from "react";
 import { AiFillWarning } from "react-icons/ai";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+
 const Course = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [phone, setPhone] = useState("");
@@ -188,7 +189,7 @@ const Course = () => {
           <div className="bg-orange-100/80 px-2 rounded-lg flex items-center gap-2">
             <img src={volume} className="h-full w-[50px]" alt="Volume" />
             <div className="text-xs text-orange-500">
-              Hơn 12.567 học viên của ET đã sử dụng lộ trình này!
+              Hơn 500 học viên của ET đã sử dụng lộ trình này!
             </div>
           </div>
         </div>
