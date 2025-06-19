@@ -22,7 +22,7 @@ create table user
         unique (email),
     constraint user_ibfk_1
         foreign key (role_id) references role (role_id)
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;;
 
 create index role_id
     on user (role_id);
@@ -44,8 +44,8 @@ create table course
     enabled     tinyint(1)                                                            null,
     duration    int                                                                   null,
     tag         varchar(255)                                                          null,
-    type        enum ('LR', 'SW')                                                     null
-)  CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+    type        enum ('LR', 'SW')  null
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 
@@ -87,7 +87,7 @@ create table test_collection
     title       varchar(255) null,
     constraint test_collection_ibfk_2
         foreign key (skill_id) references skill (id)
-);
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;  ;
 
 create index skill_id
     on test_collection (skill_id);
@@ -103,7 +103,8 @@ create table test
     constraint FK34np1jcju9km4vaswfl1oy9cp
         foreign key (test_collection_id) references test_collection (id)
             on update cascade on delete cascade
-);
+) CHAR SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 
 create table question_cluster
 (
@@ -261,26 +262,29 @@ create table test_result
             on update cascade on delete cascade
 );
 
-CREATE TABLE `flashcard_decks` (
-  `deck_id` int PRIMARY KEY AUTO_INCREMENT,
-  `creator_id` bigint,
-  `deck_name` varchar(255) NOT NULL,
-  `description` text,
-  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (`creator_id`) REFERENCES `user` (`user_id`)
-);
+CREATE TABLE `flashcard_decks`
+(
+    `deck_id`     int PRIMARY KEY AUTO_INCREMENT,
+    `creator_id`  bigint,
+    `deck_name`   varchar(255) NOT NULL,
+    `description` text,
+    `created_at`  timestamp DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`creator_id`) REFERENCES `user` (`user_id`)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `flashcards` (
-  `card_id` INT PRIMARY KEY AUTO_INCREMENT,
-  `deck_id` INT,
-  `front_content` TEXT NOT NULL,
-  `back_content` TEXT NOT NULL,
-  `audio_url` VARCHAR(255), -- Optional audio file link
-  `is_favorite` BOOLEAN DEFAULT FALSE, -- Because someone out there is emotionally attached to one flashcard
-  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (`deck_id`) REFERENCES `flashcard_decks` (`deck_id`)
-);
+
+CREATE TABLE `flashcards`
+(
+    `card_id`       INT PRIMARY KEY AUTO_INCREMENT,
+    `deck_id`       INT,
+    `front_content` TEXT NOT NULL,
+    `back_content`  TEXT NOT NULL,
+    `audio_url`     VARCHAR(255),            -- Optional audio file link
+    `is_favorite`   BOOLEAN   DEFAULT FALSE, -- Because someone out there is emotionally attached to one flashcard
+    `created_at`    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at`    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`deck_id`) REFERENCES `flashcard_decks` (`deck_id`)
+) DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;;
 
 # CREATE TABLE `enrollment` (
 #   `user_id` bigint,
@@ -328,25 +332,3 @@ create table enrollment
 
 create index course_id
     on order_course (course_id);
-
-alter table course
-    CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-    #collate = utf8mb4_vietnamese_ci;
-
-
-
-alter table test
-    collate = utf8mb3_vietnamese_ci;
-
-alter table flashcard_decks
-    collate = utf8mb3_vietnamese_ci;
-
-alter table flashcards
-    collate = utf8mb3_vietnamese_ci;
-
-alter table test_collection
-    collate = utf8mb3_vietnamese_ci;
-
-alter table user
-    collate = utf8mb3_vietnamese_ci
-

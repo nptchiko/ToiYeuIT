@@ -39,6 +39,7 @@ public abstract class UserMapper {
     @Named("convertRole")
     protected Role convertRole(PredefinedRole role){
         log.info("[UserMapper.class] Debug inside convertRole");
+        if (role == null) return null;
         return roleService.findRoleByName(role);
     }
 }

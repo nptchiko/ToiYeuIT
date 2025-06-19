@@ -43,6 +43,7 @@ public class ChangePasswordService {
             throw new AppException(ErrorCode.INVALID_CONFIRM_LOGIC);
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setStatus(true);
         userRepository.save(user);
     }
 
