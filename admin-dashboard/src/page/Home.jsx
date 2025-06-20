@@ -184,10 +184,10 @@ export default function Home() {
                   )}
                 </h3>
               </div>
-              <div className="flex items-center gap-1 rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700">
+              {/* <div className="flex items-center gap-1 rounded-full bg-green-50 px-2 py-1 text-xs font-medium text-green-700">
                 <span>+</span>
                 <span>11.01%</span>
-              </div>
+              </div> */}
             </div>
           </CardContent>
         </Card>

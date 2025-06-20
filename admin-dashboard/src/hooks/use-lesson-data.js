@@ -66,7 +66,7 @@ export const useLessonData = () => {
         addToast("Lesson deleted successfully!");
       } catch (error) {
         console.error("Error deleting lesson:", error);
-        addToast("Failed to delete lesson.");
+        addToast("Failed to delete lesson.", error);
       }
     }
   };
@@ -84,7 +84,7 @@ export const useLessonData = () => {
       handleCloseDuplicateModal();
     } catch (error) {
       console.error("Error duplicating lesson:", error);
-      addToast("Failed to duplicate lesson.");
+      addToast("Failed to duplicate lesson.", error);
       throw error; // Rethrow to be caught by modal's submit handler
     }
   };
@@ -107,7 +107,7 @@ export const useLessonData = () => {
       addToast(selectedLesson ? "Lesson updated!" : "Lesson created!");
     } catch (error) {
       console.error("Error saving lesson:", error);
-      addToast("Error saving lesson. Please try again.");
+      addToast("Error saving lesson. Please try again.", error);
       throw error; // Rethrow to be caught by form's submit handler
     }
   };

@@ -1,7 +1,7 @@
 import { Loader2 } from "lucide-react";
 
 export default function TestStats({ userCount, testStats, isLoading, error }) {
-  const StatCard = ({ icon, title, value, trend, bgColor }) => (
+  const StatCard = ({ icon, title, value, bgColor }) => (
     <div
       className={`${bgColor} rounded-xl p-6 border border-border shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1`}
     >
@@ -21,12 +21,12 @@ export default function TestStats({ userCount, testStats, isLoading, error }) {
                 value
               )}
             </h3>
-            {trend && (
-              <div className="flex items-center text-sm text-emerald-600 dark:text-emerald-500 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
-                {trend.icon}
-                <span className="font-medium">{trend.value}</span>
-              </div>
-            )}
+            {/* {trend && (
+              <div
+                
+                className="flex items-center text-sm text-emerald-600 dark:text-emerald-500 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full"
+              ></div>
+            )} */}
           </div>
         </div>
       </div>
@@ -55,24 +55,24 @@ export default function TestStats({ userCount, testStats, isLoading, error }) {
         }
         title="Total Users"
         value={userCount.toLocaleString()}
-        trend={{
-          icon: (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-3 w-3 mr-1"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="7" y1="17" x2="17" y2="7"></line>
-              <polyline points="7 7 17 7 17 17"></polyline>
-            </svg>
-          ),
-          value: "11.01%",
-        }}
+        // trend={{
+        //   icon: (
+        //     <svg
+        //       xmlns="http://www.w3.org/2000/svg"
+        //       className="h-3 w-3 mr-1"
+        //       viewBox="0 0 24 24"
+        //       fill="none"
+        //       stroke="currentColor"
+        //       strokeWidth="2"
+        //       strokeLinecap="round"
+        //       strokeLinejoin="round"
+        //     >
+        //       <line x1="7" y1="17" x2="17" y2="7"></line>
+        //       <polyline points="7 7 17 7 17 17"></polyline>
+        //     </svg>
+        //   ),
+        //   value: "11.01%",
+        // }}
         bgColor="bg-gradient-to-br from-card to-card/80"
       />
 

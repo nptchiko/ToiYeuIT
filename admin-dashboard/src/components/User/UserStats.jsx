@@ -7,7 +7,7 @@ import {
   ArrowDownRight,
 } from "lucide-react";
 
-export default function UserStats({ stats, isLoading }) {
+export default function UserStats({ stats }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
       <StatCard
@@ -16,11 +16,11 @@ export default function UserStats({ stats, isLoading }) {
         }
         title="Total Users"
         value={stats.totalUsers?.toLocaleString() || 0}
-        trend={{
-          value: stats.usersTrend?.percentage || 0,
-          isPositive: true,
-          icon: <ArrowUpRight className="h-3 w-3 mr-1" />,
-        }}
+        // trend={{
+        //   value: stats.usersTrend?.percentage || 0,
+        //   isPositive: true,
+        //   icon: <ArrowUpRight className="h-3 w-3 mr-1" />,
+        // }}
         bgColor="bg-popover dark:bg-popover"
       />
 

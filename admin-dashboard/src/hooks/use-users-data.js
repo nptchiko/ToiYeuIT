@@ -76,9 +76,9 @@ export const useUsersData = () => {
         totalUsers: 100,
         totalStudents: mockUsers.filter((user) => user.role === "USER").length,
         newRegistrations: Math.floor(mockUsers.length * 0.2),
-        usersTrend: { percentage: 5.2 },
-        studentsTrend: { percentage: 2.1 },
-        registrationTrend: { percentage: 3.7 },
+        usersTrend: null,
+        studentsTrend: null,
+        registrationTrend: null,
       };
 
       setStats(statsData);
