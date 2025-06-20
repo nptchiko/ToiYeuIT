@@ -1,5 +1,5 @@
-import React, { useState } from "react";
 import { X, Save, Trash2, CheckCircle, Circle } from "lucide-react";
+import React, { useState } from "react";
 
 const LessonForm = ({ lesson, courses, onClose, onSave, isCreating }) => {
   const [formData, setFormData] = useState({
@@ -124,26 +124,28 @@ const LessonForm = ({ lesson, courses, onClose, onSave, isCreating }) => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Course *
-                </label>
-                <select
-                  required
-                  value={formData.courseId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, courseId: e.target.value })
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">Select a course</option>
-                  {courses.map((course) => (
-                    <option key={course.id} value={course.id}>
-                      {course.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {isCreating && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Course *
+                  </label>
+                  <select
+                    required
+                    value={formData.courseId}
+                    onChange={(e) =>
+                      setFormData({ ...formData, courseId: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">Select a course</option>
+                    {courses.map((course) => (
+                      <option key={course.id} value={course.id}>
+                        {course.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
 
             <div>
@@ -324,7 +326,7 @@ const LessonForm = ({ lesson, courses, onClose, onSave, isCreating }) => {
                                 updateQuiz(
                                   quizIndex,
                                   "questionText",
-                                  e.target.value,
+                                  e.target.value
                                 )
                               }
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -344,7 +346,7 @@ const LessonForm = ({ lesson, courses, onClose, onSave, isCreating }) => {
                                 updateQuiz(
                                   quizIndex,
                                   "orderIndex",
-                                  parseInt(e.target.value),
+                                  parseInt(e.target.value)
                                 )
                               }
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -378,7 +380,7 @@ const LessonForm = ({ lesson, courses, onClose, onSave, isCreating }) => {
                                     quizIndex,
                                     optionIndex,
                                     "isCorrect",
-                                    !option.isCorrect,
+                                    !option.isCorrect
                                   )
                                 }
                                 className={`flex-shrink-0 ${
@@ -402,7 +404,7 @@ const LessonForm = ({ lesson, courses, onClose, onSave, isCreating }) => {
                                     quizIndex,
                                     optionIndex,
                                     "optionText",
-                                    e.target.value,
+                                    e.target.value
                                   )
                                 }
                                 className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

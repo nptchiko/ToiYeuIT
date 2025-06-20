@@ -1,5 +1,7 @@
+import courseService from "../api/courseAPI";
+import { LessonAPI } from "../api/lessonAPI";
+import { useToast } from "../components/toast-context";
 import { useState, useEffect, useCallback } from "react";
-import { LessonAPI, CourseAPI } from "../api/lessonAPI";
 
 export const useLessonData = () => {
   const [lessons, setLessons] = useState([]);
@@ -12,14 +14,14 @@ export const useLessonData = () => {
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [showDuplicateModal, setShowDuplicateModal] = useState(false);
   const [lessonToDuplicate, setLessonToDuplicate] = useState(null);
-
+  const { addToast } = useToast();
   const loadLessons = useCallback(async () => {
     try {
       setLoading(true);
       const response = await LessonAPI.getAllLessons(
         1,
         50,
-        selectedCourse || null,
+        selectedCourse || null
       );
       setLessons(response.body || []);
       setError(null);
@@ -33,8 +35,9 @@ export const useLessonData = () => {
 
   const loadCourses = async () => {
     try {
-      const response = await CourseAPI.getAllCourses();
-      setCourses(response.body || []);
+      const response = await courseService.getAllCourses();
+      // console.log(response);
+      setCourses(response || []);
     } catch (err) {
       console.error("Error loading courses:", err);
     }
@@ -60,10 +63,10 @@ export const useLessonData = () => {
       try {
         await LessonAPI.deleteLesson(lessonId);
         await loadLessons();
-        alert("Lesson deleted successfully!");
+        addToast("Lesson deleted successfully!");
       } catch (error) {
         console.error("Error deleting lesson:", error);
-        alert("Failed to delete lesson.");
+        addToast("Failed to delete lesson.");
       }
     }
   };
@@ -77,11 +80,11 @@ export const useLessonData = () => {
     try {
       await LessonAPI.duplicateLesson(lessonId, targetCourseId);
       await loadLessons();
-      alert("Lesson duplicated successfully!");
+      addToast("Lesson duplicated successfully!");
       handleCloseDuplicateModal();
     } catch (error) {
       console.error("Error duplicating lesson:", error);
-      alert("Failed to duplicate lesson.");
+      addToast("Failed to duplicate lesson.");
       throw error; // Rethrow to be caught by modal's submit handler
     }
   };
@@ -101,10 +104,10 @@ export const useLessonData = () => {
       }
       setShowForm(false);
       await loadLessons();
-      alert(selectedLesson ? "Lesson updated!" : "Lesson created!");
+      addToast(selectedLesson ? "Lesson updated!" : "Lesson created!");
     } catch (error) {
       console.error("Error saving lesson:", error);
-      alert("Error saving lesson. Please try again.");
+      addToast("Error saving lesson. Please try again.");
       throw error; // Rethrow to be caught by form's submit handler
     }
   };
@@ -122,7 +125,7 @@ export const useLessonData = () => {
   const filteredLessons = lessons.filter(
     (lesson) =>
       lesson.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lesson.description?.toLowerCase().includes(searchQuery.toLowerCase()),
+      lesson.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return {

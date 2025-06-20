@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from "react";
+import DuplicateModal from "../components/Lesson/DuplicateModal";
+import LessonCard from "../components/Lesson/LessonCard";
+import LessonForm from "../components/Lesson/LessonForm";
+import { useLessonData } from "../hooks/use-lesson-data";
 import {
   Search,
   Plus,
@@ -8,11 +11,7 @@ import {
   ArrowUpDown,
   ChevronDown,
 } from "lucide-react";
-
-import { useLessonData } from "../hooks/use-lesson-data";
-import LessonCard from "../components/Lesson/LessonCard";
-import LessonForm from "../components/Lesson/LessonForm";
-import DuplicateModal from "../components/Lesson/DuplicateModal";
+import React, { useState, useEffect } from "react";
 
 export default function Lesson() {
   const {
@@ -108,7 +107,7 @@ export default function Lesson() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-500">
             Lesson Management
           </h1>
           <p className="text-gray-600 mt-1">

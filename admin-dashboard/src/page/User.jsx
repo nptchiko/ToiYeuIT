@@ -1,5 +1,6 @@
 // Modal Components
 import { MODAL_TYPES } from "../Constants/user-constants";
+import CourseEnrollmentsModal from "../components/User/CourseEnrollmentsModal";
 import FilterDropdown from "../components/User/FilterDropdown";
 import Pagination from "../components/User/Pagination";
 import SearchAndActions from "../components/User/SearchAndActions";
@@ -14,8 +15,13 @@ import { useFormManagement } from "../hooks/use-form-management";
 import { useModalManagement } from "../hooks/use-modal-management";
 import { useUsersData } from "../hooks/use-users-data";
 import { UserCrudService } from "../services/user-crud-service.js";
+import { BookOpen } from "lucide-react";
+import { useState } from "react";
 
 export default function UsersPage() {
+  // State for course enrollments modal
+  const [isEnrollmentsModalOpen, setIsEnrollmentsModalOpen] = useState(false);
+
   // Custom hooks
   const {
     filteredUsers,
@@ -151,11 +157,22 @@ export default function UsersPage() {
             </span>
           </h1>
 
-          <SearchAndActions
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            onAddUser={() => handleOpenModal(MODAL_TYPES.ADD)}
-          />
+          <div className="flex items-center gap-4">
+            <SearchAndActions
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              onAddUser={() => handleOpenModal(MODAL_TYPES.ADD)}
+            />
+
+            {/* Course Enrollments Button */}
+            <button
+              onClick={() => setIsEnrollmentsModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <BookOpen className="w-4 h-4" />
+              <span>Courses Enrollment </span>
+            </button>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -199,7 +216,7 @@ export default function UsersPage() {
         </div>
       </div>
 
-      {/* Modals */}
+      {/* Existing Modals */}
       {activeModal === MODAL_TYPES.VIEW && selectedUser && (
         <ViewUserModal user={selectedUser} onClose={closeModal} />
       )}
@@ -230,6 +247,12 @@ export default function UsersPage() {
           onClose={closeModal}
         />
       )}
+
+      {/* Course Enrollments Modal */}
+      <CourseEnrollmentsModal
+        isOpen={isEnrollmentsModalOpen}
+        onClose={() => setIsEnrollmentsModalOpen(false)}
+      />
     </div>
   );
 }
