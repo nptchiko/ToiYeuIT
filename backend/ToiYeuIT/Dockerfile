@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY pom.xml .  
 
+RUN apk add --no-cache ca-certificates openssl
+
 COPY src ./src 
 
 COPY gen_cert.sh .
