@@ -1,4 +1,4 @@
-export default function StatCard({ icon, title, value, trend, color }) {
+export default function StatCard({ icon, title, value, color }) {
   return (
     <div className="bg-card rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-border animate-scaleIn">
       <div className="p-6">
@@ -19,7 +19,7 @@ export default function StatCard({ icon, title, value, trend, color }) {
               <h3 className="text-3xl font-bold mr-2 text-card-foreground">
                 {value}
               </h3>
-              {trend && (
+              {/* {trend && (
                 <div
                   className={`flex items-center text-sm ${
                     trend.isPositive
@@ -30,7 +30,7 @@ export default function StatCard({ icon, title, value, trend, color }) {
                   {trend.icon}
                   <span className="font-medium">{trend.value}%</span>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         </div>

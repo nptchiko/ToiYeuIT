@@ -153,7 +153,7 @@ export default function CourseDashboard() {
             icon={<Package className="h-6 w-6 text-primary" />}
             title="Total Courses"
             value={stats.totalCourses}
-            trend={{ value: "9.05%", isUp: true }}
+            trend={null}
             color="blue"
             loading={loading}
           />
@@ -161,7 +161,7 @@ export default function CourseDashboard() {
             icon={<Users className="h-6 w-6 text-[hsl(var(--chart-4))]" />}
             title="Total Students"
             value={stats.totalStudents.toLocaleString()}
-            trend={{ value: "12.3%", isUp: true }}
+            trend={null}
             color="purple"
             loading={loading}
           />
