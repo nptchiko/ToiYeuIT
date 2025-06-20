@@ -256,7 +256,7 @@ const Course = () => {
             )}
           </div>
 
-          <div className="text-sm font-medium">Email nhận hóa đơn(*)</div>
+          <div className="text-sm font-medium">Email(*)</div>
           <div className="w-full">
             <input
               type="email"
