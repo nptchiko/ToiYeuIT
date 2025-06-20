@@ -2,11 +2,13 @@ package com.example.toiyeuit.service.admin;
 
 import com.example.toiyeuit.dto.admin.CrudCourseRequest;
 import com.example.toiyeuit.dto.response.PaginationResponse;
+import com.example.toiyeuit.dto.response.admin.AdminEnrollmentResponse;
 import com.example.toiyeuit.dto.response.admin.AdminOrderCourseResponse;
 import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.mapper.CourseMapper;
 import com.example.toiyeuit.mapper.CourseOrderMapper;
 import com.example.toiyeuit.repository.CourseRepository;
+import com.example.toiyeuit.repository.EnrollmentRepository;
 import com.example.toiyeuit.repository.OrderCourseRepository;
 import com.example.toiyeuit.service.CourseService;
 import lombok.AccessLevel;
@@ -36,6 +38,7 @@ public class AdminCourseService {
     private final CourseMapper courseMapper;
     private final OrderCourseRepository orderCourseRepository;
     private final CourseOrderMapper courseOrderMapper;
+    private final EnrollmentRepository enrollmentRepository;
 
     public long getRevenue(){
         return courseRepository.retrieveEachMonthRevenue(LocalDate.now());
@@ -43,6 +46,21 @@ public class AdminCourseService {
 
     public Course saveCourse(CrudCourseRequest request){
         return courseService.addCourse(courseMapper.toCourse(request));
+    }
+
+    public List<AdminEnrollmentResponse> getEnrollment(){
+        return enrollmentRepository.findAll()
+                .stream()
+                .map(e -> {
+                    return AdminEnrollmentResponse.builder()
+                            .courseId(e.getCourse().getId())
+                            .courseTitle(e.getCourse().getTitle())
+                            .email(e.getUser().getEmail())
+                            .price(e.getCourse().getPrice())
+                            .username(e.getUser().getUsername())
+                            .build();
+                }).toList();
+
     }
 
     public Page<Course> getAll(Pageable pageable){

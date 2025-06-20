@@ -4,6 +4,7 @@ package com.example.toiyeuit.controller.admin;
 import com.example.toiyeuit.dto.admin.CrudCourseRequest;
 import com.example.toiyeuit.dto.response.ApiResponse;
 import com.example.toiyeuit.dto.response.OrderCourseResponse;
+import com.example.toiyeuit.dto.response.admin.AdminEnrollmentResponse;
 import com.example.toiyeuit.dto.response.admin.AdminOrderCourseResponse;
 import com.example.toiyeuit.entity.course.Course;
 import com.example.toiyeuit.service.admin.AdminCourseService;
@@ -109,5 +110,13 @@ public class AdminCourseController {
                     .build();
       }
 
-
+    @GetMapping("/enrollments")
+    public ApiResponse<List<AdminEnrollmentResponse>> getEnroll(){
+        var v =  courseService.getEnrollment();
+        return ApiResponse.<List<AdminEnrollmentResponse>>builder()
+                .code(200)
+                .message("Lam onnnnn")
+                .body(v)
+                .build();
+    }
 }

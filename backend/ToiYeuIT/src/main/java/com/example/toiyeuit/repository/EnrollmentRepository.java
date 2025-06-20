@@ -14,6 +14,10 @@ import java.util.List;
 @Repository
 public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
+
+    @Override
+    List<Enrollment> findAll();
+
     Boolean existsByCourseAndUser(Course course, User user);
 
     List<Enrollment> findEnrollmentByUser(User user);
